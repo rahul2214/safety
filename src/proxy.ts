@@ -1,0 +1,63 @@
+import { NextResponse, type NextRequest } from 'next/server';
+
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // ─── Server-Side Route Guards (SEC-08) ───────────────────────────────────
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    const adminSession = request.cookies.get('admin_session');
+    if (!adminSession?.value) {
+      const loginUrl = new URL('/admin/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  const publicOrgPaths = ['/org/login', '/org/register', '/org/request', '/org/request-access'];
+  if (pathname.startsWith('/org') && !publicOrgPaths.some((p) => pathname.startsWith(p))) {
+    const orgSession = request.cookies.get('org_session');
+    if (!orgSession?.value) {
+      const loginUrl = new URL('/org/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const isDev = process.env.NODE_ENV === 'development';
+  const apiOrigin = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const apiSocketOrigin = apiOrigin.replace(/^http/, 'ws');
+
+  const csp = `
+    default-src 'self';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''};
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' blob: data: https:;
+    font-src 'self' data: https://fonts.gstatic.com;
+    connect-src 'self' ${apiOrigin} ${apiSocketOrigin};
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+  `
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', csp);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set('Content-Security-Policy', csp);
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Referrer-Policy', 'no-referrer');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
+
+  return response;
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|manifest.json|icon.svg).*)'],
+};

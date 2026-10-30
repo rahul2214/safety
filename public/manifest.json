@@ -1,0 +1,17 @@
+﻿{
+  "name": "Sabhijude — Women Safety Network",
+  "short_name": "Sabhijude",
+  "description": "Rapid response safety network, emergency SOS, and discreet deterrence for women.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f7fa",
+  "theme_color": "#6d4aff",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
