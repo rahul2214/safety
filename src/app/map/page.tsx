@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, useRef, useMemo } from'react';
+import Link from'next/link';
 import {
   MapPin,
   Shield,
@@ -25,21 +25,21 @@ import {
   Users,
   Sparkles,
   SearchCode,
-} from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+} from'lucide-react';
+import { Button } from'@/components/ui/Button';
+import { Card } from'@/components/ui/Card';
 import {
   getCurrentCoordinates,
   extractCoordsFromLocationString,
   reverseGeocodeCoords,
   searchIndianLocation,
-} from '@/lib/location';
-import { api, type BackendPost } from '@/lib/api-client';
-import { getCategoryName } from '@/components/PostCard';
-import { MapItemSkeleton } from '@/components/ui/Skeleton';
+} from'@/lib/location';
+import { api, type BackendPost } from'@/lib/api-client';
+import { getCategoryName } from'@/components/PostCard';
+import { MapItemSkeleton } from'@/components/ui/Skeleton';
 
 // Leaflet CSS
-import 'leaflet/dist/leaflet.css';
+import'leaflet/dist/leaflet.css';
 
 export interface SafetyMapItem {
   id: string;
@@ -180,27 +180,27 @@ function resolveLocationCoords(
   // 1. Check if the string has explicit coordinates (e.g. Lat: 17.4486, Lon: 78.3908)
   const extracted = extractCoordsFromLocationString(locationName);
   if (extracted) {
-    return extracted;
+  return extracted;
   }
 
   // 2. Check pan-India known localities
   if (locationName) {
-    const lower = locationName.toLowerCase();
-    for (const [key, coords] of Object.entries(LOCALITY_COORDS)) {
-      if (lower.includes(key)) {
-        const jitterLat = ((postId || 1) % 7 - 3) * 0.0018;
-        const jitterLng = ((postId || 1) % 5 - 2) * 0.0018;
-        return { lat: coords.lat + jitterLat, lng: coords.lng + jitterLng };
-      }
-    }
+  const lower = locationName.toLowerCase();
+  for (const [key, coords] of Object.entries(LOCALITY_COORDS)) {
+  if (lower.includes(key)) {
+  const jitterLat = ((postId || 1) % 7 - 3) * 0.0018;
+  const jitterLng = ((postId || 1) % 5 - 2) * 0.0018;
+  return { lat: coords.lat + jitterLat, lng: coords.lng + jitterLng };
+  }
+  }
   }
 
   // 3. If user location is known, cluster reports near the user's vicinity
   if (fallbackCoords) {
-    const seed = postId || 1;
-    const offsetLat = ((seed * 13) % 40 - 20) * 0.0015;
-    const offsetLng = ((seed * 19) % 40 - 20) * 0.0015;
-    return { lat: fallbackCoords.lat + offsetLat, lng: fallbackCoords.lng + offsetLng };
+  const seed = postId || 1;
+  const offsetLat = ((seed * 13) % 40 - 20) * 0.0015;
+  const offsetLng = ((seed * 19) % 40 - 20) * 0.0015;
+  return { lat: fallbackCoords.lat + offsetLat, lng: fallbackCoords.lng + offsetLng };
   }
 
   // 4. Default to geographic center of India with deterministic offset
@@ -216,11 +216,11 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+  Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+  Math.cos((lat1 * Math.PI) / 180) *
+  Math.cos((lat2 * Math.PI) / 180) *
+  Math.sin(dLon / 2) *
+  Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -250,739 +250,739 @@ export default function SafetyMapPage() {
 
   // Fetch real nearby safety infrastructure from BFF route
   const fetchNearbyPlaces = async (lat?: number, lng?: number) => {
-    setLoadingPlaces(true);
-    try {
-      const url =
-        lat && lng
-          ? `/api/safety-places?lat=${lat}&lng=${lng}`
-          : `/api/safety-places`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.places && Array.isArray(data.places)) {
-          setSafetyPlaces(data.places);
-        }
-        if (data.locationName) {
-          setDetectedLocationName(data.locationName);
-          setLocStatus(`📍 ${data.locationName}`);
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to load dynamic nearby safety places:', err);
-    } finally {
-      setLoadingPlaces(false);
-    }
+  setLoadingPlaces(true);
+  try {
+  const url =
+  lat && lng
+  ? `/api/safety-places?lat=${lat}&lng=${lng}`
+  : `/api/safety-places`;
+  const res = await fetch(url);
+  if (res.ok) {
+  const data = await res.json();
+  if (data.places && Array.isArray(data.places)) {
+  setSafetyPlaces(data.places);
+  }
+  if (data.locationName) {
+  setDetectedLocationName(data.locationName);
+  setLocStatus(`📍 ${data.locationName}`);
+  }
+  }
+  } catch (err) {
+  console.warn('Failed to load dynamic nearby safety places:', err);
+  } finally {
+  setLoadingPlaces(false);
+  }
   };
 
   // Load live DB posts strictly from backend API
   const loadDbReports = async (userCoords?: { latitude: number; longitude: number } | null) => {
-    setLoadingDb(true);
-    try {
-      const res = await api.getFeed({ limit: 50 });
-      if (res.ok && res.data && Array.isArray(res.data)) {
-        const fallback = userCoords ? { lat: userCoords.latitude, lng: userCoords.longitude } : null;
-        const liveItems: SafetyMapItem[] = res.data.map((post: any) => {
-          const coords = resolveLocationCoords(post.location, post.id, fallback);
-          const catName = getCategoryName(post.category || post.categoryName);
-          const sevId =
-            post.postSeverityId ||
-            (post.severity === 'IMMEDIATE_DANGER' ? 4 : post.severity === 'SERIOUS' ? 3 : 2);
+  setLoadingDb(true);
+  try {
+  const res = await api.getFeed({ limit: 50 });
+  if (res.ok && res.data && Array.isArray(res.data)) {
+  const fallback = userCoords ? { lat: userCoords.latitude, lng: userCoords.longitude } : null;
+  const liveItems: SafetyMapItem[] = res.data.map((post: any) => {
+  const coords = resolveLocationCoords(post.location, post.id, fallback);
+  const catName = getCategoryName(post.category || post.categoryName);
+  const sevId =
+  post.postSeverityId ||
+  (post.severity === 'IMMEDIATE_DANGER' ? 4 : post.severity === 'SERIOUS' ? 3 : 2);
 
-          let statusColor = '#d97706'; // Concerning (amber)
-          let iconLabel = '!';
-          if (sevId === 4) {
-            statusColor = '#e11d48'; // Critical (rose)
-            iconLabel = '⚠️';
-          } else if (sevId === 3) {
-            statusColor = '#ea580c'; // Serious (orange)
-            iconLabel = '!';
-          } else if (sevId === 1) {
-            statusColor = '#059669'; // Advice needed (emerald)
-            iconLabel = 'ℹ️';
-          }
+  let statusColor = '#d97706'; // Concerning (amber)
+  let iconLabel = '!';
+  if (sevId === 4) {
+  statusColor = '#e11d48'; // Critical (rose)
+  iconLabel = '⚠️';
+  } else if (sevId === 3) {
+  statusColor = '#ea580c'; // Serious (orange)
+  iconLabel = '!';
+  } else if (sevId === 1) {
+  statusColor = '#059669'; // Advice needed (emerald)
+  iconLabel = 'ℹ️';
+  }
 
-          return {
-            id: `post-${post.id}`,
-            name: `Reported Hazard: ${catName}`,
-            category: 'INCIDENT_ZONE',
-            address: post.location || 'Approximate Safety Zone',
-            hours: 'Community Report',
-            lat: coords.lat,
-            lng: coords.lng,
-            details: post.content,
-            statusColor,
-            iconLabel,
-            isLiveDbReport: true,
-            severity: post.severity,
-            postSeverityId: sevId,
-            reportDate: post.incidentDateTime || post.createdAt,
-            supportCount: post.supportCount || 0,
-          };
-        });
-        setDbReports(liveItems);
-      }
-    } catch (err) {
-      console.warn('Failed to load live reports for safety map:', err);
-    } finally {
-      setLoadingDb(false);
-    }
+  return {
+  id: `post-${post.id}`,
+  name: `Reported Hazard: ${catName}`,
+  category: 'INCIDENT_ZONE',
+  address: post.location || 'Approximate Safety Zone',
+  hours: 'Community Report',
+  lat: coords.lat,
+  lng: coords.lng,
+  details: post.content,
+  statusColor,
+  iconLabel,
+  isLiveDbReport: true,
+  severity: post.severity,
+  postSeverityId: sevId,
+  reportDate: post.incidentDateTime || post.createdAt,
+  supportCount: post.supportCount || 0,
+  };
+  });
+  setDbReports(liveItems);
+  }
+  } catch (err) {
+  console.warn('Failed to load live reports for safety map:', err);
+  } finally {
+  setLoadingDb(false);
+  }
   };
 
   useEffect(() => {
-    loadDbReports(userLocation);
-    fetchNearbyPlaces();
+  loadDbReports(userLocation);
+  fetchNearbyPlaces();
   }, []);
 
   // Combined resources (Dynamic verified nearby hubs + DB reports)
   const allResources = useMemo(() => {
-    return [...safetyPlaces, ...dbReports];
+  return [...safetyPlaces, ...dbReports];
   }, [safetyPlaces, dbReports]);
 
   // Filtered resources sorted by distance if user location is available
   const filteredResources = useMemo(() => {
-    const list = allResources.filter((res) => {
-      // 1. Category Filter
-      if (activeFilter === 'POLICE' && res.category !== 'POLICE') return false;
-      if (activeFilter === 'HOSPITAL' && res.category !== 'HOSPITAL') return false;
-      if (activeFilter === 'SHELTER' && res.category !== 'SHELTER') return false;
-      if (activeFilter === 'INCIDENTS' && res.category !== 'INCIDENT_ZONE') return false;
-      if (activeFilter === 'ORGANIZATION' && res.category !== 'ORGANIZATION') return false;
+  const list = allResources.filter((res) => {
+  // 1. Category Filter
+  if (activeFilter === 'POLICE' && res.category !== 'POLICE') return false;
+  if (activeFilter === 'HOSPITAL' && res.category !== 'HOSPITAL') return false;
+  if (activeFilter === 'SHELTER' && res.category !== 'SHELTER') return false;
+  if (activeFilter === 'INCIDENTS' && res.category !== 'INCIDENT_ZONE') return false;
+  if (activeFilter === 'ORGANIZATION' && res.category !== 'ORGANIZATION') return false;
 
-      // 2. Search query filter
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchesName = res.name.toLowerCase().includes(q);
-        const matchesAddress = res.address.toLowerCase().includes(q);
-        const matchesDetails = res.details.toLowerCase().includes(q);
-        if (!matchesName && !matchesAddress && !matchesDetails) return false;
-      }
+  // 2. Search query filter
+  if (searchQuery.trim()) {
+  const q = searchQuery.toLowerCase().trim();
+  const matchesName = res.name.toLowerCase().includes(q);
+  const matchesAddress = res.address.toLowerCase().includes(q);
+  const matchesDetails = res.details.toLowerCase().includes(q);
+  if (!matchesName && !matchesAddress && !matchesDetails) return false;
+  }
 
-      return true;
-    });
+  return true;
+  });
 
-    if (userLocation) {
-      return list.sort((a, b) => {
-        const distA = calculateDistanceKm(userLocation.latitude, userLocation.longitude, a.lat, a.lng);
-        const distB = calculateDistanceKm(userLocation.latitude, userLocation.longitude, b.lat, b.lng);
-        return distA - distB;
-      });
-    }
+  if (userLocation) {
+  return list.sort((a, b) => {
+  const distA = calculateDistanceKm(userLocation.latitude, userLocation.longitude, a.lat, a.lng);
+  const distB = calculateDistanceKm(userLocation.latitude, userLocation.longitude, b.lat, b.lng);
+  return distA - distB;
+  });
+  }
 
-    return list;
+  return list;
   }, [allResources, activeFilter, searchQuery, userLocation]);
 
   // Initialize Leaflet Map
   useEffect(() => {
-    if (typeof window === 'undefined' || !mapContainerRef.current) return;
+  if (typeof window === 'undefined' || !mapContainerRef.current) return;
 
-    let isMounted = true;
+  let isMounted = true;
 
-    async function initMap() {
-      const L = (await import('leaflet')).default;
+  async function initMap() {
+  const L = (await import('leaflet')).default;
 
-      if (!mapContainerRef.current || !isMounted) return;
+  if (!mapContainerRef.current || !isMounted) return;
 
-      // Avoid re-initialization
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
+  // Avoid re-initialization
+  if (mapInstanceRef.current) {
+  mapInstanceRef.current.remove();
+  mapInstanceRef.current = null;
+  }
 
-      // Default center: User location or general center of India
-      const defaultCenter: [number, number] = userLocation
-        ? [userLocation.latitude, userLocation.longitude]
-        : [20.5937, 78.9629];
-      const initialZoom = userLocation ? 14 : 5;
+  // Default center: User location or general center of India
+  const defaultCenter: [number, number] = userLocation
+  ? [userLocation.latitude, userLocation.longitude]
+  : [20.5937, 78.9629];
+  const initialZoom = userLocation ? 14 : 5;
 
-      const map = L.map(mapContainerRef.current, {
-        center: defaultCenter,
-        zoom: initialZoom,
-        zoomControl: true,
-      });
+  const map = L.map(mapContainerRef.current, {
+  center: defaultCenter,
+  zoom: initialZoom,
+  zoomControl: true,
+  });
 
-      // CartoDB Voyager clean tile layer
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-        maxZoom: 19,
-      }).addTo(map);
+  // CartoDB Voyager clean tile layer
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution:
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+  maxZoom: 19,
+  }).addTo(map);
 
-      // Layer group for markers
-      const markersLayer = L.layerGroup().addTo(map);
-      markersLayerRef.current = markersLayer;
-      mapInstanceRef.current = map;
+  // Layer group for markers
+  const markersLayer = L.layerGroup().addTo(map);
+  markersLayerRef.current = markersLayer;
+  mapInstanceRef.current = map;
 
-      // Ensure proper sizing
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 250);
-    }
+  // Ensure proper sizing
+  setTimeout(() => {
+  map.invalidateSize();
+  }, 250);
+  }
 
-    initMap();
+  initMap();
 
-    return () => {
-      isMounted = false;
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
+  return () => {
+  isMounted = false;
+  if (mapInstanceRef.current) {
+  mapInstanceRef.current.remove();
+  mapInstanceRef.current = null;
+  }
+  };
   }, []);
 
   // Update Markers on Filter or Resource Change
   useEffect(() => {
-    if (!mapInstanceRef.current || !markersLayerRef.current) return;
+  if (!mapInstanceRef.current || !markersLayerRef.current) return;
 
-    async function updateMarkers() {
-      const L = (await import('leaflet')).default;
-      const markersLayer = markersLayerRef.current;
-      markersLayer.clearLayers();
+  async function updateMarkers() {
+  const L = (await import('leaflet')).default;
+  const markersLayer = markersLayerRef.current;
+  markersLayer.clearLayers();
 
-      filteredResources.forEach((res) => {
-        const isHazard = res.category === 'INCIDENT_ZONE';
+  filteredResources.forEach((res) => {
+  const isHazard = res.category === 'INCIDENT_ZONE';
 
-        // Custom HTML DivIcon
-        const iconHtml = `
-          <div style="
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background-color: ${res.statusColor};
-            color: #ffffff;
-            border-radius: 50%;
-            border: 2.5px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-            font-weight: 800;
-            font-size: 11px;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-          ">
-            ${
-              isHazard
-                ? `<span style="
-                    position: absolute;
-                    inset: -5px;
-                    border-radius: 50%;
-                    background-color: ${res.statusColor};
-                    opacity: 0.35;
-                    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-                  "></span>`
-                : ''
-            }
-            <span style="position: relative; z-index: 10;">${res.iconLabel}</span>
-          </div>
-        `;
+  // Custom HTML DivIcon
+  const iconHtml = `
+  <div style="
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: ${res.statusColor};
+  color: #ffffff;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  font-weight: 800;
+  font-size: 11px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  ">
+  ${
+  isHazard
+  ? `<span style="
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background-color: ${res.statusColor};
+  opacity: 0.35;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  "></span>`
+  : ''
+  }
+  <span style="position: relative; z-index: 10;">${res.iconLabel}</span>
+  </div>
+  `;
 
-        const customIcon = L.divIcon({
-          className: 'safecircle-map-pin',
-          html: iconHtml,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
-          popupAnchor: [0, -18],
-        });
+  const customIcon = L.divIcon({
+  className: 'safecircle-map-pin',
+  html: iconHtml,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+  popupAnchor: [0, -18],
+  });
 
-        const marker = L.marker([res.lat, res.lng], { icon: customIcon });
+  const marker = L.marker([res.lat, res.lng], { icon: customIcon });
 
-        // Popup Content
-        const popupContent = document.createElement('div');
-        popupContent.className = 'p-1 space-y-1 text-slate-900';
-        popupContent.innerHTML = `
-          <div style="font-weight: bold; font-size: 13px; color: #1e1b4b;">${res.name}</div>
-          <div style="font-size: 11px; color: #64748b;">${res.address}</div>
-          <div style="font-size: 11px; color: #334155; margin-top: 4px; max-height: 80px; overflow-y: auto;">${res.details}</div>
-          ${
-            res.phone
-              ? `<a href="tel:${res.phone}" style="display: inline-block; margin-top: 6px; padding: 4px 10px; background-color: #6d4aff; color: white; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none;">Call ${res.phone}</a>`
-              : ''
-          }
-        `;
+  // Popup Content
+  const popupContent = document.createElement('div');
+  popupContent.className = 'p-1 space-y-1 text-slate-900';
+  popupContent.innerHTML = `
+  <div style="font-weight: bold; font-size: 13px; color: #1e1b4b;">${res.name}</div>
+  <div style="font-size: 11px; color: #64748b;">${res.address}</div>
+  <div style="font-size: 11px; color: #334155; margin-top: 4px; max-height: 80px; overflow-y: auto;">${res.details}</div>
+  ${
+  res.phone
+  ? `<a href="tel:${res.phone}"style="display: inline-block; margin-top: 6px; padding: 4px 10px; background-color: #6d4aff; color: white; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none;">Call ${res.phone}</a>`
+  : ''
+  }
+  `;
 
-        marker.bindPopup(popupContent);
+  marker.bindPopup(popupContent);
 
-        marker.on('click', () => {
-          setSelectedPin(res);
-        });
+  marker.on('click', () => {
+  setSelectedPin(res);
+  });
 
-        markersLayer.addLayer(marker);
-      });
-    }
+  markersLayer.addLayer(marker);
+  });
+  }
 
-    updateMarkers();
+  updateMarkers();
   }, [filteredResources]);
 
   // Update User Location Marker
   useEffect(() => {
-    if (!mapInstanceRef.current || !userLocation) return;
+  if (!mapInstanceRef.current || !userLocation) return;
 
-    async function updateUserMarker() {
-      const loc = userLocation;
-      if (!loc) return;
+  async function updateUserMarker() {
+  const loc = userLocation;
+  if (!loc) return;
 
-      const L = (await import('leaflet')).default;
-      const map = mapInstanceRef.current;
-      if (!map) return;
+  const L = (await import('leaflet')).default;
+  const map = mapInstanceRef.current;
+  if (!map) return;
 
-      if (userMarkerRef.current) {
-        userMarkerRef.current.remove();
-      }
+  if (userMarkerRef.current) {
+  userMarkerRef.current.remove();
+  }
 
-      const userIconHtml = `
-        <div style="position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;">
-          <span style="position: absolute; inset: 0; border-radius: 50%; background: #3b82f6; opacity: 0.4; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
-          <span style="position: relative; width: 14px; height: 14px; border-radius: 50%; background: #2563eb; border: 2.5px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.35);"></span>
-        </div>
-      `;
+  const userIconHtml = `
+  <div style="position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;">
+  <span style="position: absolute; inset: 0; border-radius: 50%; background: #3b82f6; opacity: 0.4; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+  <span style="position: relative; width: 14px; height: 14px; border-radius: 50%; background: #2563eb; border: 2.5px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.35);"></span>
+  </div>
+  `;
 
-      const userIcon = L.divIcon({
-        className: 'user-radar-pin',
-        html: userIconHtml,
-        iconSize: [26, 26],
-        iconAnchor: [13, 13],
-      });
+  const userIcon = L.divIcon({
+  className: 'user-radar-pin',
+  html: userIconHtml,
+  iconSize: [26, 26],
+  iconAnchor: [13, 13],
+  });
 
-      const marker = L.marker([loc.latitude, loc.longitude], {
-        icon: userIcon,
-        zIndexOffset: 1000,
-      }).addTo(map);
+  const marker = L.marker([loc.latitude, loc.longitude], {
+  icon: userIcon,
+  zIndexOffset: 1000,
+  }).addTo(map);
 
-      marker.bindPopup('<b>Your Current Location</b><br/>GPS Verified Radar');
-      userMarkerRef.current = marker;
-    }
+  marker.bindPopup('<b>Your Current Location</b><br/>GPS Verified Radar');
+  userMarkerRef.current = marker;
+  }
 
-    updateUserMarker();
+  updateUserMarker();
   }, [userLocation]);
 
   // Auto-locate GPS handler (Dynamic for all of India)
   const handleLocateMe = async () => {
-    setLocLoading(true);
-    setLocStatus('Acquiring high-precision GPS...');
-    try {
-      const coords = await getCurrentCoordinates();
-      setUserLocation({ latitude: coords.latitude, longitude: coords.longitude });
+  setLocLoading(true);
+  setLocStatus('Acquiring high-precision GPS...');
+  try {
+  const coords = await getCurrentCoordinates();
+  setUserLocation({ latitude: coords.latitude, longitude: coords.longitude });
 
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.flyTo([coords.latitude, coords.longitude], 14, {
-          duration: 1.5,
-        });
-      }
+  if (mapInstanceRef.current) {
+  mapInstanceRef.current.flyTo([coords.latitude, coords.longitude], 14, {
+  duration: 1.5,
+  });
+  }
 
-      // Fetch dynamic nearby police stations, hospitals, and reverse geocode
-      await fetchNearbyPlaces(coords.latitude, coords.longitude);
-      await loadDbReports(coords);
-    } catch (e: any) {
-      setLocStatus('GPS permission needed. Enter your city or area to locate safety points.');
-    } finally {
-      setLocLoading(false);
-    }
+  // Fetch dynamic nearby police stations, hospitals, and reverse geocode
+  await fetchNearbyPlaces(coords.latitude, coords.longitude);
+  await loadDbReports(coords);
+  } catch (e: any) {
+  setLocStatus('GPS permission needed. Enter your city or area to locate safety points.');
+  } finally {
+  setLocLoading(false);
+  }
   };
 
   // Search Indian City or Area
   const handleSearchIndianCity = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!searchQuery.trim()) return;
+  if (e) e.preventDefault();
+  if (!searchQuery.trim()) return;
 
-    setIsSearchingCity(true);
-    try {
-      const geoResult = await searchIndianLocation(searchQuery.trim());
-      if (geoResult) {
-        setUserLocation({ latitude: geoResult.lat, longitude: geoResult.lng });
-        setDetectedLocationName(geoResult.displayName.split(',')[0]);
-        setLocStatus(`📍 ${geoResult.displayName.split(',').slice(0, 3).join(', ')}`);
+  setIsSearchingCity(true);
+  try {
+  const geoResult = await searchIndianLocation(searchQuery.trim());
+  if (geoResult) {
+  setUserLocation({ latitude: geoResult.lat, longitude: geoResult.lng });
+  setDetectedLocationName(geoResult.displayName.split(',')[0]);
+  setLocStatus(`📍 ${geoResult.displayName.split(',').slice(0, 3).join(', ')}`);
 
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.flyTo([geoResult.lat, geoResult.lng], 14, {
-            duration: 1.5,
-          });
-        }
+  if (mapInstanceRef.current) {
+  mapInstanceRef.current.flyTo([geoResult.lat, geoResult.lng], 14, {
+  duration: 1.5,
+  });
+  }
 
-        await fetchNearbyPlaces(geoResult.lat, geoResult.lng);
-        await loadDbReports({ latitude: geoResult.lat, longitude: geoResult.lng });
-      }
-    } catch (err) {
-      console.warn('City geocoding search failed:', err);
-    } finally {
-      setIsSearchingCity(false);
-    }
+  await fetchNearbyPlaces(geoResult.lat, geoResult.lng);
+  await loadDbReports({ latitude: geoResult.lat, longitude: geoResult.lng });
+  }
+  } catch (err) {
+  console.warn('City geocoding search failed:', err);
+  } finally {
+  setIsSearchingCity(false);
+  }
   };
 
   useEffect(() => {
-    handleLocateMe();
+  handleLocateMe();
   }, []);
 
   // Fly to Pin on click
   const focusOnPin = (res: SafetyMapItem) => {
-    setSelectedPin(res);
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo([res.lat, res.lng], 16, {
-        duration: 1.2,
-      });
-    }
+  setSelectedPin(res);
+  if (mapInstanceRef.current) {
+  mapInstanceRef.current.flyTo([res.lat, res.lng], 16, {
+  duration: 1.2,
+  });
+  }
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 pb-16">
-      {/* ============================================================ */}
-      {/* 1. TOP HEADER & EMERGENCY ACTIONS                            */}
-      {/* ============================================================ */}
-      <section className="bg-white dark:bg-[#141420] rounded-[24px] border border-[#e8e8f0] dark:border-[#26263a] p-5 sm:p-6 shadow-sm space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#fdeef6] text-[#e11d48] text-xs font-bold">
-              <Compass className="h-3.5 w-3.5 animate-spin-slow" />
-              <span className="uppercase tracking-wider">PAN-INDIA HYPERLOCAL SAFETY RADAR</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#16161d] dark:text-[#f4f4f8] tracking-tight">
-              Interactive Safety &amp; Emergency Map
-            </h1>
-            <p className="text-xs sm:text-[13px] text-[#5b5b6e] dark:text-[#a6a6be] max-w-2xl leading-relaxed">
-              Explore real-time verified police stations, 24/7 trauma hospitals, women safety desks, and live incident hazards near your location across India.
-            </p>
-          </div>
+  <div className="max-w-7xl mx-auto space-y-5 pb-16">
+  {/* ============================================================ */}
+  {/* 1. TOP HEADER & EMERGENCY ACTIONS */}
+  {/* ============================================================ */}
+  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-5 sm:p-6 shadow-sm space-y-4">
+  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div className="space-y-1">
+  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#fdeef6] text-[#e11d48] text-xs font-bold">
+  <Compass className="h-3.5 w-3.5 animate-spin-slow" />
+  <span className="uppercase tracking-wider">PAN-INDIA HYPERLOCAL SAFETY RADAR</span>
+  </div>
+  <h1 className="text-2xl sm:text-3xl font-black text-[#16161d] tracking-tight">
+  Interactive Safety &amp; Emergency Map
+  </h1>
+  <p className="text-xs sm:text-[13px] text-[#5b5b6e] max-w-2xl leading-relaxed">
+  Explore real-time verified police stations, 24/7 trauma hospitals, women safety desks, and live incident hazards near your location across India.
+  </p>
+  </div>
 
-          {/* Quick Actions */}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLocateMe}
-              loading={locLoading}
-              className="rounded-[12px] border-[#e8e8f0] dark:border-[#26263a] text-xs font-bold"
-            >
-              <Compass className="h-3.5 w-3.5 mr-1.5 text-[#6d4aff]" />
-              <span>{userLocation ? 'Re-center GPS' : 'Locate Me'}</span>
-            </Button>
+  {/* Quick Actions */}
+  <div className="flex flex-wrap items-center gap-2 shrink-0">
+  <Button
+  variant="outline"
+  size="sm"
+  onClick={handleLocateMe}
+  loading={locLoading}
+  className="rounded-[12px] border-[#e8e8f0] text-xs font-bold"
+  >
+  <Compass className="h-3.5 w-3.5 mr-1.5 text-[#6d4aff]" />
+  <span>{userLocation ? 'Re-center GPS' : 'Locate Me'}</span>
+  </Button>
 
-            <a
-              href="tel:112"
-              className="px-3.5 py-2 rounded-[12px] bg-[#fef2f2] hover:bg-[#fee2e2] text-[#e11d48] text-xs font-bold transition flex items-center gap-1.5"
-            >
-              <Phone className="h-3.5 w-3.5" />
-              <span>112 ERSS Police</span>
-            </a>
+  <a
+  href="tel:112"
+  className="px-3.5 py-2 rounded-[12px] bg-[#fef2f2] hover:bg-[#fee2e2] text-[#e11d48] text-xs font-bold transition flex items-center gap-1.5"
+  >
+  <Phone className="h-3.5 w-3.5" />
+  <span>112 ERSS Police</span>
+  </a>
 
-            <a
-              href="tel:1091"
-              className="px-3.5 py-2 rounded-[12px] bg-[#f1edff] hover:bg-[#e6deff] text-[#6d4aff] text-xs font-bold transition flex items-center gap-1.5"
-            >
-              <Phone className="h-3.5 w-3.5" />
-              <span>1091 Women Helpline</span>
-            </a>
+  <a
+  href="tel:1091"
+  className="px-3.5 py-2 rounded-[12px] bg-[#f1edff] hover:bg-[#e6deff] text-[#6d4aff] text-xs font-bold transition flex items-center gap-1.5"
+  >
+  <Phone className="h-3.5 w-3.5" />
+  <span>1091 Women Helpline</span>
+  </a>
 
-            <Link href="/report">
-              <Button
-                variant="primary"
-                size="sm"
-                className="rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-xs font-bold shadow-sm shadow-[#6d4aff]/30"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                <span>Report Hazard</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
+  <Link href="/report">
+  <Button
+  variant="primary"
+  size="sm"
+  className="rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-xs font-bold shadow-sm shadow-[#6d4aff]/30"
+  >
+  <Plus className="h-4 w-4 mr-1" />
+  <span>Report Hazard</span>
+  </Button>
+  </Link>
+  </div>
+  </div>
 
-        {/* Status Callout Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e8e8f0] dark:border-[#26263a] text-xs">
-          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-            <Lock className="h-3.5 w-3.5 text-[#6d4aff] shrink-0" />
-            <span className="text-[11.5px]">
-              <strong>Privacy Protection:</strong> Sensitive incident coordinates are aggregated into 250m safe privacy zones to protect reporter anonymity across all Indian regions.
-            </span>
-          </div>
+  {/* Status Callout Bar */}
+  <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e8e8f0] text-xs">
+  <div className="flex items-center gap-2 text-slate-600">
+  <Lock className="h-3.5 w-3.5 text-[#6d4aff] shrink-0" />
+  <span className="text-[11.5px]">
+  <strong>Privacy Protection:</strong> Sensitive incident coordinates are aggregated into 250m safe privacy zones to protect reporter anonymity across all Indian regions.
+  </span>
+  </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => {
-                loadDbReports(userLocation);
-                if (userLocation) fetchNearbyPlaces(userLocation.latitude, userLocation.longitude);
-                if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize();
-              }}
-              disabled={loadingDb || loadingPlaces}
-              className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#6d4aff] hover:underline"
-            >
-              <RefreshCw className={`h-3 w-3 ${loadingDb || loadingPlaces ? 'animate-spin' : ''}`} />
-              <span>Refresh Nearby Infrastructure ({allResources.length})</span>
-            </button>
-            <span className="text-slate-400">|</span>
-            <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Pan-India Live Radar
-            </span>
-          </div>
-        </div>
-      </section>
+  <div className="flex items-center gap-3 shrink-0">
+  <button
+  onClick={() => {
+  loadDbReports(userLocation);
+  if (userLocation) fetchNearbyPlaces(userLocation.latitude, userLocation.longitude);
+  if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize();
+  }}
+  disabled={loadingDb || loadingPlaces}
+  className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#6d4aff] hover:underline"
+  >
+  <RefreshCw className={`h-3 w-3 ${loadingDb || loadingPlaces ? 'animate-spin' : ''}`} />
+  <span>Refresh Nearby Infrastructure ({allResources.length})</span>
+  </button>
+  <span className="text-slate-400">|</span>
+  <span className="text-[11px] font-medium text-emerald-600 flex items-center gap-1">
+  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+  Pan-India Live Radar
+  </span>
+  </div>
+  </div>
+  </section>
 
-      {/* ============================================================ */}
-      {/* 2. SEARCH & FILTER TABS BAR                                  */}
-      {/* ============================================================ */}
-      <section className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Search Input with City/Locality Navigation */}
-        <form onSubmit={handleSearchIndianCity} className="relative flex-1 max-w-md flex items-center gap-1.5">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86869e]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Indian city, locality, police, or hospital..."
-              className="w-full pl-10 pr-4 py-2 rounded-[14px] bg-white dark:bg-[#141420] border border-[#e8e8f0] dark:border-[#26263a] text-xs text-[#16161d] dark:text-white placeholder-[#86869e] focus:outline-hidden focus:border-[#6d4aff] transition shadow-2xs"
-            />
-          </div>
-          <Button
-            type="submit"
-            variant="outline"
-            size="sm"
-            loading={isSearchingCity}
-            className="rounded-[12px] border-[#e8e8f0] dark:border-[#26263a] text-xs font-bold shrink-0"
-          >
-            Locate City
-          </Button>
-        </form>
+  {/* ============================================================ */}
+  {/* 2. SEARCH & FILTER TABS BAR */}
+  {/* ============================================================ */}
+  <section className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+  {/* Search Input with City/Locality Navigation */}
+  <form onSubmit={handleSearchIndianCity} className="relative flex-1 max-w-md flex items-center gap-1.5">
+  <div className="relative flex-1">
+  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86869e]" />
+  <input
+  type="text"
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  placeholder="Search Indian city, locality, police, or hospital..."
+  className="w-full pl-10 pr-4 py-2 rounded-[14px] bg-white border border-[#e8e8f0] text-xs text-[#16161d] placeholder-[#86869e] focus:outline-hidden focus:border-[#6d4aff] transition shadow-2xs"
+  />
+  </div>
+  <Button
+  type="submit"
+  variant="outline"
+  size="sm"
+  loading={isSearchingCity}
+  className="rounded-[12px] border-[#e8e8f0] text-xs font-bold shrink-0"
+  >
+  Locate City
+  </Button>
+  </form>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
-          {[
-            { id: 'ALL', label: `All Nearby (${allResources.length})` },
-            { id: 'POLICE', label: 'Police & Safety Desks' },
-            { id: 'HOSPITAL', label: 'Trauma & Hospitals' },
-            { id: 'INCIDENTS', label: `Live Reports (${dbReports.length})` },
-            { id: 'SHELTER', label: 'Safe Shelters & Transit' },
-            { id: 'ORGANIZATION', label: 'Crisis Centers (181)' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-[12px] whitespace-nowrap font-bold transition text-xs ${
-                activeFilter === tab.id
-                  ? 'bg-[#6d4aff] text-white shadow-xs shadow-[#6d4aff]/30'
-                  : 'bg-white dark:bg-[#141420] border border-[#e8e8f0] dark:border-[#26263a] text-slate-600 dark:text-slate-300 hover:bg-[#f7f7fa]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </section>
+  {/* Filter Tabs */}
+  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+  {[
+  { id: 'ALL', label: `All Nearby (${allResources.length})` },
+  { id: 'POLICE', label: 'Police & Safety Desks' },
+  { id: 'HOSPITAL', label: 'Trauma & Hospitals' },
+  { id: 'INCIDENTS', label: `Live Reports (${dbReports.length})` },
+  { id: 'SHELTER', label: 'Safe Shelters & Transit' },
+  { id: 'ORGANIZATION', label: 'Crisis Centers (181)' },
+  ].map((tab) => (
+  <button
+  key={tab.id}
+  type="button"
+  onClick={() => setActiveFilter(tab.id)}
+  className={`px-3 py-1.5 rounded-[12px] whitespace-nowrap font-bold transition text-xs ${
+  activeFilter === tab.id
+  ? 'bg-[#6d4aff] text-white shadow-xs shadow-[#6d4aff]/30'
+  : 'bg-white border border-[#e8e8f0] text-slate-600 hover:bg-[#f7f7fa]'
+  }`}
+  >
+  {tab.label}
+  </button>
+  ))}
+  </div>
+  </section>
 
-      {/* ============================================================ */}
-      {/* 3. INTERACTIVE MAP + DIRECTORY SIDEBAR LAYOUT                */}
-      {/* ============================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* Real Leaflet Map Canvas (8 cols) */}
-        <div className="lg:col-span-8 space-y-3">
-          <Card className="p-0 overflow-hidden border-[#e8e8f0] dark:border-[#26263a] relative rounded-[24px] shadow-sm">
-            {/* Map Canvas Mount Point */}
-            <div
-              ref={mapContainerRef}
-              className="w-full h-[520px] sm:h-[600px] z-10 bg-slate-100 dark:bg-slate-900"
-            />
+  {/* ============================================================ */}
+  {/* 3. INTERACTIVE MAP + DIRECTORY SIDEBAR LAYOUT */}
+  {/* ============================================================ */}
+  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+  {/* Real Leaflet Map Canvas (8 cols) */}
+  <div className="lg:col-span-8 space-y-3">
+  <Card className="p-0 overflow-hidden border-[#e8e8f0] relative rounded-[24px] shadow-sm">
+  {/* Map Canvas Mount Point */}
+  <div
+  ref={mapContainerRef}
+  className="w-full h-[520px] sm:h-[600px] z-10 bg-slate-100"
+  />
 
-            {/* GPS Status Floating Badge */}
-            <div className="absolute bottom-3 left-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 dark:bg-[#141420]/90 backdrop-blur-md text-[11px] font-bold text-slate-800 dark:text-slate-200 border border-[#e8e8f0] dark:border-[#26263a] shadow-md flex items-center gap-1.5 max-w-[80%] truncate">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
-              <span className="truncate">{detectedLocationName ? `Near ${detectedLocationName}` : locStatus || 'India (Pan-India Safety Radar)'}</span>
-            </div>
+  {/* GPS Status Floating Badge */}
+  <div className="absolute bottom-3 left-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 backdrop-blur-md text-[11px] font-bold text-slate-800 border border-[#e8e8f0] shadow-md flex items-center gap-1.5 max-w-[80%] truncate">
+  <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
+  <span className="truncate">{detectedLocationName ? `Near ${detectedLocationName}` : locStatus || 'India (Pan-India Safety Radar)'}</span>
+  </div>
 
-            {/* Live Count Floating Pill */}
-            <div className="absolute top-3 right-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 dark:bg-[#141420]/90 backdrop-blur-md text-[11px] font-bold text-slate-800 dark:text-slate-200 border border-[#e8e8f0] dark:border-[#26263a] shadow-md">
-              Showing <strong>{filteredResources.length}</strong> active markers
-            </div>
-          </Card>
+  {/* Live Count Floating Pill */}
+  <div className="absolute top-3 right-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 backdrop-blur-md text-[11px] font-bold text-slate-800 border border-[#e8e8f0] shadow-md">
+  Showing <strong>{filteredResources.length}</strong> active markers
+  </div>
+  </Card>
 
-          {/* Map Color Legend */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-white dark:bg-[#141420] border border-[#e8e8f0] dark:border-[#26263a] rounded-[18px] text-xs text-slate-600 dark:text-slate-300 shadow-2xs">
-            <div className="flex items-center gap-1.5 font-medium">
-              <span className="w-3 h-3 rounded-full bg-[#1d4ed8] inline-block shadow-2xs" />
-              <span>Police &amp; Women Desks (P)</span>
-            </div>
-            <div className="flex items-center gap-1.5 font-medium">
-              <span className="w-3 h-3 rounded-full bg-[#059669] inline-block shadow-2xs" />
-              <span>24/7 Trauma Hospitals (H)</span>
-            </div>
-            <div className="flex items-center gap-1.5 font-medium">
-              <span className="w-3 h-3 rounded-full bg-[#0891b2] inline-block shadow-2xs" />
-              <span>Transit Safe Kiosks (S)</span>
-            </div>
-            <div className="flex items-center gap-1.5 font-medium">
-              <span className="w-3 h-3 rounded-full bg-[#e11d48] inline-block shadow-2xs" />
-              <span>Reported Hazards (!)</span>
-            </div>
-            <div className="flex items-center gap-1.5 font-medium">
-              <span className="w-3 h-3 rounded-full bg-[#7c3aed] inline-block shadow-2xs" />
-              <span>Crisis Support (O)</span>
-            </div>
-          </div>
-        </div>
+  {/* Map Color Legend */}
+  <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-white border border-[#e8e8f0] rounded-[18px] text-xs text-slate-600 shadow-2xs">
+  <div className="flex items-center gap-1.5 font-medium">
+  <span className="w-3 h-3 rounded-full bg-[#1d4ed8] inline-block shadow-2xs" />
+  <span>Police &amp; Women Desks (P)</span>
+  </div>
+  <div className="flex items-center gap-1.5 font-medium">
+  <span className="w-3 h-3 rounded-full bg-[#059669] inline-block shadow-2xs" />
+  <span>24/7 Trauma Hospitals (H)</span>
+  </div>
+  <div className="flex items-center gap-1.5 font-medium">
+  <span className="w-3 h-3 rounded-full bg-[#0891b2] inline-block shadow-2xs" />
+  <span>Transit Safe Kiosks (S)</span>
+  </div>
+  <div className="flex items-center gap-1.5 font-medium">
+  <span className="w-3 h-3 rounded-full bg-[#e11d48] inline-block shadow-2xs" />
+  <span>Reported Hazards (!)</span>
+  </div>
+  <div className="flex items-center gap-1.5 font-medium">
+  <span className="w-3 h-3 rounded-full bg-[#7c3aed] inline-block shadow-2xs" />
+  <span>Crisis Support (O)</span>
+  </div>
+  </div>
+  </div>
 
-        {/* Selected Pin & Resource Directory Sidebar (4 cols) */}
-        <div className="lg:col-span-4 space-y-4">
-          {/* 1. Selected Pin Focus Card */}
-          {selectedPin ? (
-            <Card className="p-4 sm:p-5 border-[#6d4aff]/40 bg-white dark:bg-[#181826] rounded-[22px] space-y-3.5 shadow-md animate-in fade-in zoom-in-95 duration-200">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <span
-                    className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block shadow-2xs"
-                    style={{ backgroundColor: selectedPin.statusColor }}
-                  >
-                    {selectedPin.category.replace('_', ' ')}
-                  </span>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">
-                    {selectedPin.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-rose-500 shrink-0" />
-                    <span>{selectedPin.address}</span>
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedPin(null)}
-                  className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs font-bold transition"
-                >
-                  ✕
-                </button>
-              </div>
+  {/* Selected Pin & Resource Directory Sidebar (4 cols) */}
+  <div className="lg:col-span-4 space-y-4">
+  {/* 1. Selected Pin Focus Card */}
+  {selectedPin ? (
+  <Card className="p-4 sm:p-5 border-[#6d4aff]/40 bg-white rounded-[22px] space-y-3.5 shadow-md animate-in fade-in zoom-in-95 duration-200">
+  <div className="flex items-start justify-between gap-2">
+  <div>
+  <span
+  className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white inline-block shadow-2xs"
+  style={{ backgroundColor: selectedPin.statusColor }}
+  >
+  {selectedPin.category.replace('_', ' ')}
+  </span>
+  <h3 className="text-sm font-bold text-slate-900 mt-1.5">
+  {selectedPin.name}
+  </h3>
+  <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+  <MapPin className="h-3 w-3 text-rose-500 shrink-0" />
+  <span>{selectedPin.address}</span>
+  </p>
+  </div>
+  <button
+  onClick={() => setSelectedPin(null)}
+  className="w-7 h-7 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs font-bold transition"
+  >
+  ✕
+  </button>
+  </div>
 
-              {/* Description / Content */}
-              <div className="p-3 rounded-[14px] bg-white dark:bg-[#141420] border border-[#e8e8f0] dark:border-[#26263a] text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
-                {selectedPin.details}
-              </div>
+  {/* Description / Content */}
+  <div className="p-3 rounded-[14px] bg-white border border-[#e8e8f0] text-xs text-slate-700 leading-relaxed">
+  {selectedPin.details}
+  </div>
 
-              {/* Meta details */}
-              <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-slate-400" />
-                  <span>{selectedPin.hours}</span>
-                </span>
-                {userLocation && (
-                  <span className="font-bold text-[#6d4aff]">
-                    {calculateDistanceKm(
-                      userLocation.latitude,
-                      userLocation.longitude,
-                      selectedPin.lat,
-                      selectedPin.lng
-                    ).toFixed(1)}{' '}
-                    km away
-                  </span>
-                )}
-              </div>
+  {/* Meta details */}
+  <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+  <span className="flex items-center gap-1">
+  <Clock className="h-3.5 w-3.5 text-slate-400" />
+  <span>{selectedPin.hours}</span>
+  </span>
+  {userLocation && (
+  <span className="font-bold text-[#6d4aff]">
+  {calculateDistanceKm(
+  userLocation.latitude,
+  userLocation.longitude,
+  selectedPin.lat,
+  selectedPin.lng
+  ).toFixed(1)}{' '}
+  km away
+  </span>
+  )}
+  </div>
 
-              {/* Action Buttons */}
-              <div className="pt-2 flex flex-col gap-2">
-                {selectedPin.phone && (
-                  <a
-                    href={`tel:${selectedPin.phone}`}
-                    className="w-full py-2.5 px-3 rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-[#6d4aff]/30"
-                  >
-                    <Phone className="h-3.5 w-3.5" />
-                    <span>Call Helpline ({selectedPin.phone})</span>
-                  </a>
-                )}
+  {/* Action Buttons */}
+  <div className="pt-2 flex flex-col gap-2">
+  {selectedPin.phone && (
+  <a
+  href={`tel:${selectedPin.phone}`}
+  className="w-full py-2.5 px-3 rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-[#6d4aff]/30"
+  >
+  <Phone className="h-3.5 w-3.5" />
+  <span>Call Helpline ({selectedPin.phone})</span>
+  </a>
+  )}
 
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPin.lat},${selectedPin.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2 px-3 rounded-[12px] bg-white dark:bg-[#1d1d2c] border border-[#e8e8f0] dark:border-[#26263a] hover:bg-slate-50 text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5"
-                >
-                  <Navigation className="h-3.5 w-3.5 text-[#6d4aff]" />
-                  <span>Get Directions in Google Maps</span>
-                  <ExternalLink className="h-3 w-3 opacity-60 ml-0.5" />
-                </a>
-              </div>
-            </Card>
-          ) : (
-            <div className="p-6 rounded-[22px] border border-dashed border-[#e8e8f0] dark:border-[#26263a] bg-white dark:bg-[#141420] text-center space-y-2 text-xs text-slate-500 shadow-2xs">
-              <div className="w-10 h-10 rounded-full bg-[#f1edff] text-[#6d4aff] flex items-center justify-center mx-auto">
-                <MapPin className="h-5 w-5" />
-              </div>
-              <p className="font-bold text-slate-900 dark:text-white">Click any point on the map</p>
-              <p className="text-[11.5px] leading-relaxed max-w-xs mx-auto">
-                Select any verified police post, trauma hospital, or community hazard pin to view navigation, details, and direct helpline numbers.
-              </p>
-            </div>
-          )}
+  <a
+  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPin.lat},${selectedPin.lng}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="w-full py-2 px-3 rounded-[12px] bg-white border border-[#e8e8f0] hover:bg-slate-50 text-slate-800 text-xs font-bold transition flex items-center justify-center gap-1.5"
+  >
+  <Navigation className="h-3.5 w-3.5 text-[#6d4aff]" />
+  <span>Get Directions in Google Maps</span>
+  <ExternalLink className="h-3 w-3 opacity-60 ml-0.5" />
+  </a>
+  </div>
+  </Card>
+  ) : (
+  <div className="p-6 rounded-[22px] border border-dashed border-[#e8e8f0] bg-white text-center space-y-2 text-xs text-slate-500 shadow-2xs">
+  <div className="w-10 h-10 rounded-full bg-[#f1edff] text-[#6d4aff] flex items-center justify-center mx-auto">
+  <MapPin className="h-5 w-5" />
+  </div>
+  <p className="font-bold text-slate-900">Click any point on the map</p>
+  <p className="text-[11.5px] leading-relaxed max-w-xs mx-auto">
+  Select any verified police post, trauma hospital, or community hazard pin to view navigation, details, and direct helpline numbers.
+  </p>
+  </div>
+  )}
 
-          {/* 2. Scrollable Directory List */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider px-1">
-              <span>Nearby Safety Points ({filteredResources.length})</span>
-              {userLocation && <span className="text-[11px] text-[#6d4aff] font-semibold">Sorted by Distance</span>}
-            </div>
+  {/* 2. Scrollable Directory List */}
+  <div className="space-y-2.5">
+  <div className="flex items-center justify-between text-xs font-bold text-slate-900 uppercase tracking-wider px-1">
+  <span>Nearby Safety Points ({filteredResources.length})</span>
+  {userLocation && <span className="text-[11px] text-[#6d4aff] font-semibold">Sorted by Distance</span>}
+  </div>
 
-            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
-              {(loadingDb || loadingPlaces) && filteredResources.length === 0 ? (
-                <>
-                  <MapItemSkeleton />
-                  <MapItemSkeleton />
-                  <MapItemSkeleton />
-                  <MapItemSkeleton />
-                </>
-              ) : filteredResources.length === 0 ? (
-                <div className="p-6 text-center text-xs text-slate-500 bg-white dark:bg-[#141420] rounded-[16px] border border-dashed border-[#e8e8f0] dark:border-[#26263a]">
-                  No safety points found matching your criteria.
-                </div>
-              ) : (
-                filteredResources.map((res) => {
-                const isSelected = selectedPin?.id === res.id;
-                const distance = userLocation
-                  ? calculateDistanceKm(
-                      userLocation.latitude,
-                      userLocation.longitude,
-                      res.lat,
-                      res.lng
-                    ).toFixed(1) + ' km'
-                  : null;
+  <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+  {(loadingDb || loadingPlaces) && filteredResources.length === 0 ? (
+  <>
+  <MapItemSkeleton />
+  <MapItemSkeleton />
+  <MapItemSkeleton />
+  <MapItemSkeleton />
+  </>
+  ) : filteredResources.length === 0 ? (
+  <div className="p-6 text-center text-xs text-slate-500 bg-white rounded-[16px] border border-dashed border-[#e8e8f0]">
+  No safety points found matching your criteria.
+  </div>
+  ) : (
+  filteredResources.map((res) => {
+  const isSelected = selectedPin?.id === res.id;
+  const distance = userLocation
+  ? calculateDistanceKm(
+  userLocation.latitude,
+  userLocation.longitude,
+  res.lat,
+  res.lng
+  ).toFixed(1) + 'km'
+  : null;
 
-                return (
-                  <div
-                    key={res.id}
-                    onClick={() => focusOnPin(res)}
-                    className={`p-3 rounded-[16px] border text-left cursor-pointer transition-all ${
-                      isSelected
-                        ? 'border-[#6d4aff] bg-[#f1edff]/40 dark:bg-[#251e44] shadow-xs'
-                        : 'border-[#e8e8f0] dark:border-[#26263a] bg-white dark:bg-[#141420] hover:border-[#6d4aff]/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 truncate">
-                        <span
-                          className="w-2 h-2 rounded-full shrink-0"
-                          style={{ backgroundColor: res.statusColor }}
-                        />
-                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                          {res.name}
-                        </p>
-                      </div>
-                      {distance && (
-                        <span className="text-[11px] font-bold text-[#6d4aff] shrink-0">
-                          {distance}
-                        </span>
-                      )}
-                    </div>
+  return (
+  <div
+  key={res.id}
+  onClick={() => focusOnPin(res)}
+  className={`p-3 rounded-[16px] border text-left cursor-pointer transition-all ${
+  isSelected
+  ? 'border-[#6d4aff] bg-[#f1edff]/40 shadow-xs'
+  : 'border-[#e8e8f0] bg-white hover:border-[#6d4aff]/40'
+  }`}
+  >
+  <div className="flex items-center justify-between gap-2">
+  <div className="flex items-center gap-1.5 truncate">
+  <span
+  className="w-2 h-2 rounded-full shrink-0"
+  style={{ backgroundColor: res.statusColor }}
+  />
+  <p className="text-xs font-bold text-slate-900 truncate">
+  {res.name}
+  </p>
+  </div>
+  {distance && (
+  <span className="text-[11px] font-bold text-[#6d4aff] shrink-0">
+  {distance}
+  </span>
+  )}
+  </div>
 
-                    <p className="text-[11px] text-slate-500 truncate mt-1 pl-3.5">
-                      {res.address}
-                    </p>
+  <p className="text-[11px] text-slate-500 truncate mt-1 pl-3.5">
+  {res.address}
+  </p>
 
-                    <div className="flex items-center justify-between text-[10.5px] text-slate-400 mt-2 pl-3.5">
-                      <span>{res.hours}</span>
-                      {res.phone && (
-                        <span className="text-[#6d4aff] font-bold">Dial {res.phone}</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div className="flex items-center justify-between text-[10.5px] text-slate-400 mt-2 pl-3.5">
+  <span>{res.hours}</span>
+  {res.phone && (
+  <span className="text-[#6d4aff] font-bold">Dial {res.phone}</span>
+  )}
+  </div>
+  </div>
+  );
+  })
+  )}
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
   );
 }

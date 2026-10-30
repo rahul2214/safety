@@ -1,7 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
+/* Force light theme across entire platform and disable dark variant */
+@variant dark (&:where(.never-match-dark));
+
 :root {
+  color-scheme: light;
+
   /* Neutral surfaces */
   --canvas-bg: #f8fafc;
   --surface-card: #ffffff;
@@ -31,6 +36,7 @@
 
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
 }
 
 body {
@@ -40,6 +46,10 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+input, select, textarea, button {
+  color-scheme: light;
 }
 
 /* Accessible focus ring style */
