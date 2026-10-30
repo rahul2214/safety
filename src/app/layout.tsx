@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
@@ -18,6 +18,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     pathname?.startsWith('/admin/') ||
     pathname === '/org' ||
     pathname?.startsWith('/org/');
+
+  useEffect(() => {
+    const removeNetlifyHud = () => {
+      const frame = document.getElementById('nl-badge-frame');
+      if (frame) frame.remove();
+      document.querySelectorAll('iframe[title*="Netlify" i]').forEach((el) => el.remove());
+    };
+    removeNetlifyHud();
+    const observer = new MutationObserver(() => removeNetlifyHud());
+    if (document.body) {
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <html lang="en">
