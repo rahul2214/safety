@@ -5,12 +5,14 @@
 
 import { apiCache } from './api-cache';
 
+const DEFAULT_PROD_API = 'https://safecircle-api-752721321209.asia-south1.run.app';
+
 const API_BASE =
   typeof window !== 'undefined'
     ? '/api/proxy'
     : process.env.INTERNAL_API_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
-      'http://127.0.0.1:5000';
+      (process.env.NODE_ENV === 'production' ? DEFAULT_PROD_API : 'http://127.0.0.1:5000');
 
 export interface ApiResponse<T> {
   success: boolean;

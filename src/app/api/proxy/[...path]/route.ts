@@ -9,10 +9,12 @@ import { NextRequest, NextResponse } from 'next/server';
  * exclusively by Sabhijude.Api.
  */
 
+const DEFAULT_PROD_URL = 'https://safecircle-api-752721321209.asia-south1.run.app';
+
 const BACKEND_URL =
   process.env.INTERNAL_API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  'http://127.0.0.1:5000';
+  (process.env.NODE_ENV === 'production' ? DEFAULT_PROD_URL : 'http://127.0.0.1:5000');
 
 interface ProxyCacheItem {
   status: number;

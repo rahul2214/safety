@@ -30,7 +30,10 @@ export function proxy(request: NextRequest) {
 
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const isDev = process.env.NODE_ENV === 'development';
-  const apiOrigin = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const defaultApiOrigin = isDev
+    ? 'http://localhost:5000'
+    : 'https://safecircle-api-752721321209.asia-south1.run.app';
+  const apiOrigin = process.env.NEXT_PUBLIC_API_URL || defaultApiOrigin;
   const apiSocketOrigin = apiOrigin.replace(/^http/, 'ws');
 
   const csp = `

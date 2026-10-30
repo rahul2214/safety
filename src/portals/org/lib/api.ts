@@ -1,6 +1,10 @@
 import { clearSession, getToken, isTokenExpired, touchSession } from './session';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const DEFAULT_PROD_API = 'https://safecircle-api-752721321209.asia-south1.run.app';
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === 'production' ? DEFAULT_PROD_API : 'http://localhost:5000');
 
 export interface ApiResponse<T = any> {
   success: boolean;

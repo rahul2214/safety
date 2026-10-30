@@ -46,7 +46,10 @@ export class SafetyHubClient {
   }
 
   public async start() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const defaultProdUrl = 'https://safecircle-api-752721321209.asia-south1.run.app';
+    const backendUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      (process.env.NODE_ENV === 'production' ? defaultProdUrl : 'http://localhost:5000');
 
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(`${backendUrl}/hubs/safety`, {
