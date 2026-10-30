@@ -28,7 +28,6 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const isDev = process.env.NODE_ENV === 'development';
   const defaultApiOrigin = isDev
     ? 'http://localhost:5000'
@@ -38,11 +37,11 @@ export function proxy(request: NextRequest) {
 
   const csp = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''};
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob:;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https:;
     font-src 'self' data: https://fonts.gstatic.com;
-    connect-src 'self' ${apiOrigin} ${apiSocketOrigin};
+    connect-src 'self' ${apiOrigin} ${apiSocketOrigin} https://safecircle-api-752721321209.asia-south1.run.app wss://safecircle-api-752721321209.asia-south1.run.app https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
@@ -53,7 +52,6 @@ export function proxy(request: NextRequest) {
     .trim();
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
   requestHeaders.set('Content-Security-Policy', csp);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
@@ -61,7 +59,7 @@ export function proxy(request: NextRequest) {
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('Referrer-Policy', 'no-referrer');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  response.headers.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=()');
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
 

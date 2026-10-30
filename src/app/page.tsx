@@ -93,8 +93,8 @@ export default function HomePage() {
     }
   };
 
-  // If unauthenticated guest, render the clean redesigned Public Landing
-  if (!isAuthenticated && !isLoading) {
+  // If unauthenticated guest (or loading auth from localStorage), render the public landing
+  if (!isAuthenticated) {
     return (
       <PublicLanding
         posts={recentReports as any}
