@@ -65,7 +65,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="pb-2 border-b border-slate-200">
         
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Portal Settings &amp; Preferences</h1>
+        <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">Portal Settings &amp; Preferences</h1>
         <p className="text-xs text-slate-500 mt-0.5">
           Manage your verified identity, emergency dispatches, and device diagnostics.
         </p>

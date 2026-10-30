@@ -219,7 +219,7 @@ export default function EmergencyPage() {
         <div className="space-y-6">
           {/* Main Emergency Header */}
           <div className="text-center space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
               Emergency Assistance
             </h1>
             <p className="text-xs text-slate-500 max-w-md mx-auto">

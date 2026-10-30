@@ -148,29 +148,29 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
 
   return (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm select-none">
-  <div className="relative w-full max-w-lg bg-white rounded-[24px] border border-[#e8e8f0] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div className="relative w-full max-w-lg bg-white rounded-[24px] border border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
   {/* Top Wizard Navigation Bar (Matching mobile create.tsx) */}
-  <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8e8f0]">
+  <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
   <button
   onClick={handleBack}
-  className="w-9 h-9 rounded-full bg-[#f1f1f6] hover:bg-[#e8e8f0] flex items-center justify-center text-[#16161d] transition"
+  className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-ink transition"
   >
   {step === 1 ? <X className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
   </button>
 
-  <span className="text-[16px] font-black text-[#16161d]">
+  <span className="text-[16px] font-black text-ink">
   Share what happened
   </span>
 
-  <span className="px-2.5 py-1 rounded-full bg-[#f1edff] text-[#6d4aff] text-xs font-black">
+  <span className="px-2.5 py-1 rounded-full bg-brand-tint text-brand text-xs font-black">
   {step} / {TOTAL_STEPS}
   </span>
   </div>
 
   {/* 3px Progress Bar */}
-  <div className="h-[3px] bg-[#f1f1f6] w-full">
+  <div className="h-[3px] bg-slate-100 w-full">
   <div
-  className="h-full bg-[#6d4aff] transition-all duration-300 ease-out"
+  className="h-full bg-brand transition-all duration-300 ease-out"
   style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
   />
   </div>
@@ -180,7 +180,7 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   {/* STEP 1: POSTED AS (Anonymous vs Profile) */}
   {step === 1 && (
   <div className="space-y-3">
-  <span className="text-[11px] font-black uppercase text-[#5b5b6e] tracking-[1px] block">
+  <span className="text-[11px] font-black uppercase text-slate-600 tracking-[1px] block">
   POSTED AS
   </span>
 
@@ -191,21 +191,21 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   onClick={() => setIsAnonymous(true)}
   className={`p-4 rounded-[18px] border text-left transition relative flex flex-col justify-between h-[120px] ${
   isAnonymous
-  ? 'bg-[#f1edff] border-[#6d4aff]'
-  : 'bg-white border-[#e8e8f0]'
+  ? 'bg-brand-tint border-brand'
+  : 'bg-white border-slate-200'
   }`}
   >
   <div className="flex items-center justify-between">
-  <div className="w-8 h-8 rounded-full bg-white text-[#6d4aff] flex items-center justify-center shadow-xs">
+  <div className="w-8 h-8 rounded-full bg-white text-brand flex items-center justify-center shadow-xs">
   <EyeOff className="h-4 w-4" />
   </div>
-  {isAnonymous && <CheckCircle2 className="h-4 w-4 text-[#6d4aff]" />}
+  {isAnonymous && <CheckCircle2 className="h-4 w-4 text-brand" />}
   </div>
   <div>
-  <span className="text-sm font-bold text-[#16161d] block">
+  <span className="text-sm font-bold text-ink block">
   Anonymous
   </span>
-  <span className="text-xs text-[#6d4aff]">
+  <span className="text-xs text-brand">
   Your name stays hidden
   </span>
   </div>
@@ -217,21 +217,21 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   onClick={() => setIsAnonymous(false)}
   className={`p-4 rounded-[18px] border text-left transition relative flex flex-col justify-between h-[120px] ${
   !isAnonymous
-  ? 'bg-[#f1edff] border-[#6d4aff]'
-  : 'bg-white border-[#e8e8f0]'
+  ? 'bg-brand-tint border-brand'
+  : 'bg-white border-slate-200'
   }`}
   >
   <div className="flex items-center justify-between">
-  <div className="w-8 h-8 rounded-full bg-[#f1f1f6] text-[#5b5b6e] flex items-center justify-center shadow-xs">
+  <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shadow-xs">
   <User className="h-4 w-4" />
   </div>
-  {!isAnonymous && <CheckCircle2 className="h-4 w-4 text-[#6d4aff]" />}
+  {!isAnonymous && <CheckCircle2 className="h-4 w-4 text-brand" />}
   </div>
   <div>
-  <span className="text-sm font-bold text-[#16161d] block truncate max-w-[130px]">
+  <span className="text-sm font-bold text-ink block truncate max-w-[130px]">
   {user?.displayName || 'My Profile'}
   </span>
-  <span className="text-xs text-[#5b5b6e]">
+  <span className="text-xs text-slate-600">
   Posted as your profile
   </span>
   </div>
@@ -243,28 +243,28 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   {/* STEP 2: YOUR STORY */}
   {step === 2 && (
   <div className="space-y-3">
-  <span className="text-[11px] font-black uppercase text-[#5b5b6e] tracking-[1px] block">
+  <span className="text-[11px] font-black uppercase text-slate-600 tracking-[1px] block">
   YOUR STORY
   </span>
 
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] focus-within:border-[#6d4aff] focus-within:bg-white transition-colors">
+  <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200 focus-within:border-brand focus-within:bg-white transition-colors">
   <textarea
   rows={5}
   maxLength={1000}
   value={content}
   onChange={(e) => setContent(e.target.value)}
   placeholder="Start with what happened, then what you need…"
-  className="w-full bg-transparent border-0 p-0 text-[14.5px] text-[#16161d] focus:outline-none resize-none leading-relaxed"
+  className="w-full bg-transparent border-0 p-0 text-[14.5px] text-ink focus:outline-none resize-none leading-relaxed"
   />
 
-  <div className="pt-2 border-t border-[#e8e8f0] flex items-center justify-between text-xs text-[#5b5b6e]">
+  <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
   <button
   type="button"
   onClick={handleAttachLocation}
   disabled={locating}
-  className="flex items-center gap-1 hover:text-[#6d4aff] transition"
+  className="flex items-center gap-1 hover:text-brand transition"
   >
-  <MapPin className="h-3.5 w-3.5 text-[#6d4aff]" />
+  <MapPin className="h-3.5 w-3.5 text-brand" />
   <span>{locating ? 'Locating...' : locationTag ? 'Location Attached' : 'Attach Area Pin'}</span>
   </button>
   <span>{content.length} / 1000</span>
@@ -283,7 +283,7 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   {/* STEP 3: CATEGORY */}
   {step === 3 && (
   <div className="space-y-3">
-  <span className="text-[11px] font-black uppercase text-[#5b5b6e] tracking-[1px] block">
+  <span className="text-[11px] font-black uppercase text-slate-600 tracking-[1px] block">
   CATEGORY
   </span>
 
@@ -297,8 +297,8 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   onClick={() => setSelectedCategoryId(cat.id)}
   className={`px-4 py-2 rounded-full text-xs font-bold transition ${
   selected
-  ? 'bg-[#6d4aff] text-white shadow-xs'
-  : 'bg-[#f7f7fa] border border-[#e8e8f0] text-[#16161d]'
+  ? 'bg-brand text-white shadow-xs'
+  : 'bg-mist border border-slate-200 text-ink'
   }`}
   >
   {cat.name}
@@ -313,10 +313,10 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   {step === 4 && (
   <div className="space-y-3">
   <div className="flex items-center justify-between">
-  <span className="text-[11px] font-black uppercase text-[#5b5b6e] tracking-[1px] block">
+  <span className="text-[11px] font-black uppercase text-slate-600 tracking-[1px] block">
   SEVERITY
   </span>
-  <span className="text-[11px] text-[#9797ab]">Helps prioritize safety feed</span>
+  <span className="text-[11px] text-slate-400">Helps prioritize safety feed</span>
   </div>
 
   <div className="grid grid-cols-3 gap-2.5">
@@ -327,7 +327,7 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   className={`p-3 rounded-[16px] text-center transition border ${
   severity === 'ADVICE_NEEDED'
   ? 'bg-[#ecfdf5] border-[#059669] text-[#059669]'
-  : 'bg-[#f7f7fa] border-[#e8e8f0] text-[#16161d]'
+  : 'bg-mist border-slate-200 text-ink'
   }`}
   >
   <span className="w-2 h-2 rounded-full bg-[#059669] mx-auto block mb-1.5" />
@@ -341,7 +341,7 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   className={`p-3 rounded-[16px] text-center transition border ${
   severity === 'CONCERNING'
   ? 'bg-[#fffbeb] border-[#d97706] text-[#d97706]'
-  : 'bg-[#f7f7fa] border-[#e8e8f0] text-[#16161d]'
+  : 'bg-mist border-slate-200 text-ink'
   }`}
   >
   <span className="w-2 h-2 rounded-full bg-[#d97706] mx-auto block mb-1.5" />
@@ -355,7 +355,7 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   className={`p-3 rounded-[16px] text-center transition border ${
   severity === 'CRITICAL'
   ? 'bg-[#fff1f2] border-[#e11d48] text-[#e11d48]'
-  : 'bg-[#f7f7fa] border-[#e8e8f0] text-[#16161d]'
+  : 'bg-mist border-slate-200 text-ink'
   }`}
   >
   <span className="w-2 h-2 rounded-full bg-[#e11d48] mx-auto block mb-1.5" />
@@ -368,7 +368,7 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   {/* STEP 5: VISIBLE TO */}
   {step === 5 && (
   <div className="space-y-3">
-  <span className="text-[11px] font-black uppercase text-[#5b5b6e] tracking-[1px] block">
+  <span className="text-[11px] font-black uppercase text-slate-600 tracking-[1px] block">
   VISIBLE TO
   </span>
 
@@ -379,8 +379,8 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   onClick={() => setVisibility('PUBLIC')}
   className={`p-3.5 rounded-[16px] border text-left flex items-center justify-between transition ${
   visibility === 'PUBLIC'
-  ? 'bg-[#f1edff] border-[#6d4aff] text-[#6d4aff]'
-  : 'bg-[#f7f7fa] border-[#e8e8f0] text-[#16161d]'
+  ? 'bg-brand-tint border-brand text-brand'
+  : 'bg-mist border-slate-200 text-ink'
   }`}
   >
   <div className="flex items-center gap-2">
@@ -396,8 +396,8 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   onClick={() => setVisibility('COMMUNITY_ONLY')}
   className={`p-3.5 rounded-[16px] border text-left flex items-center justify-between transition ${
   visibility === 'COMMUNITY_ONLY'
-  ? 'bg-[#f1edff] border-[#6d4aff] text-[#6d4aff]'
-  : 'bg-[#f7f7fa] border-[#e8e8f0] text-[#16161d]'
+  ? 'bg-brand-tint border-brand text-brand'
+  : 'bg-mist border-slate-200 text-ink'
   }`}
   >
   <div className="flex items-center gap-2">
@@ -411,19 +411,19 @@ export function CreatePostModal({ isOpen, categories, onClose, onPostCreated }: 
   )}
 
   {/* Privacy Footnote */}
-  <div className="flex items-center justify-center gap-1.5 text-center text-[11px] text-[#9797ab] pt-2">
+  <div className="flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-400 pt-2">
   <Lock className="h-3 w-3" />
   <span>All data is end-to-end encrypted and stripped of IP headers.</span>
   </div>
   </div>
 
   {/* Bottom Action Bar */}
-  <div className="p-4 bg-white border-t border-[#e8e8f0]">
+  <div className="p-4 bg-white border-t border-slate-200">
   <button
   type="button"
   onClick={handleNext}
   disabled={submitting}
-  className="w-full h-[52px] rounded-[16px] bg-[#6d4aff] hover:bg-[#5325e8] text-white font-bold text-[14.5px] shadow-md shadow-[#6d4aff]/25 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-50"
+  className="w-full h-[52px] rounded-[16px] bg-brand hover:bg-brand-deep text-white font-bold text-[14.5px] shadow-md shadow-brand/25 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-50"
   >
   {submitting ? (
   <div className="flex items-center gap-2">

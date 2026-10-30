@@ -151,23 +151,23 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
 
   return (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm select-none">
-  <div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-[24px] border border-[#e8e8f0] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-[24px] border border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
   {/* Modal Top Header */}
-  <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[#e8e8f0]">
+  <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-200">
   <div className="flex items-center gap-2.5">
   <span
   className={`w-2.5 h-2.5 rounded-full ${
   isUrgent ? 'bg-[#e11d48]' : isResolved ? 'bg-[#059669]' : 'bg-[#d97706]'
   }`}
   />
-  <h2 className="text-[16px] font-black text-[#16161d]">
+  <h2 className="text-[16px] font-black text-ink">
   Incident Details &amp; Solutions
   </h2>
   </div>
 
   <button
   onClick={onClose}
-  className="w-8 h-8 rounded-full bg-[#f1f1f6] hover:bg-[#e8e8f0] flex items-center justify-center text-[#5b5b6e] transition"
+  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition"
   >
   <X className="h-4 w-4" />
   </button>
@@ -178,7 +178,7 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   {/* Post Author Row */}
   <div className="flex items-center justify-between">
   <div className="flex items-center gap-3">
-  <div className="w-10 h-10 rounded-full bg-[#f1edff] text-[#6d4aff] flex items-center justify-center font-bold text-sm shrink-0">
+  <div className="w-10 h-10 rounded-full bg-brand-tint text-brand flex items-center justify-center font-bold text-sm shrink-0">
   {isAnon ? (
   <EyeOff className="h-5 w-5" />
   ) : (
@@ -187,16 +187,16 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   </div>
   <div>
   <div className="flex items-center gap-2">
-  <span className="font-bold text-[#16161d] text-[15px]">
+  <span className="font-bold text-ink text-[15px]">
   {authorDisplay}
   </span>
   {isAnon && (
-  <span className="text-[10px] font-bold text-[#6d4aff] bg-[#f1edff] px-2 py-0.5 rounded-full">
+  <span className="text-[10px] font-bold text-brand bg-brand-tint px-2 py-0.5 rounded-full">
   Private
   </span>
   )}
   </div>
-  <p className="text-[11.5px] text-[#9797ab]">{post.timeAgo || 'Recently'}</p>
+  <p className="text-[11.5px] text-slate-400">{post.timeAgo || 'Recently'}</p>
   </div>
   </div>
 
@@ -214,15 +214,15 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   </div>
 
   {/* Post Full Content */}
-  <div className="p-4 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0]">
-  <p className="text-[15px] text-[#16161d] leading-[22px] whitespace-pre-wrap">
+  <div className="p-4 rounded-[16px] bg-mist border border-slate-200">
+  <p className="text-[15px] text-ink leading-[22px] whitespace-pre-wrap">
   {post.content}
   </p>
   </div>
 
   {/* Chips & Tags */}
   <div className="flex flex-wrap items-center gap-2">
-  <span className="px-3 py-1 rounded-full bg-[#f1edff] text-[#6d4aff] text-xs font-bold">
+  <span className="px-3 py-1 rounded-full bg-brand-tint text-brand text-xs font-bold">
   {categoryDisplay}
   </span>
   <span
@@ -265,17 +265,17 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   </div>
 
   {/* Interaction Bar */}
-  <div className="flex items-center justify-between pt-2 border-t border-[#e8e8f0]">
+  <div className="flex items-center justify-between pt-2 border-t border-slate-200">
   <div className="flex items-center gap-4">
   <button
   onClick={toggleSupport}
   className={`flex items-center gap-1.5 text-xs font-bold transition ${
   supported
-  ? 'text-[#e0308e]'
-  : 'text-[#5b5b6e] hover:text-[#16161d]'
+  ? 'text-coral'
+  : 'text-slate-600 hover:text-ink'
   }`}
   >
-  <Heart className={`h-4 w-4 ${supported ? 'fill-[#e0308e]' : ''}`} />
+  <Heart className={`h-4 w-4 ${supported ? 'fill-coral' : ''}`} />
   <span>{supportCount} Supported</span>
   </button>
 
@@ -283,8 +283,8 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   onClick={toggleFacedThis}
   className={`flex items-center gap-1.5 text-xs font-bold transition ${
   facedThis
-  ? 'text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d]'
+  ? 'text-brand'
+  : 'text-slate-600 hover:text-ink'
   }`}
   >
   <Users className="h-4 w-4" />
@@ -294,7 +294,7 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
 
   <button
   onClick={handleShareWhatsApp}
-  className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-[#f1f1f6] hover:bg-[#e8e8f0] text-xs font-bold text-[#16161d] transition"
+  className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-slate-100 hover:bg-slate-200 text-xs font-bold text-ink transition"
   >
   <Share2 className="h-3.5 w-3.5 text-[#059669]" />
   <span>Share Alert</span>
@@ -304,7 +304,7 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   {/* Community Solutions Section (From mobile-app post/[id].tsx) */}
   <div className="space-y-3 pt-2">
   <div className="flex items-center justify-between">
-  <h3 className="text-sm font-black text-[#16161d] flex items-center gap-2">
+  <h3 className="text-sm font-black text-ink flex items-center gap-2">
   <MessageSquare className="h-4 w-4 text-[#0891b2]" />
   <span>Community Solutions &amp; Advice ({solutions.length})</span>
   </h3>
@@ -322,11 +322,11 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   {solutions.map((sol) => (
   <div
   key={sol.id}
-  className="p-3.5 rounded-[14px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1.5"
+  className="p-3.5 rounded-[14px] bg-mist border border-slate-200 space-y-1.5"
   >
   <div className="flex items-center justify-between">
   <div className="flex items-center gap-2">
-  <span className="text-xs font-bold text-[#16161d]">
+  <span className="text-xs font-bold text-ink">
   {sol.author?.displayName || 'Community Member'}
   </span>
   {sol.isAccepted && (
@@ -335,17 +335,17 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   </span>
   )}
   </div>
-  <span className="text-[10.5px] text-[#9797ab]">Recently</span>
+  <span className="text-[10.5px] text-slate-400">Recently</span>
   </div>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
+  <p className="text-xs text-slate-600 leading-relaxed">
   {sol.content}
   </p>
   </div>
   ))}
   </div>
   ) : (
-  <div className="p-6 rounded-[16px] bg-[#f7f7fa] border border-dashed border-[#e8e8f0] text-center space-y-1 text-xs text-[#9797ab]">
-  <p className="font-semibold text-[#16161d]">
+  <div className="p-6 rounded-[16px] bg-mist border border-dashed border-slate-200 text-center space-y-1 text-xs text-slate-400">
+  <p className="font-semibold text-ink">
   No solutions shared yet
   </p>
   <p>Be the first member to share trusted advice or practical steps.</p>
@@ -355,7 +355,7 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   </div>
 
   {/* Modal Bottom: Submit New Solution Form */}
-  <div className="p-4 bg-white border-t border-[#e8e8f0]">
+  <div className="p-4 bg-white border-t border-slate-200">
   <form onSubmit={handleSendSolution} className="flex gap-2">
   <input
   type="text"
@@ -367,12 +367,12 @@ export function PostDetailModal({ post, isOpen, onClose, onPostUpdated }: PostDe
   value={newSolutionText}
   onChange={(e) => setNewSolutionText(e.target.value)}
   disabled={submittingSolution}
-  className="flex-1 h-11 bg-[#f7f7fa] border border-[#e8e8f0] rounded-[14px] px-3.5 text-xs text-[#16161d] focus:outline-none focus:border-[#6d4aff]"
+  className="flex-1 h-11 bg-mist border border-slate-200 rounded-[14px] px-3.5 text-xs text-ink focus:outline-none focus:border-brand"
   />
   <button
   type="submit"
   disabled={submittingSolution || !newSolutionText.trim()}
-  className="h-11 px-4 rounded-[14px] bg-[#6d4aff] hover:bg-[#5325e8] text-white font-bold text-xs shadow-sm transition flex items-center gap-1.5 disabled:opacity-50"
+  className="h-11 px-4 rounded-[14px] bg-brand hover:bg-brand-deep text-white font-bold text-xs shadow-sm transition flex items-center gap-1.5 disabled:opacity-50"
   >
   {submittingSolution ? (
   <Loader2 className="h-4 w-4 animate-spin" />

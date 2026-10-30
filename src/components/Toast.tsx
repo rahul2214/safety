@@ -46,13 +46,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   ? 'bg-[#ecfdf5] border-[#059669]/30 text-[#059669]'
   : toast.type === 'error'
   ? 'bg-[#fff1f2] border-[#e11d48]/30 text-[#e11d48]'
-  : 'bg-white border-[#e8e8f0] text-[#16161d]'
+  : 'bg-white border-slate-200 text-ink'
   }`}
   >
   <div className="flex items-center gap-2">
   {toast.type === 'success' && <CheckCircle2 className="h-4 w-4 shrink-0" />}
   {toast.type === 'error' && <AlertCircle className="h-4 w-4 shrink-0" />}
-  {toast.type === 'info' && <Info className="h-4 w-4 shrink-0 text-[#6d4aff]" />}
+  {toast.type === 'info' && <Info className="h-4 w-4 shrink-0 text-brand" />}
   <span>{toast.message}</span>
   </div>
   <button

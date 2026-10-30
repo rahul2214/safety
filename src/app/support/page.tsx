@@ -202,7 +202,7 @@ export default function SupportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
             Need Help? Safety Support &amp; Help Desk
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -285,7 +285,7 @@ export default function SupportPage() {
               <Card key={t.id} className="p-4 space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-[#6d4aff] px-2 py-0.5 rounded bg-[#f1edff]">
+                    <span className="font-mono text-xs font-bold text-brand px-2 py-0.5 rounded bg-brand-tint">
                       {t.ticketCode}
                     </span>
                     <span className="text-slate-300">&bull;</span>

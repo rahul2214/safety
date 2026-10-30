@@ -244,7 +244,7 @@ export default function UserOrganizationsPage() {
                 <ShieldCheck className="w-4 h-4 text-orange-400" />
                 Verified Campus & Workplace Safety Network
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
                 My Connected Organisations
               </h1>
               <p className="mt-1 text-sm sm:text-base text-blue-200 max-w-2xl">
@@ -338,7 +338,7 @@ export default function UserOrganizationsPage() {
                   {/* Card Header */}
                   <div className="p-6 border-b border-slate-100 flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3.5">
-                      <div className="w-12 h-12 rounded-xl bg-[#6d4aff] text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                      <div className="w-12 h-12 rounded-xl bg-brand text-white flex items-center justify-center font-bold text-lg shadow-sm">
                         {org.organizationName.slice(0, 2).toUpperCase()}
                       </div>
                       <div>

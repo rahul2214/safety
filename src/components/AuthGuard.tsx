@@ -56,21 +56,21 @@ export function AuthGuard({
   return (
   <div className="relative max-w-md mx-auto py-12 px-4 select-none text-center space-y-6">
   {/* Soft background aura */}
-  <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#6d4aff]/10 rounded-full blur-3xl z-0" />
+  <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-64 bg-brand/10 rounded-full blur-3xl z-0" />
 
   <div className="relative z-10 flex flex-col items-center space-y-4">
-  <div className="w-16 h-16 rounded-[22px] bg-[#f1edff] border border-[#6d4aff]/20 flex items-center justify-center text-[#6d4aff] shadow-sm">
+  <div className="w-16 h-16 rounded-[22px] bg-brand-tint border border-brand/20 flex items-center justify-center text-brand shadow-sm">
   <Lock className="h-8 w-8" />
   </div>
 
   <div className="space-y-1.5">
-  <span className="px-2.5 py-1 rounded-full bg-[#f1edff] text-[#6d4aff] text-[11px] font-bold uppercase tracking-wider">
+  <span className="px-2.5 py-1 rounded-full bg-brand-tint text-brand text-[11px] font-bold uppercase tracking-wider">
   Private Safety Area
   </span>
-  <h2 className="text-[22px] font-black text-[#16161d] tracking-tight">
+  <h2 className="text-[22px] font-black text-ink tracking-tight">
   {title}
   </h2>
-  <p className="text-[13px] text-[#5b5b6e] leading-relaxed max-w-sm">
+  <p className="text-[13px] text-slate-600 leading-relaxed max-w-sm">
   {description}
   </p>
   </div>
@@ -78,7 +78,7 @@ export function AuthGuard({
   <div className="pt-2 w-full space-y-2.5">
   <Link
   href={`/login?redirect=${encodeURIComponent(pathname)}`}
-  className="w-full h-11 rounded-[14px] bg-[#6d4aff] hover:bg-[#5325e8] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.98]"
+  className="w-full h-11 rounded-[14px] bg-brand hover:bg-brand-deep text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.98]"
   >
   <LogIn className="h-4 w-4" />
   <span>Log in to Sabhijude</span>
@@ -86,9 +86,9 @@ export function AuthGuard({
 
   <Link
   href={`/signup?redirect=${encodeURIComponent(pathname)}`}
-  className="w-full h-11 rounded-[14px] bg-white border border-[#e8e8f0] hover:bg-[#f7f7fa] text-[#16161d] font-bold text-xs flex items-center justify-center gap-2 transition shadow-sm"
+  className="w-full h-11 rounded-[14px] bg-white border border-slate-200 hover:bg-mist text-ink font-bold text-xs flex items-center justify-center gap-2 transition shadow-sm"
   >
-  <UserPlus className="h-4 w-4 text-[#6d4aff]" />
+  <UserPlus className="h-4 w-4 text-brand" />
   <span>Create Free Account</span>
   </Link>
   </div>
@@ -96,7 +96,7 @@ export function AuthGuard({
   <div className="pt-4">
   <Link
   href="/"
-  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5b5b6e] hover:text-[#16161d] transition"
+  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-ink transition"
   >
   <ArrowLeft className="h-3.5 w-3.5" />
   <span>Back to Public Safety Feed</span>

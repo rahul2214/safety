@@ -26,27 +26,27 @@ export function Button({
 }: ButtonProps) {
   const loadingState = isLoading || loading;
   const baseStyles =
-    'inline-flex items-center justify-center font-medium rounded-lg transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+    'inline-flex items-center justify-center font-semibold rounded-full transition active:scale-[0.98] cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
   const variantStyles = {
     primary:
-      'bg-blue-600 hover:bg-blue-700 text-white focus-visible:ring-blue-600 shadow-xs active:bg-blue-800',
+      'bg-brand hover:bg-brand-deep text-white focus-visible:ring-brand shadow-[0_6px_16px_-8px_rgba(29,91,216,0.7)]',
     secondary:
-      'bg-slate-100 hover:bg-slate-200 text-slate-800 focus-visible:ring-slate-400 active:bg-slate-300',
+      'bg-mist hover:bg-slate-200 text-ink focus-visible:ring-slate-400',
     emergency:
-      'bg-red-600 hover:bg-red-700 text-white font-semibold focus-visible:ring-red-600 shadow-xs active:bg-red-800',
+      'bg-red-600 hover:bg-red-700 text-white focus-visible:ring-red-600 shadow-[0_6px_16px_-8px_rgba(220,38,38,0.7)]',
     outline:
-      'border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 focus-visible:ring-slate-400 active:bg-slate-100',
+      'border border-slate-200 bg-white hover:border-slate-300 hover:bg-mist text-ink focus-visible:ring-slate-400',
     ghost:
-      'text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:ring-slate-400',
+      'text-slate-600 hover:text-ink hover:bg-mist focus-visible:ring-slate-400',
     success:
-      'bg-emerald-600 hover:bg-emerald-700 text-white focus-visible:ring-emerald-600 shadow-xs active:bg-emerald-800',
+      'bg-emerald-600 hover:bg-emerald-700 text-white focus-visible:ring-emerald-600',
   };
 
   const sizeStyles = {
-    sm: 'text-xs px-2.5 py-1.5 gap-1.5 min-h-[32px]',
-    md: 'text-sm px-4 py-2 gap-2 min-h-[40px]',
-    lg: 'text-base px-5 py-2.5 gap-2.5 min-h-[48px]',
+    sm: 'text-xs px-3.5 py-1.5 gap-1.5 min-h-[34px]',
+    md: 'text-sm px-5 py-2.5 gap-2 min-h-[42px]',
+    lg: 'text-base px-6 py-3 gap-2.5 min-h-[50px]',
   };
 
   return (

@@ -87,15 +87,15 @@ export default function DiscoverPage() {
   <div>
   <Link
   href="/"
-  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5b5b6e] hover:text-[#16161d] mb-2 transition"
+  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-ink mb-2 transition"
   >
   <ArrowLeft className="h-4 w-4" />
   Back to Feed
   </Link>
-  <h1 className="text-[24px] font-black tracking-[-0.5px] leading-[30px] text-[#16161d]">
+  <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
   Discover Topics
   </h1>
-  <p className="text-[13px] text-[#5b5b6e] mt-0.5">
+  <p className="text-[13px] text-slate-600 mt-0.5">
   Browse verified community reports, safety advisories, and prevention playbooks.
   </p>
   </div>
@@ -121,13 +121,13 @@ export default function DiscoverPage() {
   placeholder="Search safety topics (e.g. Metro, Hostel, Stalking)..."
   value={searchTerm}
   onChange={(e) => setSearchTerm(e.target.value)}
-  className="w-full h-11 bg-white border border-[#e8e8f0] rounded-[14px] px-4 text-[14px] text-[#16161d] placeholder-[#9797ab] focus:outline-none focus:border-[#6d4aff] transition shadow-sm"
+  className="w-full h-11 bg-white border border-slate-200 rounded-[14px] px-4 text-[14px] text-ink placeholder-slate-400 focus:outline-none focus:border-brand transition shadow-sm"
   />
   </div>
 
   {/* Topic Grid */}
   <section className="space-y-3">
-  <h2 className="text-[14px] font-black uppercase text-[#5b5b6e] tracking-[1px]">
+  <h2 className="text-[14px] font-black uppercase text-slate-600 tracking-[1px]">
   ACTIVE TOPICS
   </h2>
   {loading ? (
@@ -142,22 +142,22 @@ export default function DiscoverPage() {
   <Link
   key={topic.id}
   href="/"
-  className="p-4 rounded-[16px] bg-white border border-[#e8e8f0] hover:border-[#6d4aff] transition shadow-sm flex items-center justify-between group"
+  className="p-4 rounded-[16px] bg-white border border-slate-200 hover:border-brand transition shadow-sm flex items-center justify-between group"
   >
   <div className="flex items-center gap-3">
   <span className="text-xl">
   {CATEGORY_ICONS[topic.name.toLowerCase()] || '🛡️'}
   </span>
   <div>
-  <h4 className="text-[14px] font-bold text-[#16161d] group-hover:text-[#6d4aff] transition-colors">
+  <h4 className="text-[14px] font-bold text-ink group-hover:text-brand transition-colors">
   {topic.name}
   </h4>
-  <p className="text-[11.5px] text-[#5b5b6e] line-clamp-1">
+  <p className="text-[11.5px] text-slate-600 line-clamp-1">
   {topic.description || 'Verified safety sector'}
   </p>
   </div>
   </div>
-  <ArrowUpRight className="h-4 w-4 text-[#9797ab] group-hover:text-[#6d4aff] transition-colors" />
+  <ArrowUpRight className="h-4 w-4 text-slate-400 group-hover:text-brand transition-colors" />
   </Link>
   ))}
   </div>
@@ -166,24 +166,24 @@ export default function DiscoverPage() {
 
   {/* Verified Safety Guides */}
   <section className="space-y-3 pt-3">
-  <h2 className="text-[14px] font-black uppercase text-[#5b5b6e] tracking-[1px]">
+  <h2 className="text-[14px] font-black uppercase text-slate-600 tracking-[1px]">
   SAFETY PLAYBOOKS
   </h2>
   <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
   {SAFETY_TIPS.map((tip, i) => (
   <div
   key={i}
-  className="p-5 rounded-[18px] bg-white border border-[#e8e8f0] shadow-sm space-y-2 flex flex-col justify-between"
+  className="p-5 rounded-[18px] bg-white border border-slate-200 shadow-sm space-y-2 flex flex-col justify-between"
   >
   <div className="space-y-1.5">
-  <h3 className="text-[14.5px] font-bold text-[#16161d]">
+  <h3 className="text-[14.5px] font-bold text-ink">
   {tip.title}
   </h3>
-  <p className="text-[13px] text-[#5b5b6e] leading-[19px]">
+  <p className="text-[13px] text-slate-600 leading-[19px]">
   {tip.desc}
   </p>
   </div>
-  <span className="text-[11px] font-semibold text-[#6d4aff] pt-2">
+  <span className="text-[11px] font-semibold text-brand pt-2">
   {tip.readTime}
   </span>
   </div>

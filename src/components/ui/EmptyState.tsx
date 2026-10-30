@@ -23,12 +23,12 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`rounded-lg border border-dashed border-slate-300 p-8 sm:p-12 text-center bg-white ${className}`}
+      className={`rounded-3xl border-2 border-dashed border-slate-200 p-8 sm:p-12 text-center bg-white ${className}`}
     >
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-slate-500 mb-3.5">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-tint text-brand mb-4">
         {icon || <Inbox className="h-6 w-6" />}
       </div>
-      <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+      <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
       <p className="mt-1 text-xs sm:text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
         {description}
       </p>

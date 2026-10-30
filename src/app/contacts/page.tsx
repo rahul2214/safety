@@ -154,7 +154,7 @@ export default function TrustedContactsPage() {
   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
   <div>
    
-  <h1 className="text-xl font-bold text-slate-900 tracking-tight">Trusted Emergency Contacts</h1>
+  <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">Trusted Emergency Contacts</h1>
   <p className="text-xs text-slate-500 mt-0.5">
   Designate guardians who will receive instantaneous coordinate dispatches when SOS is triggered.
   </p>

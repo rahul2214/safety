@@ -103,16 +103,16 @@ export function FakeCallModal({ isOpen, onClose }: FakeCallModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-sm rounded-[36px] bg-[#10101a] border border-[#2a2a40] p-6 text-white shadow-2xl flex flex-col items-center justify-between min-h-[590px]">
+      <div className="relative w-full max-w-sm rounded-[36px] bg-[#10101a] border border-ink-soft p-6 text-white shadow-2xl flex flex-col items-center justify-between min-h-[590px]">
         
 
         {/* Caller Avatar Header */}
         <div className="flex flex-col items-center mt-3 text-center space-y-3">
-          <div className="relative flex items-center justify-center h-28 w-28 rounded-full bg-[#6d4aff] shadow-2xl shadow-[#6d4aff]/30">
+          <div className="relative flex items-center justify-center h-28 w-28 rounded-full bg-brand shadow-2xl shadow-brand/30">
             <User className="h-14 w-14 text-white" />
             {callState === 'RINGING' && (
               <>
-                <span className="absolute -inset-2 rounded-full border-2 border-[#6d4aff] animate-ping opacity-60 pointer-events-none" />
+                <span className="absolute -inset-2 rounded-full border-2 border-brand animate-ping opacity-60 pointer-events-none" />
                 <span className="absolute -inset-5 rounded-full border border-[#e11d48] animate-pulse opacity-40 pointer-events-none" />
               </>
             )}
@@ -135,23 +135,23 @@ export function FakeCallModal({ isOpen, onClose }: FakeCallModalProps) {
                 type="button"
                 onClick={() => setIsMuted(!isMuted)}
                 className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${
-                  isMuted ? 'bg-white text-slate-900' : 'bg-[#222234] text-white hover:bg-[#2c2c42]'
+                  isMuted ? 'bg-white text-slate-900' : 'bg-[#222234] text-white hover:bg-ink-soft'
                 }`}
               >
                 {isMuted ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
               </button>
-              <span className="text-[11px] text-[#86869e] font-medium">mute</span>
+              <span className="text-[11px] text-slate-400 font-medium">mute</span>
             </div>
 
             {/* Keypad Button */}
             <div className="flex flex-col items-center gap-1.5">
               <button
                 type="button"
-                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-[#2c2c42] transition-colors"
+                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-ink-soft transition-colors"
               >
                 <Grid className="h-6 w-6" />
               </button>
-              <span className="text-[11px] text-[#86869e] font-medium">keypad</span>
+              <span className="text-[11px] text-slate-400 font-medium">keypad</span>
             </div>
 
             {/* Speaker Button */}
@@ -160,45 +160,45 @@ export function FakeCallModal({ isOpen, onClose }: FakeCallModalProps) {
                 type="button"
                 onClick={() => setIsSpeakerOn(!isSpeakerOn)}
                 className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${
-                  isSpeakerOn ? 'bg-white text-slate-900' : 'bg-[#222234] text-white hover:bg-[#2c2c42]'
+                  isSpeakerOn ? 'bg-white text-slate-900' : 'bg-[#222234] text-white hover:bg-ink-soft'
                 }`}
               >
                 {isSpeakerOn ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
               </button>
-              <span className="text-[11px] text-[#86869e] font-medium">speaker</span>
+              <span className="text-[11px] text-slate-400 font-medium">speaker</span>
             </div>
 
             {/* Add Call Button */}
             <div className="flex flex-col items-center gap-1.5">
               <button
                 type="button"
-                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-[#2c2c42] transition-colors"
+                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-ink-soft transition-colors"
               >
                 <Plus className="h-6 w-6" />
               </button>
-              <span className="text-[11px] text-[#86869e] font-medium">add call</span>
+              <span className="text-[11px] text-slate-400 font-medium">add call</span>
             </div>
 
             {/* Audio Button */}
             <div className="flex flex-col items-center gap-1.5">
               <button
                 type="button"
-                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-[#2c2c42] transition-colors"
+                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-ink-soft transition-colors"
               >
                 <Phone className="h-6 w-6" />
               </button>
-              <span className="text-[11px] text-[#86869e] font-medium">audio</span>
+              <span className="text-[11px] text-slate-400 font-medium">audio</span>
             </div>
 
             {/* Contacts Button */}
             <div className="flex flex-col items-center gap-1.5">
               <button
                 type="button"
-                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-[#2c2c42] transition-colors"
+                className="w-14 h-14 rounded-full bg-[#222234] text-white flex items-center justify-center hover:bg-ink-soft transition-colors"
               >
                 <User className="h-6 w-6" />
               </button>
-              <span className="text-[11px] text-[#86869e] font-medium">contacts</span>
+              <span className="text-[11px] text-slate-400 font-medium">contacts</span>
             </div>
           </div>
         ) : (
@@ -219,7 +219,7 @@ export function FakeCallModal({ isOpen, onClose }: FakeCallModalProps) {
               >
                 <PhoneOff className="h-7 w-7" />
               </button>
-              <span className="text-xs font-semibold text-[#86869e]">Decline</span>
+              <span className="text-xs font-semibold text-slate-400">Decline</span>
             </div>
 
             {/* Accept */}
@@ -231,7 +231,7 @@ export function FakeCallModal({ isOpen, onClose }: FakeCallModalProps) {
               >
                 <Phone className="h-7 w-7" />
               </button>
-              <span className="text-xs font-semibold text-[#86869e]">Accept</span>
+              <span className="text-xs font-semibold text-slate-400">Accept</span>
             </div>
           </div>
         ) : (
@@ -243,7 +243,7 @@ export function FakeCallModal({ isOpen, onClose }: FakeCallModalProps) {
             >
               <PhoneOff className="h-7 w-7" />
             </button>
-            <span className="text-xs font-semibold text-[#86869e]">End Call</span>
+            <span className="text-xs font-semibold text-slate-400">End Call</span>
           </div>
         )}
       </div>

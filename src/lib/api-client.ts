@@ -23,6 +23,15 @@ export interface ApiResponse<T> {
   };
 }
 
+/** The API returns hashtags as `{ id, name }` objects; older/local data uses plain strings. */
+export type PostHashtag = string | { id?: number; name?: string };
+
+/** Hashtag text without a leading '#', whichever shape it arrived in. */
+export function hashtagText(tag: PostHashtag | null | undefined): string {
+  const raw = typeof tag === 'string' ? tag : tag?.name ?? '';
+  return raw.replace(/^#/, '');
+}
+
 export interface BackendPost {
   id: number;
   content: string;
@@ -42,7 +51,7 @@ export interface BackendPost {
   hasSupported?: boolean;
   hasFacedThis?: boolean;
   hasSaved?: boolean;
-  hashtags?: string[];
+  hashtags?: PostHashtag[];
   safetyAdvice?: string;
   riskScore?: number;
   postSeverityId?: number;

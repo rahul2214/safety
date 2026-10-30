@@ -123,7 +123,7 @@ export default function NotificationsPage() {
   <div>
    
   <div className="flex items-center gap-2">
-  <h1 className="text-xl font-bold text-slate-900 tracking-tight">Notifications</h1>
+  <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">Notifications</h1>
   {unreadCount > 0 && (
   <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
   {unreadCount} unread

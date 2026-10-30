@@ -412,10 +412,10 @@ export default function ProfilePage() {
   {/* Top Header */}
   <div className="flex items-center justify-between">
   <div>
-  <h1 className="text-[26px] font-black tracking-[-0.5px] leading-[32px] text-[#16161d]">
+  <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
   Member Profile & Identity
   </h1>
-  <p className="text-[13.5px] text-[#5b5b6e] mt-0.5">
+  <p className="text-[13.5px] text-slate-600 mt-0.5">
   Comprehensive account details, emergency readiness, and safety telemetry.
   </p>
   </div>
@@ -424,16 +424,16 @@ export default function ProfilePage() {
   onClick={() => loadAllProfileData(true)}
   disabled={refreshing || loading}
   title="Refresh database records"
-  className="p-2.5 rounded-[12px] bg-white border border-[#e8e8f0] text-[#5b5b6e] hover:text-[#6d4aff] transition shadow-xs flex items-center gap-1.5 text-xs font-semibold"
+  className="p-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-600 hover:text-brand transition shadow-xs flex items-center gap-1.5 text-xs font-semibold"
   >
-  <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-[#6d4aff]' : ''}`} />
+  <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-brand' : ''}`} />
   <span className="hidden sm:inline">Refresh</span>
   </button>
   </div>
 
   {/* ─── 1. Primary Identity Card ────────────────────────────────────── */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-  <div className="w-24 h-24 rounded-full bg-[#6d4aff] text-white flex items-center justify-center text-4xl font-black shrink-0 shadow-md">
+  <section className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+  <div className="w-24 h-24 rounded-full bg-brand text-white flex items-center justify-center text-4xl font-black shrink-0 shadow-md">
   {profile?.displayName
   ? profile.displayName.charAt(0).toUpperCase()
   : authUser?.displayName
@@ -443,11 +443,11 @@ export default function ProfilePage() {
 
   <div className="text-center md:text-left space-y-2 flex-1 min-w-0">
   <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
-  <h2 className="text-[22px] font-black text-[#16161d] truncate">
+  <h2 className="text-[22px] font-black text-ink truncate">
   {profile?.displayName || authUser?.displayName || 'Protected Member'}
   </h2>
   {profile?.isVerifiedExpert ? (
-  <span className="px-2.5 py-0.5 rounded-full bg-[#f1edff] text-[#6d4aff] text-xs font-bold flex items-center gap-1">
+  <span className="px-2.5 py-0.5 rounded-full bg-brand-tint text-brand text-xs font-bold flex items-center gap-1">
   <Sparkles className="h-3 w-3" /> Verified Safety Expert
   </span>
   ) : (
@@ -458,23 +458,23 @@ export default function ProfilePage() {
    
   </div>
 
-  <div className="text-[13px] text-[#5b5b6e] flex flex-wrap items-center justify-center md:justify-start gap-4">
+  <div className="text-[13px] text-slate-600 flex flex-wrap items-center justify-center md:justify-start gap-4">
   <span className="flex items-center gap-1.5">
-  <Mail className="h-3.5 w-3.5 text-[#9797ab]" />
+  <Mail className="h-3.5 w-3.5 text-slate-400" />
   {profile?.email || authUser?.email || 'No email registered'}
   </span>
   <span className="flex items-center gap-1.5">
-  <Phone className="h-3.5 w-3.5 text-[#9797ab]" />
+  <Phone className="h-3.5 w-3.5 text-slate-400" />
   {profile?.phoneNumber || authUser?.phoneNumber || 'No phone added'}
   </span>
   <span className="flex items-center gap-1.5">
-  <Clock className="h-3.5 w-3.5 text-[#9797ab]" />
+  <Clock className="h-3.5 w-3.5 text-slate-400" />
   Joined {formatDate(profile?.createdAt)}
   </span>
   </div>
 
   {profile?.bio && (
-  <p className="text-[13px] text-[#16161d] italic bg-[#f7f7fa] p-2.5 rounded-[12px] border border-[#e8e8f0] max-w-xl">
+  <p className="text-[13px] text-ink italic bg-mist p-2.5 rounded-[12px] border border-slate-200 max-w-xl">
   &ldquo;{profile.bio}&rdquo;
   </p>
   )}
@@ -484,7 +484,7 @@ export default function ProfilePage() {
   <div className="flex md:flex-col gap-2 shrink-0">
   <button
   onClick={() => setIsEditModalOpen(true)}
-  className="px-4 py-2.5 rounded-[14px] bg-[#6d4aff] hover:bg-[#5b3adb] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm"
+  className="px-4 py-2.5 rounded-[14px] bg-brand hover:bg-[#5b3adb] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm"
   >
   <Edit3 className="h-4 w-4" />
   <span>Edit Profile</span>
@@ -498,16 +498,16 @@ export default function ProfilePage() {
   {/* Guardians */}
   <Link
   href="/contacts"
-  className="p-4 rounded-[18px] bg-white border border-[#e8e8f0] text-center shadow-xs hover:border-[#6d4aff] transition block group"
+  className="p-4 rounded-[18px] bg-white border border-slate-200 text-center shadow-xs hover:border-brand transition block group"
   >
-  <span className="text-[22px] font-black text-[#16161d] block group-hover:text-[#6d4aff]">
+  <span className="text-[22px] font-black text-ink block group-hover:text-brand">
   {loading ? <Skeleton className="h-6 w-10 mx-auto rounded-md" /> : guardians.length}
   </span>
-  <p className="text-[11.5px] font-medium text-[#5b5b6e] mt-0.5">Guardians</p>
+  <p className="text-[11.5px] font-medium text-slate-600 mt-0.5">Guardians</p>
   </Link>
 
   {/* Readiness */}
-  <div className="p-4 rounded-[18px] bg-white border border-[#e8e8f0] text-center shadow-xs">
+  <div className="p-4 rounded-[18px] bg-white border border-slate-200 text-center shadow-xs">
   <span
   className={`text-[22px] font-black block ${
   readinessPercent >= 80
@@ -519,105 +519,105 @@ export default function ProfilePage() {
   >
   {loading ? <Skeleton className="h-6 w-12 mx-auto rounded-md" /> : `${readinessPercent}%`}
   </span>
-  <p className="text-[11.5px] font-medium text-[#5b5b6e] mt-0.5">Readiness</p>
+  <p className="text-[11.5px] font-medium text-slate-600 mt-0.5">Readiness</p>
   </div>
 
   {/* Incidents Shared */}
   <Link
   href="/myposts"
-  className="p-4 rounded-[18px] bg-white border border-[#e8e8f0] text-center shadow-xs hover:border-[#6d4aff] transition block group"
+  className="p-4 rounded-[18px] bg-white border border-slate-200 text-center shadow-xs hover:border-brand transition block group"
   >
-  <span className="text-[22px] font-black text-[#6d4aff] block group-hover:underline">
+  <span className="text-[22px] font-black text-brand block group-hover:underline">
   {loading ? <Skeleton className="h-6 w-10 mx-auto rounded-md" /> : stats.postCount}
   </span>
-  <p className="text-[11.5px] font-medium text-[#5b5b6e] mt-0.5">Posts Shared</p>
+  <p className="text-[11.5px] font-medium text-slate-600 mt-0.5">Posts Shared</p>
   </Link>
 
   {/* Solutions Given */}
-  <div className="p-4 rounded-[18px] bg-white border border-[#e8e8f0] text-center shadow-xs">
-  <span className="text-[22px] font-black text-[#16161d] block">
+  <div className="p-4 rounded-[18px] bg-white border border-slate-200 text-center shadow-xs">
+  <span className="text-[22px] font-black text-ink block">
   {loading ? <Skeleton className="h-6 w-10 mx-auto rounded-md" /> : stats.solutionCount}
   </span>
-  <p className="text-[11.5px] font-medium text-[#5b5b6e] mt-0.5">Advice Given</p>
+  <p className="text-[11.5px] font-medium text-slate-600 mt-0.5">Advice Given</p>
   </div>
 
   {/* Support Given */}
-  <div className="p-4 rounded-[18px] bg-white border border-[#e8e8f0] text-center shadow-xs">
-  <span className="text-[22px] font-black text-[#16161d] block">
+  <div className="p-4 rounded-[18px] bg-white border border-slate-200 text-center shadow-xs">
+  <span className="text-[22px] font-black text-ink block">
   {loading ? <Skeleton className="h-6 w-10 mx-auto rounded-md" /> : stats.supportGivenCount}
   </span>
-  <p className="text-[11.5px] font-medium text-[#5b5b6e] mt-0.5">Faced This Too</p>
+  <p className="text-[11.5px] font-medium text-slate-600 mt-0.5">Faced This Too</p>
   </div>
 
   {/* Saved Posts */}
-  <div className="p-4 rounded-[18px] bg-white border border-[#e8e8f0] text-center shadow-xs">
-  <span className="text-[22px] font-black text-[#16161d] block">
+  <div className="p-4 rounded-[18px] bg-white border border-slate-200 text-center shadow-xs">
+  <span className="text-[22px] font-black text-ink block">
   {loading ? <Skeleton className="h-6 w-10 mx-auto rounded-md" /> : savedPostsCount}
   </span>
-  <p className="text-[11.5px] font-medium text-[#5b5b6e] mt-0.5">Saved Guides</p>
+  <p className="text-[11.5px] font-medium text-slate-600 mt-0.5">Saved Guides</p>
   </div>
   </div>
 
   {/* ─── 3. Demographic & Account Metadata ──────────────────────────── */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-6 shadow-sm space-y-4">
-  <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
+  <section className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm space-y-4">
+  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
   <div className="flex items-center gap-2">
-  <UserCheck className="h-5 w-5 text-[#6d4aff]" />
-  <h3 className="text-[16px] font-black text-[#16161d]">
+  <UserCheck className="h-5 w-5 text-brand" />
+  <h3 className="text-[16px] font-black text-ink">
   Personal & Safety Demographics
   </h3>
   </div>
   <button
   onClick={() => setIsEditModalOpen(true)}
-  className="text-xs font-bold text-[#6d4aff] hover:underline flex items-center gap-1"
+  className="text-xs font-bold text-brand hover:underline flex items-center gap-1"
   >
   <Edit3 className="h-3.5 w-3.5" /> Edit Details
   </button>
   </div>
 
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0]">
-  <p className="text-[11.5px] font-medium text-[#5b5b6e]">Display Name</p>
-  <p className="text-[14px] font-bold text-[#16161d] mt-0.5">
+  <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
+  <p className="text-[11.5px] font-medium text-slate-600">Display Name</p>
+  <p className="text-[14px] font-bold text-ink mt-0.5">
   {profile?.displayName || 'Not configured'}
   </p>
   </div>
 
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0]">
-  <p className="text-[11.5px] font-medium text-[#5b5b6e]">Date of Birth</p>
-  <p className="text-[14px] font-bold text-[#16161d] mt-0.5 flex items-center gap-2">
+  <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
+  <p className="text-[11.5px] font-medium text-slate-600">Date of Birth</p>
+  <p className="text-[14px] font-bold text-ink mt-0.5 flex items-center gap-2">
   {formatDate(profile?.dob)}
   {calculateAge(profile?.dob) && (
-  <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#f1edff] text-[#6d4aff] font-bold">
+  <span className="text-[11px] px-2 py-0.5 rounded-full bg-brand-tint text-brand font-bold">
   {calculateAge(profile?.dob)}
   </span>
   )}
   </p>
   </div>
 
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0]">
-  <p className="text-[11.5px] font-medium text-[#5b5b6e]">Gender</p>
-  <p className="text-[14px] font-bold text-[#16161d] mt-0.5">
+  <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
+  <p className="text-[11.5px] font-medium text-slate-600">Gender</p>
+  <p className="text-[14px] font-bold text-ink mt-0.5">
   {currentGenderName}
   </p>
   </div>
 
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0]">
-  <p className="text-[11.5px] font-medium text-[#5b5b6e]">Occupation</p>
-  <p className="text-[14px] font-bold text-[#16161d] mt-0.5">
+  <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
+  <p className="text-[11.5px] font-medium text-slate-600">Occupation</p>
+  <p className="text-[14px] font-bold text-ink mt-0.5">
   {currentOccupationName}
   </p>
   </div>
 
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0]">
-  <p className="text-[11.5px] font-medium text-[#5b5b6e]">Emergency Phone</p>
-  <p className="text-[14px] font-bold text-[#16161d] mt-0.5">
+  <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
+  <p className="text-[11.5px] font-medium text-slate-600">Emergency Phone</p>
+  <p className="text-[14px] font-bold text-ink mt-0.5">
   {profile?.phoneNumber || authUser?.phoneNumber || 'None linked'}
   </p>
   </div>
 
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0]">
-  <p className="text-[11.5px] font-medium text-[#5b5b6e]">Push Notifications</p>
+  <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
+  <p className="text-[11.5px] font-medium text-slate-600">Push Notifications</p>
   <p className="text-[14px] font-bold text-[#059669] mt-0.5 flex items-center gap-1.5">
   <Bell className="h-3.5 w-3.5" />
   {profile?.pushNotifications !== false ? 'Enabled' : 'Disabled'}
@@ -627,17 +627,17 @@ export default function ProfilePage() {
   </section>
 
   {/* ─── 4. Emergency Circle Guardians ─────────────────────────────── */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-6 shadow-sm space-y-4">
-  <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
+  <section className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm space-y-4">
+  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
   <div className="flex items-center gap-2">
-  <Users className="h-5 w-5 text-[#6d4aff]" />
-  <h3 className="text-[16px] font-black text-[#16161d]">
+  <Users className="h-5 w-5 text-brand" />
+  <h3 className="text-[16px] font-black text-ink">
   Emergency Circle & Trusted Guardians ({guardians.length})
   </h3>
   </div>
   <Link
   href="/contacts"
-  className="text-xs font-bold text-[#6d4aff] hover:underline flex items-center gap-1"
+  className="text-xs font-bold text-brand hover:underline flex items-center gap-1"
   >
   Manage Circle <ChevronRight className="h-3.5 w-3.5" />
   </Link>
@@ -649,18 +649,18 @@ export default function ProfilePage() {
   <Skeleton className="h-14 w-full rounded-[16px]" />
   </div>
   ) : guardians.length === 0 ? (
-  <div className="p-6 rounded-[18px] bg-[#f7f7fa] text-center space-y-2 border border-dashed border-[#e8e8f0]">
+  <div className="p-6 rounded-[18px] bg-mist text-center space-y-2 border border-dashed border-slate-200">
   <AlertTriangle className="h-6 w-6 text-[#d97706] mx-auto" />
-  <p className="text-sm font-bold text-[#16161d]">
+  <p className="text-sm font-bold text-ink">
   No emergency contacts added yet
   </p>
-  <p className="text-xs text-[#5b5b6e] max-w-md mx-auto">
+  <p className="text-xs text-slate-600 max-w-md mx-auto">
   Add at least two trusted contacts (parents, friends, siblings) so emergency SMS and
   real-time GPS dispatch can alert them instantly.
   </p>
   <Link
   href="/contacts"
-  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[12px] bg-[#6d4aff] text-white text-xs font-bold shadow-xs hover:bg-[#5b3adb] transition mt-2"
+  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[12px] bg-brand text-white text-xs font-bold shadow-xs hover:bg-[#5b3adb] transition mt-2"
   >
   <Plus className="h-3.5 w-3.5" /> Add First Guardian
   </Link>
@@ -670,11 +670,11 @@ export default function ProfilePage() {
   {guardians.map((c) => (
   <div
   key={c.id}
-  className="p-4 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] flex items-center justify-between"
+  className="p-4 rounded-[16px] bg-mist border border-slate-200 flex items-center justify-between"
   >
   <div className="space-y-0.5">
   <div className="flex items-center gap-2">
-  <span className="text-sm font-bold text-[#16161d]">
+  <span className="text-sm font-bold text-ink">
   {c.name}
   </span>
   {c.isPrimary && (
@@ -683,7 +683,7 @@ export default function ProfilePage() {
   </span>
   )}
   </div>
-  <p className="text-xs text-[#5b5b6e] flex items-center gap-2">
+  <p className="text-xs text-slate-600 flex items-center gap-2">
   <span>{c.relationship || 'Guardian'}</span>
   <span>•</span>
   <span className="font-mono">{c.phoneNumber}</span>
@@ -691,7 +691,7 @@ export default function ProfilePage() {
   </div>
   <Link
   href={`tel:${c.phoneNumber}`}
-  className="p-2 rounded-[10px] bg-white text-[#059669] hover:bg-[#ecfdf5] transition border border-[#e8e8f0]"
+  className="p-2 rounded-[10px] bg-white text-[#059669] hover:bg-[#ecfdf5] transition border border-slate-200"
   title="Call contact"
   >
   <Phone className="h-4 w-4" />
@@ -704,24 +704,24 @@ export default function ProfilePage() {
 
    
   {/* ─── 6. Recent Incident Posts & Community Shares ────────────────── */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-6 shadow-sm space-y-4">
-  <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
+  <section className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm space-y-4">
+  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
   <div className="flex items-center gap-2">
-  <Share2 className="h-5 w-5 text-[#6d4aff]" />
-  <h3 className="text-[16px] font-black text-[#16161d]">
+  <Share2 className="h-5 w-5 text-brand" />
+  <h3 className="text-[16px] font-black text-ink">
   My Recent Safety Shares ({stats.postCount})
   </h3>
   </div>
   <Link
   href="/myposts"
-  className="text-xs font-bold text-[#6d4aff] hover:underline flex items-center gap-1"
+  className="text-xs font-bold text-brand hover:underline flex items-center gap-1"
   >
   View All Posts <ChevronRight className="h-3.5 w-3.5" />
   </Link>
   </div>
 
   {recentPosts.length === 0 ? (
-  <p className="text-xs text-[#5b5b6e] py-2">
+  <p className="text-xs text-slate-600 py-2">
   You haven&apos;t shared any incident reports or safety spots yet. Your contributions help
   warn others in your neighborhood.
   </p>
@@ -730,23 +730,23 @@ export default function ProfilePage() {
   {recentPosts.map((post) => (
   <div
   key={post.id}
-  className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] flex items-center justify-between gap-3"
+  className="p-3.5 rounded-[16px] bg-mist border border-slate-200 flex items-center justify-between gap-3"
   >
   <div className="min-w-0 space-y-1">
   <div className="flex items-center gap-2">
-  <span className="px-2 py-0.5 rounded-full bg-[#f1edff] text-[#6d4aff] text-[10px] font-bold">
+  <span className="px-2 py-0.5 rounded-full bg-brand-tint text-brand text-[10px] font-bold">
   {post.categoryName || 'General Safety'}
   </span>
   {post.isAnonymous && (
-  <span className="px-2 py-0.5 rounded-full bg-[#f1f1f6] text-[#5b5b6e] text-[10px] font-medium">
+  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-medium">
   Anonymous
   </span>
   )}
-  <span className="text-[11px] text-[#5b5b6e]">
+  <span className="text-[11px] text-slate-600">
   {formatDate(post.createdAt)}
   </span>
   </div>
-  <p className="text-xs text-[#16161d] font-medium truncate">
+  <p className="text-xs text-ink font-medium truncate">
   {post.content}
   </p>
   </div>
@@ -761,34 +761,34 @@ export default function ProfilePage() {
   </section>
 
   {/* ─── 7. Device Diagnostics & Geolocation Sensor ────────────────── */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-6 shadow-sm space-y-4">
+  <section className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm space-y-4">
   <div className="flex items-center gap-2">
-  <MapPin className="h-5 w-5 text-[#6d4aff]" />
-  <h3 className="text-[16px] font-black text-[#16161d]">
+  <MapPin className="h-5 w-5 text-brand" />
+  <h3 className="text-[16px] font-black text-ink">
   Device Diagnostics & Sensor Readiness
   </h3>
   </div>
 
   <div className="space-y-3">
-  <div className="p-4 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] flex items-center justify-between">
+  <div className="p-4 rounded-[16px] bg-mist border border-slate-200 flex items-center justify-between">
   <div>
-  <p className="text-[13.5px] font-bold text-[#16161d]">
+  <p className="text-[13.5px] font-bold text-ink">
   High-Accuracy Geolocation Sensor
   </p>
-  <p className="text-[12px] text-[#5b5b6e]">
+  <p className="text-[12px] text-slate-600">
   Verifies browser GPS telemetry fix for zero-delay emergency SOS dispatch
   </p>
   </div>
   <button
   onClick={handleTestLocation}
-  className="px-4 py-2 rounded-[12px] bg-white border border-[#e8e8f0] text-[#16161d] text-xs font-bold transition hover:border-[#6d4aff] shadow-xs"
+  className="px-4 py-2 rounded-[12px] bg-white border border-slate-200 text-ink text-xs font-bold transition hover:border-brand shadow-xs"
   >
   Test Sensor
   </button>
   </div>
 
   {testLocMsg && (
-  <div className="p-3.5 rounded-[14px] bg-[#f1edff] border border-[#6d4aff]/30 text-[#6d4aff] text-xs font-semibold">
+  <div className="p-3.5 rounded-[14px] bg-brand-tint border border-brand/30 text-brand text-xs font-semibold">
   {testLocMsg}
   </div>
   )}
@@ -823,7 +823,7 @@ export default function ProfilePage() {
   maxLength={50}
   value={editForm.displayName}
   onChange={(e) => setEditForm({ ...editForm, displayName: e.target.value })}
-  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#6d4aff]"
+  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand"
   placeholder="Your full or preferred name"
   />
   </div>
@@ -835,7 +835,7 @@ export default function ProfilePage() {
   maxLength={200}
   value={editForm.bio}
   onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#6d4aff]"
+  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand"
   placeholder="Optional short note about yourself or trusted campus dorm"
   />
   </div>
@@ -847,7 +847,7 @@ export default function ProfilePage() {
   type="date"
   value={editForm.dob}
   onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
-  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#6d4aff]"
+  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand"
   />
   </div>
 
@@ -856,7 +856,7 @@ export default function ProfilePage() {
   <select
   value={editForm.genderId}
   onChange={(e) => setEditForm({ ...editForm, genderId: e.target.value })}
-  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#6d4aff] bg-white"
+  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand bg-white"
   >
   <option value="">Select Gender</option>
   {genders.map((g) => (
@@ -873,7 +873,7 @@ export default function ProfilePage() {
   <select
   value={editForm.occupationStatusId}
   onChange={(e) => setEditForm({ ...editForm, occupationStatusId: e.target.value })}
-  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#6d4aff] bg-white"
+  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand bg-white"
   >
   <option value="">Select Occupation</option>
   {occupations.map((o) => (
@@ -895,7 +895,7 @@ export default function ProfilePage() {
   <button
   type="submit"
   disabled={editSaving}
-  className="px-5 py-2 rounded-xl bg-[#6d4aff] hover:bg-[#5b3adb] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+  className="px-5 py-2 rounded-xl bg-brand hover:bg-[#5b3adb] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
   >
   {editSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Changes'}
   </button>

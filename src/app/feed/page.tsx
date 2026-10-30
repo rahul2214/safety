@@ -39,6 +39,7 @@ import {
 } from'lucide-react';
 import {
   api,
+  hashtagText,
   type Category,
   type PostSeverityOption,
   type PostStatusOption,
@@ -444,7 +445,7 @@ function FeedPageContent() {
   .toLowerCase()
   .includes(query);
   const locMatch = (post.location || '').toLowerCase().includes(query);
-  const tagMatch = (post.hashtags || []).some((tag) => tag.toLowerCase().includes(query));
+  const tagMatch = (post.hashtags || []).some((tag) => hashtagText(tag).toLowerCase().includes(query));
 
   if (!contentMatch && !authorMatch && !catMatch && !locMatch && !tagMatch) {
   return false;
@@ -503,14 +504,14 @@ function FeedPageContent() {
   {/* ============================================================ */}
   {/* 1. HERO HEADER: Public Safety Feed Banner */}
   {/* ============================================================ */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-5 sm:p-7 shadow-sm space-y-5">
+  <section className="bg-white rounded-[24px] border border-slate-200 p-5 sm:p-7 shadow-sm space-y-5">
   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
   <div className="space-y-2">
    
-  <h1 className="text-2xl sm:text-3xl font-black text-[#16161d] tracking-tight">
+  <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
   Hyperlocal Safety Reports &amp; Verified Solutions
   </h1>
-  <p className="text-xs sm:text-[13.5px] text-[#5b5b6e] max-w-2xl leading-relaxed">
+  <p className="text-xs sm:text-[13.5px] text-slate-600 max-w-2xl leading-relaxed">
   Explore real-time community alerts, transit warnings, and peer-verified safety alternatives submitted by women across communities in India.
   </p>
   </div>
@@ -527,7 +528,7 @@ function FeedPageContent() {
 
   <a
   href="tel:1091"
-  className="px-3.5 py-2 rounded-[12px] bg-[#f1edff] hover:bg-[#e6deff] text-[#6d4aff] text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
+  className="px-3.5 py-2 rounded-[12px] bg-brand-tint hover:bg-[#e6deff] text-brand text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
   >
   <ShieldAlert className="h-3.5 w-3.5" />
   <span>1091 Women Line</span>
@@ -536,7 +537,7 @@ function FeedPageContent() {
   {isAuthenticated ? (
   <Link
   href="/report"
-  className="px-4 py-2 rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-[#6d4aff]/30"
+  className="px-4 py-2 rounded-[12px] bg-brand hover:bg-brand-deep text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-brand/30"
   >
   <Plus className="h-4 w-4" />
   <span>Post Alert</span>
@@ -544,7 +545,7 @@ function FeedPageContent() {
   ) : (
   <Link
   href="/login?redirect=/report"
-  className="px-4 py-2 rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-[#6d4aff]/30"
+  className="px-4 py-2 rounded-[12px] bg-brand hover:bg-brand-deep text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-brand/30"
   >
   <Plus className="h-4 w-4" />
   <span>Report Incident</span>
@@ -557,16 +558,16 @@ function FeedPageContent() {
 
   {/* Guest Sign-in Prompt Banner */}
   {!isAuthenticated && (
-  <section className="bg-[#f4f0ff] rounded-[20px] border border-[#e8e8f0] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <section className="bg-brand-tint rounded-[20px] border border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
   <div className="flex items-center gap-3">
-  <div className="w-10 h-10 rounded-[12px] bg-[#6d4aff] text-white flex items-center justify-center shrink-0">
+  <div className="w-10 h-10 rounded-[12px] bg-brand text-white flex items-center justify-center shrink-0">
   <Shield className="h-5 w-5" />
   </div>
   <div className="space-y-0.5">
-  <h3 className="text-xs sm:text-sm font-bold text-[#16161d]">
+  <h3 className="text-xs sm:text-sm font-bold text-ink">
   Viewing Public Community Mesh
   </h3>
-  <p className="text-[11px] sm:text-xs text-[#5b5b6e]">
+  <p className="text-[11px] sm:text-xs text-slate-600">
   Create a free account to verify reports, post safety alerts, and connect trusted guardians.
   </p>
   </div>
@@ -574,13 +575,13 @@ function FeedPageContent() {
   <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
   <Link
   href="/login"
-  className="px-3.5 py-1.5 rounded-[10px] bg-white border border-[#e8e8f0] text-xs font-bold text-[#16161d] hover:bg-[#f1f1f6] transition"
+  className="px-3.5 py-1.5 rounded-[10px] bg-white border border-slate-200 text-xs font-bold text-ink hover:bg-slate-100 transition"
   >
   Sign In
   </Link>
   <Link
   href="/signup"
-  className="px-3.5 py-1.5 rounded-[10px] bg-[#6d4aff] hover:bg-[#5325e8] text-white text-xs font-bold transition shadow-xs shadow-[#6d4aff]/20"
+  className="px-3.5 py-1.5 rounded-[10px] bg-brand hover:bg-brand-deep text-white text-xs font-bold transition shadow-xs shadow-brand/20"
   >
   Join Free
   </Link>
@@ -596,13 +597,13 @@ function FeedPageContent() {
   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
   {/* Search Input */}
   <div className="relative flex-1">
-  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86869e]" />
+  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
   <input
   type="text"
   value={searchQuery}
   onChange={(e) => handleSearchChange(e.target.value)}
   placeholder="Search reports by incident description, location, category, or author..."
-  className="w-full pl-10 pr-9 py-2.5 rounded-[14px] bg-white border border-[#e8e8f0] text-xs sm:text-[13px] text-[#16161d] placeholder-[#86869e] focus:outline-hidden focus:border-[#6d4aff] transition shadow-2xs"
+  className="w-full pl-10 pr-9 py-2.5 rounded-[14px] bg-white border border-slate-200 text-xs sm:text-[13px] text-ink placeholder-slate-400 focus:outline-hidden focus:border-brand transition shadow-2xs"
   />
   {searchQuery && (
   <button
@@ -620,15 +621,15 @@ function FeedPageContent() {
   <select
   value={sortBy}
   onChange={(e) => setSortBy(e.target.value)}
-  className="w-full sm:w-auto appearance-none pl-8 pr-8 py-2.5 rounded-[14px] bg-white border border-[#e8e8f0] text-xs font-bold text-[#16161d] focus:outline-hidden focus:border-[#6d4aff] transition cursor-pointer shadow-2xs"
+  className="w-full sm:w-auto appearance-none pl-8 pr-8 py-2.5 rounded-[14px] bg-white border border-slate-200 text-xs font-bold text-ink focus:outline-hidden focus:border-brand transition cursor-pointer shadow-2xs"
   >
   <option value="NEWEST_INCIDENT">Newest Incident First</option>
   <option value="NEWEST_REPORT">Newest Posted</option>
   <option value="MOST_URGENT">Most Urgent (Critical First)</option>
   <option value="MOST_SUPPORTED">Most Supported</option>
   </select>
-  <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#86869e] pointer-events-none" />
-  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#86869e] pointer-events-none" />
+  <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
   </div>
 
   {/* Refresh Button */}
@@ -636,9 +637,9 @@ function FeedPageContent() {
   onClick={() => loadFeedData(true)}
   disabled={refreshing}
   title="Refresh Safety Feed"
-  className="p-2.5 rounded-[14px] bg-white border border-[#e8e8f0] text-[#5b5b6e] hover:text-[#16161d] transition shrink-0"
+  className="p-2.5 rounded-[14px] bg-white border border-slate-200 text-slate-600 hover:text-ink transition shrink-0"
   >
-  <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-[#6d4aff]' : ''}`} />
+  <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-brand' : ''}`} />
   </button>
   </div>
 
@@ -688,8 +689,8 @@ function FeedPageContent() {
   onChange={(e) => setSelectedTimeframe(e.target.value)}
   className={`appearance-none pl-8 pr-8 py-2.5 rounded-[14px] text-xs font-bold transition shadow-2xs cursor-pointer border ${
   selectedTimeframe !== 'ALL'
-  ? 'bg-[#6d4aff]/10 border-[#6d4aff] text-[#6d4aff]'
-  : 'bg-white border-[#e8e8f0] text-[#16161d]'
+  ? 'bg-brand/10 border-brand text-brand'
+  : 'bg-white border-slate-200 text-ink'
   }`}
   >
   <option value="ALL">Timing: All Time</option>
@@ -697,8 +698,8 @@ function FeedPageContent() {
   <option value="7D">Timing: Past 7 Days</option>
   <option value="30D">Timing: Past 30 Days</option>
   </select>
-  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6d4aff] pointer-events-none" />
-  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#86869e] pointer-events-none" />
+  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand pointer-events-none" />
+  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
   </div>
 
   {/* 5. More Filters Dropdown (Location search & Author privacy) */}
@@ -708,28 +709,28 @@ function FeedPageContent() {
   onClick={() => setIsMoreFiltersOpen((prev) => !prev)}
   className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-[14px] text-xs font-bold transition shadow-2xs border ${
   locationQuery || hasLocationOnly || selectedAuthorTypes.length > 0 || isMoreFiltersOpen
-  ? 'bg-[#6d4aff]/10 border-[#6d4aff] text-[#6d4aff]'
-  : 'bg-white border-[#e8e8f0] text-[#16161d] hover:bg-[#f7f7fa]'
+  ? 'bg-brand/10 border-brand text-brand'
+  : 'bg-white border-slate-200 text-ink hover:bg-mist'
   }`}
   >
-  <SlidersHorizontal className="h-3.5 w-3.5 text-[#6d4aff]" />
+  <SlidersHorizontal className="h-3.5 w-3.5 text-brand" />
   <span>More Filters</span>
   {(locationQuery || hasLocationOnly || selectedAuthorTypes.length > 0) && (
-  <span className="w-4 h-4 rounded-full bg-[#6d4aff] text-white text-[10px] font-black flex items-center justify-center">
+  <span className="w-4 h-4 rounded-full bg-brand text-white text-[10px] font-black flex items-center justify-center">
   {(locationQuery ? 1 : 0) + (hasLocationOnly ? 1 : 0) + selectedAuthorTypes.length}
   </span>
   )}
   <ChevronDown
-  className={`h-3.5 w-3.5 text-[#86869e] transition-transform ${
+  className={`h-3.5 w-3.5 text-slate-400 transition-transform ${
   isMoreFiltersOpen ? 'rotate-180' : ''
   }`}
   />
   </button>
 
   {isMoreFiltersOpen && (
-  <div className="absolute right-0 sm:left-0 mt-2 w-72 sm:w-80 rounded-[18px] bg-white border border-[#e8e8f0] shadow-xl z-50 p-4 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-  <div className="flex items-center justify-between pb-2 border-b border-[#e8e8f0]">
-  <h4 className="text-xs font-black text-[#16161d]">
+  <div className="absolute right-0 sm:left-0 mt-2 w-72 sm:w-80 rounded-[18px] bg-white border border-slate-200 shadow-xl z-50 p-4 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+  <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+  <h4 className="text-xs font-black text-ink">
   Location &amp; Author Filters
   </h4>
   <button
@@ -757,7 +758,7 @@ function FeedPageContent() {
   value={locationQuery}
   onChange={(e) => setLocationQuery(e.target.value)}
   placeholder="e.g. Madhapur, Transit, Campus..."
-  className="w-full pl-3 pr-7 py-1.5 rounded-[10px] bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-[#6d4aff]"
+  className="w-full pl-3 pr-7 py-1.5 rounded-[10px] bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-brand"
   />
   {locationQuery && (
   <button
@@ -773,7 +774,7 @@ function FeedPageContent() {
   type="checkbox"
   checked={hasLocationOnly}
   onChange={(e) => setHasLocationOnly(e.target.checked)}
-  className="rounded border-slate-300 text-[#6d4aff] focus:ring-[#6d4aff]"
+  className="rounded border-slate-300 text-brand focus:ring-brand"
   />
   <span className="text-[11px] text-slate-600 select-none">
   Only reports with location tagged
@@ -782,7 +783,7 @@ function FeedPageContent() {
   </div>
 
   {/* Author Privacy Multi-Select */}
-  <div className="space-y-2 pt-1 border-t border-[#e8e8f0]">
+  <div className="space-y-2 pt-1 border-t border-slate-200">
   <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
   <EyeOff className="h-3.5 w-3.5 text-purple-500" />
   <span>Author Privacy (Multiple)</span>
@@ -800,12 +801,12 @@ function FeedPageContent() {
   onClick={() => toggleAuthorType(auth.id)}
   className={`w-full px-2.5 py-1.5 rounded-[10px] text-xs font-medium transition flex items-center gap-2 border text-left cursor-pointer ${
   isSelected
-  ? 'bg-[#6d4aff]/10 border-[#6d4aff] text-[#6d4aff] font-bold'
+  ? 'bg-brand/10 border-brand text-brand font-bold'
   : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-700'
   }`}
   >
   {isSelected ? (
-  <CheckSquare className="h-4 w-4 text-[#6d4aff] shrink-0" />
+  <CheckSquare className="h-4 w-4 text-brand shrink-0" />
   ) : (
   <Square className="h-4 w-4 text-slate-400 shrink-0" />
   )}
@@ -816,11 +817,11 @@ function FeedPageContent() {
   </div>
   </div>
 
-  <div className="pt-2 border-t border-[#e8e8f0] flex justify-end">
+  <div className="pt-2 border-t border-slate-200 flex justify-end">
   <button
   type="button"
   onClick={() => setIsMoreFiltersOpen(false)}
-  className="px-3 py-1 rounded-[10px] bg-[#6d4aff] text-white text-xs font-bold hover:bg-[#5325e8]"
+  className="px-3 py-1 rounded-[10px] bg-brand text-white text-xs font-bold hover:bg-brand-deep"
   >
   Done
   </button>
@@ -866,7 +867,7 @@ function FeedPageContent() {
   return (
   <span
   key={catId}
-  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#f1edff] text-[#6d4aff] border border-[#6d4aff]/30"
+  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-brand-tint text-brand border border-brand/30"
   >
   <span>Category: {label}</span>
   <button
@@ -1002,7 +1003,7 @@ function FeedPageContent() {
   {activeFilterCount > 0 ? ` (${activeFilterCount} filter criteria applied)` : ''}
   </span>
   {activeFilterCount > 0 && (
-  <button onClick={resetAllFilters} className="text-[#6d4aff] hover:underline font-semibold">
+  <button onClick={resetAllFilters} className="text-brand hover:underline font-semibold">
   Reset Filters
   </button>
   )}
@@ -1050,21 +1051,21 @@ function FeedPageContent() {
   </div>
   ) : (
   /* Empty Search / Filter State */
-  <div className="p-10 text-center bg-white rounded-[24px] border border-[#e8e8f0] space-y-3">
-  <div className="w-12 h-12 rounded-full bg-[#f1edff] text-[#6d4aff] flex items-center justify-center mx-auto">
+  <div className="p-10 text-center bg-white rounded-[24px] border border-slate-200 space-y-3">
+  <div className="w-12 h-12 rounded-full bg-brand-tint text-brand flex items-center justify-center mx-auto">
   <Search className="h-6 w-6" />
   </div>
-  <h3 className="text-base font-bold text-[#16161d]">
+  <h3 className="text-base font-bold text-ink">
   No incident reports found
   </h3>
-  <p className="text-xs text-[#5b5b6e] max-w-sm mx-auto">
+  <p className="text-xs text-slate-600 max-w-sm mx-auto">
   No public reports matched your current filters
   {searchQuery ? ` ("${searchQuery}")` : ''}.
   Try clearing some filter criteria or searching with broader keywords.
   </p>
   <button
   onClick={resetAllFilters}
-  className="px-4 py-2 rounded-[12px] bg-[#6d4aff] text-white text-xs font-bold hover:bg-[#5325e8] transition shadow-xs"
+  className="px-4 py-2 rounded-[12px] bg-brand text-white text-xs font-bold hover:bg-brand-deep transition shadow-xs"
   >
   Reset All Filters
   </button>

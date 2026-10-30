@@ -70,17 +70,17 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   return (
   <>
   {/* Top Header */}
-  <header className="sticky top-0 z-40 w-full border-b border-[#e8e8f0] bg-white/90 backdrop-blur-md">
+  <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
   <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-3 sm:px-6">
   {/* Logo & Identity */}
   <Link href="/"className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
   <Logo size={36} />
   <div>
-  <span className="font-black text-[#16161d] text-[15px] sm:text-[16px] tracking-tight flex items-center gap-1.5 group-hover:text-[#6d4aff] transition-colors">
+  <span className="font-black text-ink text-[15px] sm:text-[16px] tracking-tight flex items-center gap-1.5 group-hover:text-brand transition-colors">
   Sabhijude
    
   </span>
-  <p className="text-[10px] sm:text-[10.5px] text-[#5b5b6e] -mt-0.5 font-medium hidden xs:block">
+  <p className="text-[10px] sm:text-[10.5px] text-slate-600 -mt-0.5 font-medium hidden xs:block">
   Women Safety Network
   </p>
   </div>
@@ -99,8 +99,8 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   href={item.href}
   className={`flex items-center gap-2 px-3.5 py-2 rounded-[12px] text-[13px] font-semibold transition ${
   isActive
-  ? 'bg-[#f1edff] text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6]'
+  ? 'bg-brand-tint text-brand'
+  : 'text-slate-600 hover:text-ink hover:bg-slate-100'
   }`}
   >
   <Icon className="h-4 w-4" />
@@ -116,19 +116,19 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   href="/"
   className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-[12px] text-[12px] sm:text-[13px] font-semibold transition ${
   pathname === '/'
-  ? 'bg-[#f1edff] text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6]'
+  ? 'bg-brand-tint text-brand'
+  : 'text-slate-600 hover:text-ink hover:bg-slate-100'
   }`}
   >
-  <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#6d4aff]" />
+  <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand" />
   <span>Home</span>
   </Link>
   <Link
   href="/feed"
   className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-[12px] text-[12px] sm:text-[13px] font-semibold transition ${
   pathname === '/feed'
-  ? 'bg-[#f1edff] text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6]'
+  ? 'bg-brand-tint text-brand'
+  : 'text-slate-600 hover:text-ink hover:bg-slate-100'
   }`}
   >
   <Radio className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#e11d48]" />
@@ -138,30 +138,30 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   href="/map"
   className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-[12px] text-[12px] sm:text-[13px] font-semibold transition ${
   pathname === '/map'
-  ? 'bg-[#f1edff] text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6]'
+  ? 'bg-brand-tint text-brand'
+  : 'text-slate-600 hover:text-ink hover:bg-slate-100'
   }`}
   >
-  <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#6d4aff]" />
+  <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand" />
   <span>Map</span>
   </Link>
   <Link
   href="/about"
   className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-[12px] text-[12px] sm:text-[13px] font-semibold transition ${
   pathname === '/about'
-  ? 'bg-[#f1edff] text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6]'
+  ? 'bg-brand-tint text-brand'
+  : 'text-slate-600 hover:text-ink hover:bg-slate-100'
   }`}
   >
-  <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#6d4aff]" />
+  <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand" />
   <span>About</span>
   </Link>
   <Link
   href="/safety-measures"
   className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-[12px] text-[12px] sm:text-[13px] font-semibold transition ${
   pathname === '/safety-measures'
-  ? 'bg-[#f1edff] text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6]'
+  ? 'bg-brand-tint text-brand'
+  : 'text-slate-600 hover:text-ink hover:bg-slate-100'
   }`}
   >
   <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#059669]" />
@@ -182,30 +182,30 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   aria-label="Switch platform portals"
   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[12px] text-xs font-semibold border transition ${
   portalsMenuOpen
-  ? 'bg-[#f1edff] text-[#6d4aff] border-[#6d4aff]/30 shadow-sm'
-  : 'bg-[#f7f7fa] text-[#5b5b6e] border-[#e8e8f0] hover:text-[#16161d]'
+  ? 'bg-brand-tint text-brand border-brand/30 shadow-sm'
+  : 'bg-mist text-slate-600 border-slate-200 hover:text-ink'
   }`}
   >
-  <Building2 className="h-3.5 w-3.5 text-[#6d4aff]" />
+  <Building2 className="h-3.5 w-3.5 text-brand" />
   <span>Portals</span>
   <ChevronDown
-  className={`h-3 w-3 text-[#9797ab] transition-transform duration-200 ${
+  className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${
   portalsMenuOpen ? 'rotate-180' : ''
   }`}
   />
   </button>
 
   {portalsMenuOpen && (
-  <div className="absolute right-0 mt-2 w-64 rounded-[16px] bg-white border border-[#e8e8f0] shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-1">
-  <div className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-[#9797ab]">
+  <div className="absolute right-0 mt-2 w-64 rounded-[16px] bg-white border border-slate-200 shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-1">
+  <div className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400">
   Sabhijude Unified Portals
   </div>
   <Link
   href="/"
   onClick={() => setPortalsMenuOpen(false)}
-  className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-xs text-[#16161d] hover:bg-[#f1f1f6] transition"
+  className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-xs text-ink hover:bg-slate-100 transition"
   >
-  <div className="h-7 w-7 rounded-[8px] bg-[#f1edff] text-[#6d4aff] flex items-center justify-center shrink-0">
+  <div className="h-7 w-7 rounded-[8px] bg-brand-tint text-brand flex items-center justify-center shrink-0">
   <Home className="h-4 w-4" />
   </div>
   <div>
@@ -215,7 +215,7 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   Current
   </span>
   </div>
-  <div className="text-[10.5px] text-[#5b5b6e]">
+  <div className="text-[10.5px] text-slate-600">
   Member feed & safety circles
   </div>
   </div>
@@ -224,16 +224,16 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   <Link
   href="/org"
   onClick={() => setPortalsMenuOpen(false)}
-  className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-xs text-[#16161d] hover:bg-[#f1f1f6] transition"
+  className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-xs text-ink hover:bg-slate-100 transition"
   >
   <div className="h-7 w-7 rounded-[8px] bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
   <Building2 className="h-4 w-4" />
   </div>
   <div>
-  <div className="font-bold text-[#16161d]">
+  <div className="font-bold text-ink">
   Org & Campus Command
   </div>
-  <div className="text-[10.5px] text-[#5b5b6e]">
+  <div className="text-[10.5px] text-slate-600">
   Campus security & enterprise desk
   </div>
   </div>
@@ -242,14 +242,14 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   <Link
   href="/admin"
   onClick={() => setPortalsMenuOpen(false)}
-  className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-xs text-[#16161d] hover:bg-[#f1f1f6] transition"
+  className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] text-xs text-ink hover:bg-slate-100 transition"
   >
    
   <div>
-  <div className="font-bold text-[#16161d]">
+  <div className="font-bold text-ink">
   System Admin Console
   </div>
-  <div className="text-[10.5px] text-[#5b5b6e]">
+  <div className="text-[10.5px] text-slate-600">
   Moderation & platform control
   </div>
   </div>
@@ -264,9 +264,9 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   <button
   onClick={onOpenFakeCall}
   title="Discreet Deterrence Call"
-  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-[12px] bg-[#f1f1f6] hover:bg-[#e6e6ee] border border-[#e8e8f0] text-[#16161d] text-xs font-bold transition"
+  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-[12px] bg-slate-100 hover:bg-slate-200 border border-slate-200 text-ink text-xs font-bold transition"
   >
-  <Phone className="h-3.5 w-3.5 text-[#6d4aff]" />
+  <Phone className="h-3.5 w-3.5 text-brand" />
   <span className="hidden sm:inline">Fake Call</span>
   </button>
 
@@ -279,13 +279,13 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   <span>SOS</span>
   </button>
 
-  <div className="flex items-center gap-1.5 sm:gap-2 pl-1 border-l border-[#e8e8f0]">
+  <div className="flex items-center gap-1.5 sm:gap-2 pl-1 border-l border-slate-200">
   {/* Notifications Bell (Private) */}
   <Link
   href="/notifications"
   title="Safety Notifications"
-  className={`p-2 rounded-[10px] text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6] transition relative ${
-  pathname === '/notifications' ? 'bg-[#f1edff] text-[#6d4aff]' : ''
+  className={`p-2 rounded-[10px] text-slate-600 hover:text-ink hover:bg-slate-100 transition relative ${
+  pathname === '/notifications' ? 'bg-brand-tint text-brand' : ''
   }`}
   >
   <Bell className="h-4 w-4" />
@@ -295,11 +295,11 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   {/* Profile Pill (Private - Desktop Only) */}
   <Link
   href="/profile"
-  className={`hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-[12px] hover:bg-[#f1f1f6] text-xs font-semibold text-[#16161d] transition ${
-  pathname === '/profile' ? 'bg-[#f1edff] text-[#6d4aff]' : ''
+  className={`hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-[12px] hover:bg-slate-100 text-xs font-semibold text-ink transition ${
+  pathname === '/profile' ? 'bg-brand-tint text-brand' : ''
   }`}
   >
-  <div className="h-6 w-6 rounded-full bg-[#f1edff] text-[#6d4aff] font-bold text-xs flex items-center justify-center">
+  <div className="h-6 w-6 rounded-full bg-brand-tint text-brand font-bold text-xs flex items-center justify-center">
   {user?.displayName ? user.displayName[0].toUpperCase() : 'U'}
   </div>
   <span className="hidden lg:inline max-w-[80px] truncate">{user?.displayName}</span>
@@ -308,7 +308,7 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   <button
   onClick={logout}
   title="Sign out"
-  className="p-1.5 text-[#5b5b6e] hover:text-[#e11d48] rounded-[8px] hover:bg-[#f1f1f6] transition"
+  className="p-1.5 text-slate-600 hover:text-[#e11d48] rounded-[8px] hover:bg-slate-100 transition"
   >
   <LogOut className="h-4 w-4" />
   </button>
@@ -316,13 +316,13 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   </>
   ) : (
   /* Public Right Cluster: Only Login & Join/Signup Buttons */
-  <div className="flex items-center gap-1.5 sm:gap-2 pl-1 border-l border-[#e8e8f0]">
+  <div className="flex items-center gap-1.5 sm:gap-2 pl-1 border-l border-slate-200">
   <Link
   href="/login"
   className={`px-2.5 sm:px-3 py-1.5 rounded-[10px] text-xs font-bold transition flex items-center gap-1 ${
   pathname === '/login'
-  ? 'bg-[#f1edff] text-[#6d4aff]'
-  : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-[#f1f1f6]'
+  ? 'bg-brand-tint text-brand'
+  : 'text-slate-600 hover:text-ink hover:bg-slate-100'
   }`}
   >
   <LogIn className="h-3.5 w-3.5" />
@@ -332,8 +332,8 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   href="/signup"
   className={`px-3 sm:px-3.5 py-1.5 rounded-[10px] text-xs font-bold transition shadow-sm flex items-center gap-1 ${
   pathname === '/signup'
-  ? 'bg-[#5325e8] text-white ring-2 ring-[#6d4aff]/30'
-  : 'bg-[#6d4aff] hover:bg-[#5325e8] text-white'
+  ? 'bg-brand-deep text-white ring-2 ring-brand/30'
+  : 'bg-brand hover:bg-brand-deep text-white'
   }`}
   >
   <UserPlus className="h-3.5 w-3.5" />
@@ -347,7 +347,7 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
 
   {/* Mobile Bottom Navigation Bar: ONLY shown for Authenticated Members */}
   {isAuthenticated && (
-  <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-[#e8e8f0] backdrop-blur-lg px-2 py-2">
+  <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-slate-200 backdrop-blur-lg px-2 py-2">
   <div className="flex items-center justify-around max-w-md mx-auto">
   {authMobileLinks.map((item) => {
   const Icon = item.icon;
@@ -358,13 +358,13 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
   href={item.href}
   className={`flex flex-col items-center py-1 px-3 rounded-full text-[10.5px] font-bold transition ${
   isActive
-  ? 'text-[#6d4aff]'
-  : 'text-[#9797ab] hover:text-[#16161d]'
+  ? 'text-brand'
+  : 'text-slate-400 hover:text-ink'
   }`}
   >
   <div
   className={`w-[52px] h-[30px] rounded-full flex items-center justify-center transition-colors ${
-  isActive ? 'bg-[#f1edff]' : 'bg-transparent'
+  isActive ? 'bg-brand-tint' : 'bg-transparent'
   }`}
   >
   <Icon className="h-5 w-5" />

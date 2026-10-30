@@ -36,6 +36,27 @@
   .animate-float, .animate-marquee, .animate-ring { animation: none !important; }
 }
 
+/* Member dashboard: map Tailwind's stock blues and radii onto the brand so every inner page matches */
+.app-shell {
+  --color-blue-50: #eaf1ff;
+  --color-blue-100: #d6e4ff;
+  --color-blue-200: #b7cefc;
+  --color-blue-500: #3a74e6;
+  --color-blue-600: #1d5bd8;
+  --color-blue-700: #133e9e;
+  --color-blue-800: #0f3283;
+  --color-slate-900: #0b1630;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+  --radius-2xl: 1.5rem;
+}
+
+.app-main h2,
+.app-main h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
 /* Shared public-page primitives */
 @layer components {
   .public-container {

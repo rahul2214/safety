@@ -48,7 +48,7 @@ export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-medium rounded-md border ${colorStyles} ${sizeStyles}`}
+      className={`inline-flex items-center gap-1.5 font-semibold rounded-full border ${colorStyles} ${sizeStyles}`}
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${

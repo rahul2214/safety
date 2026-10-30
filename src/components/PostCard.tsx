@@ -13,7 +13,7 @@ import {
   Share2,
   MapPin,
 } from'lucide-react';
-import { api } from'@/lib/api-client';
+import { api, hashtagText, type PostHashtag } from'@/lib/api-client';
 import { useAuth } from'@/lib/auth-context';
 import { useToast } from'@/components/Toast';
 import { PostDetailModal } from'@/components/PostDetailModal';
@@ -42,7 +42,7 @@ export interface PostItem {
   solutionsCount?: number;
   hasSupported?: boolean;
   hasFacedThis?: boolean;
-  hashtags?: string[];
+  hashtags?: PostHashtag[];
   riskScore?: number;
   safetyAdvice?: string;
 }
@@ -183,13 +183,13 @@ export function PostCard({ post }: { post: PostItem }) {
   <>
   <article
   onClick={() => setDetailOpen(true)}
-  className={`relative bg-white rounded-[20px] border border-[#e8e8f0] border-l-4 ${stripeColor} p-4 sm:p-5 space-y-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group`}
+  className={`relative bg-white rounded-[20px] border border-slate-200 border-l-4 ${stripeColor} p-4 sm:p-5 space-y-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group`}
   >
   {/* 1. Author row */}
   <div className="flex items-center justify-between">
   <div className="flex items-center gap-2.5">
   {/* 36px Avatar */}
-  <div className="w-9 h-9 rounded-full bg-[#f1edff] text-[#6d4aff] flex items-center justify-center font-bold text-sm shrink-0">
+  <div className="w-9 h-9 rounded-full bg-brand-tint text-brand flex items-center justify-center font-bold text-sm shrink-0">
   {isAnon ? (
   <EyeOff className="h-4 w-4" />
   ) : (
@@ -199,16 +199,16 @@ export function PostCard({ post }: { post: PostItem }) {
 
   <div>
   <div className="flex items-center gap-1.5">
-  <span className="font-semibold text-[#16161d] text-[14px]">
+  <span className="font-semibold text-ink text-[14px]">
   {displayName}
   </span>
   {isAnon && (
-  <span className="text-[10px] font-semibold text-[#6d4aff] bg-[#f1edff] px-2 py-0.5 rounded-full">
+  <span className="text-[10px] font-semibold text-brand bg-brand-tint px-2 py-0.5 rounded-full">
   Private
   </span>
   )}
   </div>
-  <p className="text-[11.5px] text-[#9797ab]">{displayTime}</p>
+  <p className="text-[11.5px] text-slate-400">{displayTime}</p>
   </div>
   </div>
 
@@ -216,13 +216,13 @@ export function PostCard({ post }: { post: PostItem }) {
   </div>
 
   {/* 2. Post content (line-clamped with 15px leading-21px Stitch spec) */}
-  <p className="text-[15px] text-[#16161d] leading-[21px] font-normal line-clamp-4">
+  <p className="text-[15px] text-ink leading-[21px] font-normal line-clamp-4">
   {post.content}
   </p>
 
   {/* 3. Chip row (Category, Solved/Open status, hashtags) */}
   <div className="flex flex-wrap items-center gap-2 pt-0.5">
-  <span className="text-[12px] font-bold text-[#6d4aff] bg-[#f1edff] px-3 py-1 rounded-full">
+  <span className="text-[12px] font-bold text-brand bg-brand-tint px-3 py-1 rounded-full">
   {categoryName}
   </span>
 
@@ -256,12 +256,11 @@ export function PostCard({ post }: { post: PostItem }) {
   )}
 
   {post.hashtags && post.hashtags.length > 0 && (
-  <span className="text-[11.5px] text-[#9797ab]">
+  <span className="text-[11.5px] text-slate-400">
   {post.hashtags
-  .map((t: any) => {
-  const tagStr = typeof t === 'string' ? t : (t?.name || '');
-  if (!tagStr) return'';
-  return tagStr.startsWith('#') ? tagStr : `#${tagStr}`;
+  .map((t) => {
+  const tagStr = hashtagText(t);
+  return tagStr ? `#${tagStr}` : '';
   })
   .filter(Boolean)
   .join(' ')}
@@ -279,17 +278,17 @@ export function PostCard({ post }: { post: PostItem }) {
   </div>
 
   {/* 4. Hairline divider & Interactions Footer */}
-  <div className="pt-2.5 border-t border-[#e8e8f0] flex items-center justify-between text-[13px] text-[#5b5b6e]">
+  <div className="pt-2.5 border-t border-slate-200 flex items-center justify-between text-[13px] text-slate-600">
   <div className="flex items-center gap-4">
   {/* Heart / Support */}
   <button
   onClick={toggleSupport}
   className={`flex items-center gap-1.5 transition-colors ${
-  supported ? 'text-[#e0308e] font-bold' : 'hover:text-[#16161d]'
+  supported ? 'text-coral font-bold' : 'hover:text-ink'
   }`}
   >
   <Heart
-  className={`h-4 w-4 ${supported ? 'fill-[#e0308e] text-[#e0308e]' : ''}`}
+  className={`h-4 w-4 ${supported ? 'fill-coral text-coral' : ''}`}
   />
   <span>{supportCount}</span>
   </button>
@@ -298,10 +297,10 @@ export function PostCard({ post }: { post: PostItem }) {
   <button
   onClick={toggleFacedThis}
   className={`flex items-center gap-1.5 transition-colors ${
-  facedThis ? 'text-[#6d4aff] font-bold' : 'hover:text-[#16161d]'
+  facedThis ? 'text-brand font-bold' : 'hover:text-ink'
   }`}
   >
-  <Users className={`h-4 w-4 ${facedThis ? 'text-[#6d4aff]' : ''}`} />
+  <Users className={`h-4 w-4 ${facedThis ? 'text-brand' : ''}`} />
   <span className="hidden sm:inline">{similarCount} faced this</span>
   <span className="sm:hidden">{similarCount}</span>
   </button>

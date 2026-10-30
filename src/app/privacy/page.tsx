@@ -207,7 +207,7 @@ export default function PrivacyCenterPage() {
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
               Privacy Center &amp; Personal Safeguards
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">

@@ -132,65 +132,65 @@ export default function PlayGamePage() {
   <div>
   <Link
   href="/"
-  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5b5b6e] hover:text-[#16161d] mb-2 transition"
+  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-ink mb-2 transition"
   >
   <ArrowLeft className="h-4 w-4" />
   Back to Feed
   </Link>
-  <h1 className="text-[24px] font-black tracking-[-0.5px] leading-[30px] text-[#16161d]">
+  <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
   Safety IQ Trainer
   </h1>
-  <p className="text-[13px] text-[#5b5b6e] mt-0.5">
+  <p className="text-[13px] text-slate-600 mt-0.5">
   Sharpen real-world instinct and crisis decision-making through realistic scenarios.
   </p>
   </div>
 
   {/* Progress & Score Bar */}
-  <div className="flex items-center justify-between p-4 rounded-[16px] bg-white border border-[#e8e8f0] shadow-sm">
+  <div className="flex items-center justify-between p-4 rounded-[16px] bg-white border border-slate-200 shadow-sm">
   <div className="flex items-center gap-2.5">
   <Award className="h-5 w-5 text-[#d97706]" />
   <div>
-  <span className="text-[10.5px] text-[#5b5b6e] block uppercase tracking-wider font-bold">
+  <span className="text-[10.5px] text-slate-600 block uppercase tracking-wider font-bold">
   Safety Score
   </span>
-  <span className="text-[16px] font-black text-[#16161d]">
+  <span className="text-[16px] font-black text-ink">
   {score} XP
   </span>
   </div>
   </div>
 
   <div className="text-right">
-  <span className="text-[10.5px] text-[#5b5b6e] block uppercase tracking-wider font-bold">
+  <span className="text-[10.5px] text-slate-600 block uppercase tracking-wider font-bold">
   Scenario
   </span>
-  <span className="text-[13.5px] font-bold text-[#6d4aff]">
+  <span className="text-[13.5px] font-bold text-brand">
   {completed ? SCENARIOS.length : currentScenarioIdx + 1} of {SCENARIOS.length}
   </span>
   </div>
   </div>
 
   {!completed ? (
-  <section className="bg-white rounded-[20px] border border-[#e8e8f0] p-6 space-y-5 shadow-sm">
+  <section className="bg-white rounded-[20px] border border-slate-200 p-6 space-y-5 shadow-sm">
   <div>
-  <span className="text-[11px] font-bold uppercase tracking-wider text-[#6d4aff] bg-[#f1edff] px-2.5 py-1 rounded-full inline-block mb-2">
+  <span className="text-[11px] font-bold uppercase tracking-wider text-brand bg-brand-tint px-2.5 py-1 rounded-full inline-block mb-2">
   {scenario.category}
   </span>
-  <h2 className="text-[18px] font-black text-[#16161d]">
+  <h2 className="text-[18px] font-black text-ink">
   {scenario.title}
   </h2>
-  <p className="text-[14px] text-[#5b5b6e] leading-[21px] mt-2">
+  <p className="text-[14px] text-slate-600 leading-[21px] mt-2">
   {scenario.situation}
   </p>
   </div>
 
   <div className="space-y-2.5">
-  <span className="text-[10.5px] font-black uppercase text-[#9797ab] tracking-wider block">
+  <span className="text-[10.5px] font-black uppercase text-slate-400 tracking-wider block">
   CHOOSE YOUR RESPONSE
   </span>
   {scenario.options.map((opt, idx) => {
   const isSelected = selectedOption === idx;
   let btnStyle =
-  'bg-[#f7f7fa] border-[#e8e8f0] hover:border-[#6d4aff] text-[#16161d]';
+  'bg-mist border-slate-200 hover:border-brand text-ink';
 
   if (selectedOption !== null) {
   if (opt.isCorrect) {
@@ -233,7 +233,7 @@ export default function PlayGamePage() {
   <div className="pt-2 flex justify-end">
   <button
   onClick={handleNext}
-  className="px-5 py-2.5 rounded-[14px] bg-[#6d4aff] hover:bg-[#5325e8] text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm"
+  className="px-5 py-2.5 rounded-[14px] bg-brand hover:bg-brand-deep text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm"
   >
   <span>
   {currentScenarioIdx < SCENARIOS.length - 1 ? 'Next Scenario' : 'View Results'}
@@ -244,21 +244,21 @@ export default function PlayGamePage() {
   )}
   </section>
   ) : (
-  <section className="bg-white rounded-[20px] border border-[#e8e8f0] p-8 text-center space-y-4 shadow-sm">
-  <div className="w-16 h-16 rounded-full bg-[#f1edff] text-[#6d4aff] flex items-center justify-center mx-auto">
+  <section className="bg-white rounded-[20px] border border-slate-200 p-8 text-center space-y-4 shadow-sm">
+  <div className="w-16 h-16 rounded-full bg-brand-tint text-brand flex items-center justify-center mx-auto">
   <Award className="h-8 w-8" />
   </div>
-  <h2 className="text-[22px] font-black text-[#16161d]">
+  <h2 className="text-[22px] font-black text-ink">
   Simulation Completed!
   </h2>
-  <p className="text-[14px] text-[#5b5b6e] max-w-md mx-auto">
-  You scored <span className="font-bold text-[#6d4aff]">{score} XP</span> out of{' '}
+  <p className="text-[14px] text-slate-600 max-w-md mx-auto">
+  You scored <span className="font-bold text-brand">{score} XP</span> out of{' '}
   {SCENARIOS.length * 100} XP. Consistent scenario preparation builds automatic safety reflexes in real crises.
   </p>
   <div className="pt-2">
   <button
   onClick={handleRestart}
-  className="px-5 py-2.5 rounded-[14px] bg-[#6d4aff] hover:bg-[#5325e8] text-white font-bold text-xs inline-flex items-center gap-2 transition shadow-sm"
+  className="px-5 py-2.5 rounded-[14px] bg-brand hover:bg-brand-deep text-white font-bold text-xs inline-flex items-center gap-2 transition shadow-sm"
   >
   <RotateCcw className="h-4 w-4" />
   <span>Retry Trainer</span>

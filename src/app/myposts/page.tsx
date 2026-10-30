@@ -29,7 +29,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Modal } from '@/components/ui/Modal';
-import { api, BackendPost } from '@/lib/api-client';
+import { api, BackendPost, hashtagText } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
 import { PostCardSkeleton, Skeleton } from '@/components/ui/Skeleton';
 
@@ -110,7 +110,7 @@ export default function MyPostsPage() {
       post.content.toLowerCase().includes(query) ||
       (post.categoryName && post.categoryName.toLowerCase().includes(query)) ||
       (post.location && post.location.toLowerCase().includes(query)) ||
-      (post.hashtags && post.hashtags.some((t) => t.toLowerCase().includes(query)))
+      (post.hashtags && post.hashtags.some((t) => hashtagText(t).toLowerCase().includes(query)))
     );
   });
 
@@ -184,7 +184,7 @@ export default function MyPostsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">My Posts</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">My Posts</h1>
           <p className="text-xs text-slate-500 mt-0.5">
             View, track, and manage safety incidents, advisories, and community posts you shared.
           </p>
@@ -332,7 +332,7 @@ export default function MyPostsPage() {
                           className="inline-flex items-center gap-0.5 text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded"
                         >
                           <Tag className="h-2.5 w-2.5" />
-                          <span>#{tag.replace(/^#/, '')}</span>
+                          <span>#{hashtagText(tag)}</span>
                         </span>
                       ))}
                     </div>

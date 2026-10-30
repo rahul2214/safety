@@ -28,7 +28,7 @@ export function Select({
       {label && (
         <label
           htmlFor={selectId}
-          className="block text-xs font-semibold text-slate-700"
+          className="block text-[13px] font-semibold text-ink"
         >
           {label}
         </label>
@@ -37,10 +37,10 @@ export function Select({
       <div className="relative">
         <select
           id={selectId}
-          className={`w-full appearance-none rounded-lg border bg-white px-3.5 py-2 pr-9 text-sm text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 ${
+          className={`w-full appearance-none rounded-xl border bg-white px-4 py-2.5 pr-9 text-sm text-slate-900 transition-colors focus:outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand ${
             error
               ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50/20'
-              : 'border-slate-300'
+              : 'border-slate-200 hover:border-slate-300'
           } ${className}`}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}

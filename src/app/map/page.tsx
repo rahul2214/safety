@@ -627,17 +627,17 @@ export default function SafetyMapPage() {
   {/* ============================================================ */}
   {/* 1. TOP HEADER & EMERGENCY ACTIONS */}
   {/* ============================================================ */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-5 sm:p-6 shadow-sm space-y-4">
+  <section className="bg-white rounded-[24px] border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
   <div className="space-y-1">
   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#fdeef6] text-[#e11d48] text-xs font-bold">
   <Compass className="h-3.5 w-3.5 animate-spin-slow" />
   <span className="uppercase tracking-wider">PAN-INDIA HYPERLOCAL SAFETY RADAR</span>
   </div>
-  <h1 className="text-2xl sm:text-3xl font-black text-[#16161d] tracking-tight">
+  <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
   Interactive Safety &amp; Emergency Map
   </h1>
-  <p className="text-xs sm:text-[13px] text-[#5b5b6e] max-w-2xl leading-relaxed">
+  <p className="text-xs sm:text-[13px] text-slate-600 max-w-2xl leading-relaxed">
   Explore real-time verified police stations, 24/7 trauma hospitals, women safety desks, and live incident hazards near your location across India.
   </p>
   </div>
@@ -649,9 +649,9 @@ export default function SafetyMapPage() {
   size="sm"
   onClick={handleLocateMe}
   loading={locLoading}
-  className="rounded-[12px] border-[#e8e8f0] text-xs font-bold"
+  className="rounded-[12px] border-slate-200 text-xs font-bold"
   >
-  <Compass className="h-3.5 w-3.5 mr-1.5 text-[#6d4aff]" />
+  <Compass className="h-3.5 w-3.5 mr-1.5 text-brand" />
   <span>{userLocation ? 'Re-center GPS' : 'Locate Me'}</span>
   </Button>
 
@@ -665,7 +665,7 @@ export default function SafetyMapPage() {
 
   <a
   href="tel:1091"
-  className="px-3.5 py-2 rounded-[12px] bg-[#f1edff] hover:bg-[#e6deff] text-[#6d4aff] text-xs font-bold transition flex items-center gap-1.5"
+  className="px-3.5 py-2 rounded-[12px] bg-brand-tint hover:bg-[#e6deff] text-brand text-xs font-bold transition flex items-center gap-1.5"
   >
   <Phone className="h-3.5 w-3.5" />
   <span>1091 Women Helpline</span>
@@ -675,7 +675,7 @@ export default function SafetyMapPage() {
   <Button
   variant="primary"
   size="sm"
-  className="rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-xs font-bold shadow-sm shadow-[#6d4aff]/30"
+  className="rounded-[12px] bg-brand hover:bg-brand-deep text-xs font-bold shadow-sm shadow-brand/30"
   >
   <Plus className="h-4 w-4 mr-1" />
   <span>Report Hazard</span>
@@ -685,9 +685,9 @@ export default function SafetyMapPage() {
   </div>
 
   {/* Status Callout Bar */}
-  <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e8e8f0] text-xs">
+  <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200 text-xs">
   <div className="flex items-center gap-2 text-slate-600">
-  <Lock className="h-3.5 w-3.5 text-[#6d4aff] shrink-0" />
+  <Lock className="h-3.5 w-3.5 text-brand shrink-0" />
   <span className="text-[11.5px]">
   <strong>Privacy Protection:</strong> Sensitive incident coordinates are aggregated into 250m safe privacy zones to protect reporter anonymity across all Indian regions.
   </span>
@@ -701,7 +701,7 @@ export default function SafetyMapPage() {
   if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize();
   }}
   disabled={loadingDb || loadingPlaces}
-  className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#6d4aff] hover:underline"
+  className="inline-flex items-center gap-1.5 text-[11px] font-bold text-brand hover:underline"
   >
   <RefreshCw className={`h-3 w-3 ${loadingDb || loadingPlaces ? 'animate-spin' : ''}`} />
   <span>Refresh Nearby Infrastructure ({allResources.length})</span>
@@ -722,13 +722,13 @@ export default function SafetyMapPage() {
   {/* Search Input with City/Locality Navigation */}
   <form onSubmit={handleSearchIndianCity} className="relative flex-1 max-w-md flex items-center gap-1.5">
   <div className="relative flex-1">
-  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86869e]" />
+  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
   <input
   type="text"
   value={searchQuery}
   onChange={(e) => setSearchQuery(e.target.value)}
   placeholder="Search Indian city, locality, police, or hospital..."
-  className="w-full pl-10 pr-4 py-2 rounded-[14px] bg-white border border-[#e8e8f0] text-xs text-[#16161d] placeholder-[#86869e] focus:outline-hidden focus:border-[#6d4aff] transition shadow-2xs"
+  className="w-full pl-10 pr-4 py-2 rounded-[14px] bg-white border border-slate-200 text-xs text-ink placeholder-slate-400 focus:outline-hidden focus:border-brand transition shadow-2xs"
   />
   </div>
   <Button
@@ -736,7 +736,7 @@ export default function SafetyMapPage() {
   variant="outline"
   size="sm"
   loading={isSearchingCity}
-  className="rounded-[12px] border-[#e8e8f0] text-xs font-bold shrink-0"
+  className="rounded-[12px] border-slate-200 text-xs font-bold shrink-0"
   >
   Locate City
   </Button>
@@ -758,8 +758,8 @@ export default function SafetyMapPage() {
   onClick={() => setActiveFilter(tab.id)}
   className={`px-3 py-1.5 rounded-[12px] whitespace-nowrap font-bold transition text-xs ${
   activeFilter === tab.id
-  ? 'bg-[#6d4aff] text-white shadow-xs shadow-[#6d4aff]/30'
-  : 'bg-white border border-[#e8e8f0] text-slate-600 hover:bg-[#f7f7fa]'
+  ? 'bg-brand text-white shadow-xs shadow-brand/30'
+  : 'bg-white border border-slate-200 text-slate-600 hover:bg-mist'
   }`}
   >
   {tab.label}
@@ -774,7 +774,7 @@ export default function SafetyMapPage() {
   <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
   {/* Real Leaflet Map Canvas (8 cols) */}
   <div className="lg:col-span-8 space-y-3">
-  <Card className="p-0 overflow-hidden border-[#e8e8f0] relative rounded-[24px] shadow-sm">
+  <Card className="p-0 overflow-hidden border-slate-200 relative rounded-[24px] shadow-sm">
   {/* Map Canvas Mount Point */}
   <div
   ref={mapContainerRef}
@@ -782,19 +782,19 @@ export default function SafetyMapPage() {
   />
 
   {/* GPS Status Floating Badge */}
-  <div className="absolute bottom-3 left-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 backdrop-blur-md text-[11px] font-bold text-slate-800 border border-[#e8e8f0] shadow-md flex items-center gap-1.5 max-w-[80%] truncate">
+  <div className="absolute bottom-3 left-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 backdrop-blur-md text-[11px] font-bold text-slate-800 border border-slate-200 shadow-md flex items-center gap-1.5 max-w-[80%] truncate">
   <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
   <span className="truncate">{detectedLocationName ? `Near ${detectedLocationName}` : locStatus || 'India (Pan-India Safety Radar)'}</span>
   </div>
 
   {/* Live Count Floating Pill */}
-  <div className="absolute top-3 right-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 backdrop-blur-md text-[11px] font-bold text-slate-800 border border-[#e8e8f0] shadow-md">
+  <div className="absolute top-3 right-3 z-20 px-3 py-1.5 rounded-[12px] bg-white/90 backdrop-blur-md text-[11px] font-bold text-slate-800 border border-slate-200 shadow-md">
   Showing <strong>{filteredResources.length}</strong> active markers
   </div>
   </Card>
 
   {/* Map Color Legend */}
-  <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-white border border-[#e8e8f0] rounded-[18px] text-xs text-slate-600 shadow-2xs">
+  <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-white border border-slate-200 rounded-[18px] text-xs text-slate-600 shadow-2xs">
   <div className="flex items-center gap-1.5 font-medium">
   <span className="w-3 h-3 rounded-full bg-[#1d4ed8] inline-block shadow-2xs" />
   <span>Police &amp; Women Desks (P)</span>
@@ -822,7 +822,7 @@ export default function SafetyMapPage() {
   <div className="lg:col-span-4 space-y-4">
   {/* 1. Selected Pin Focus Card */}
   {selectedPin ? (
-  <Card className="p-4 sm:p-5 border-[#6d4aff]/40 bg-white rounded-[22px] space-y-3.5 shadow-md animate-in fade-in zoom-in-95 duration-200">
+  <Card className="p-4 sm:p-5 border-brand/40 bg-white rounded-[22px] space-y-3.5 shadow-md animate-in fade-in zoom-in-95 duration-200">
   <div className="flex items-start justify-between gap-2">
   <div>
   <span
@@ -848,7 +848,7 @@ export default function SafetyMapPage() {
   </div>
 
   {/* Description / Content */}
-  <div className="p-3 rounded-[14px] bg-white border border-[#e8e8f0] text-xs text-slate-700 leading-relaxed">
+  <div className="p-3 rounded-[14px] bg-white border border-slate-200 text-xs text-slate-700 leading-relaxed">
   {selectedPin.details}
   </div>
 
@@ -859,7 +859,7 @@ export default function SafetyMapPage() {
   <span>{selectedPin.hours}</span>
   </span>
   {userLocation && (
-  <span className="font-bold text-[#6d4aff]">
+  <span className="font-bold text-brand">
   {calculateDistanceKm(
   userLocation.latitude,
   userLocation.longitude,
@@ -876,7 +876,7 @@ export default function SafetyMapPage() {
   {selectedPin.phone && (
   <a
   href={`tel:${selectedPin.phone}`}
-  className="w-full py-2.5 px-3 rounded-[12px] bg-[#6d4aff] hover:bg-[#5325e8] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-[#6d4aff]/30"
+  className="w-full py-2.5 px-3 rounded-[12px] bg-brand hover:bg-brand-deep text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm shadow-brand/30"
   >
   <Phone className="h-3.5 w-3.5" />
   <span>Call Helpline ({selectedPin.phone})</span>
@@ -887,17 +887,17 @@ export default function SafetyMapPage() {
   href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPin.lat},${selectedPin.lng}`}
   target="_blank"
   rel="noopener noreferrer"
-  className="w-full py-2 px-3 rounded-[12px] bg-white border border-[#e8e8f0] hover:bg-slate-50 text-slate-800 text-xs font-bold transition flex items-center justify-center gap-1.5"
+  className="w-full py-2 px-3 rounded-[12px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-bold transition flex items-center justify-center gap-1.5"
   >
-  <Navigation className="h-3.5 w-3.5 text-[#6d4aff]" />
+  <Navigation className="h-3.5 w-3.5 text-brand" />
   <span>Get Directions in Google Maps</span>
   <ExternalLink className="h-3 w-3 opacity-60 ml-0.5" />
   </a>
   </div>
   </Card>
   ) : (
-  <div className="p-6 rounded-[22px] border border-dashed border-[#e8e8f0] bg-white text-center space-y-2 text-xs text-slate-500 shadow-2xs">
-  <div className="w-10 h-10 rounded-full bg-[#f1edff] text-[#6d4aff] flex items-center justify-center mx-auto">
+  <div className="p-6 rounded-[22px] border border-dashed border-slate-200 bg-white text-center space-y-2 text-xs text-slate-500 shadow-2xs">
+  <div className="w-10 h-10 rounded-full bg-brand-tint text-brand flex items-center justify-center mx-auto">
   <MapPin className="h-5 w-5" />
   </div>
   <p className="font-bold text-slate-900">Click any point on the map</p>
@@ -911,7 +911,7 @@ export default function SafetyMapPage() {
   <div className="space-y-2.5">
   <div className="flex items-center justify-between text-xs font-bold text-slate-900 uppercase tracking-wider px-1">
   <span>Nearby Safety Points ({filteredResources.length})</span>
-  {userLocation && <span className="text-[11px] text-[#6d4aff] font-semibold">Sorted by Distance</span>}
+  {userLocation && <span className="text-[11px] text-brand font-semibold">Sorted by Distance</span>}
   </div>
 
   <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
@@ -923,7 +923,7 @@ export default function SafetyMapPage() {
   <MapItemSkeleton />
   </>
   ) : filteredResources.length === 0 ? (
-  <div className="p-6 text-center text-xs text-slate-500 bg-white rounded-[16px] border border-dashed border-[#e8e8f0]">
+  <div className="p-6 text-center text-xs text-slate-500 bg-white rounded-[16px] border border-dashed border-slate-200">
   No safety points found matching your criteria.
   </div>
   ) : (
@@ -944,8 +944,8 @@ export default function SafetyMapPage() {
   onClick={() => focusOnPin(res)}
   className={`p-3 rounded-[16px] border text-left cursor-pointer transition-all ${
   isSelected
-  ? 'border-[#6d4aff] bg-[#f1edff]/40 shadow-xs'
-  : 'border-[#e8e8f0] bg-white hover:border-[#6d4aff]/40'
+  ? 'border-brand bg-brand-tint/40 shadow-xs'
+  : 'border-slate-200 bg-white hover:border-brand/40'
   }`}
   >
   <div className="flex items-center justify-between gap-2">
@@ -959,7 +959,7 @@ export default function SafetyMapPage() {
   </p>
   </div>
   {distance && (
-  <span className="text-[11px] font-bold text-[#6d4aff] shrink-0">
+  <span className="text-[11px] font-bold text-brand shrink-0">
   {distance}
   </span>
   )}
@@ -972,7 +972,7 @@ export default function SafetyMapPage() {
   <div className="flex items-center justify-between text-[10.5px] text-slate-400 mt-2 pl-3.5">
   <span>{res.hours}</span>
   {res.phone && (
-  <span className="text-[#6d4aff] font-bold">Dial {res.phone}</span>
+  <span className="text-brand font-bold">Dial {res.phone}</span>
   )}
   </div>
   </div>
