@@ -1,26 +1,19 @@
 'use client';
 
-import React, { useState } from'react';
-import Link from'next/link';
+import React, { useState } from 'react';
+import Link from 'next/link';
 import {
-  Shield,
   ShieldCheck,
   Lock,
-  Sparkles,
   Users,
-  EyeOff,
   Zap,
-  Phone,
-  Heart,
   ChevronDown,
   ArrowRight,
-  CheckCircle2,
-  AlertTriangle,
-  Volume2,
-  FileText,
-  UserPlus,
-  LogIn,
-} from'lucide-react';
+  Scale,
+  Phone,
+  Gavel,
+  Heart,
+} from 'lucide-react';
 
 interface FaqItem {
   question: string;
@@ -29,407 +22,220 @@ interface FaqItem {
 
 const FAQ_LIST: FaqItem[] = [
   {
-  question: 'How does Sabhijude ensure my complete anonymity?',
-  answer:
-  'Sabhijude utilizes cryptographic pseudonyms and zero-knowledge privacy architecture. When you share a safety concern or incident report, your real name, email, and phone number are never exposed to the public feed. You can choose whether to display your verified profile name or post as an anonymous community member.',
+    question: 'How does Sabhijude keep me anonymous?',
+    answer:
+      'When you share a safety concern or incident report, your real name, email and phone number are never shown on the public feed. Reports are published under a pseudonym, and you choose whether to show your profile name or post anonymously.',
   },
   {
-  question: 'What happens during an Emergency SOS trigger?',
-  answer:
-  'When you trigger SOS, a 3-second abort countdown begins to prevent accidental presses. Once confirmed, high-precision GPS coordinates are gathered from your device and packaged into an immediate distress dispatch with a direct Google Maps link via WhatsApp and native SMS fallback. You also gain 1-tap access to national emergency hotlines (112, 1091).',
+    question: 'What happens when I press SOS?',
+    answer:
+      'A 3-second countdown starts so accidental presses can be cancelled. Then your device’s GPS location is packaged into a distress message with a Google Maps link and sent over WhatsApp, with SMS as a fallback. You also get one-tap access to national helplines like 112 and 1091.',
   },
   {
-  question: 'How does the Discreet Fake Call deter potential harassers?',
-  answer:
-  'The Fake Call tool simulates a realistic incoming phone call on your mobile device, complete with standard ringing vibrations, audio ringtones, and caller profiles like"Mom", "Dad", or"Inspector Sharma". When answered, a realistic ongoing call screen displays dialer controls and an active timer, signaling that you are actively on a call.',
+    question: 'How does the fake call help?',
+    answer:
+      'It simulates a realistic incoming call — ringtone, vibration and a caller like “Mom” or “Dad”. Once answered, an in-call screen with a running timer shows you are on the phone, giving you a natural reason to step away.',
   },
   {
-  question: 'How does Sabhijude support workplace safety and POSH compliance?',
-  answer:
-  'Sabhijude incorporates statutory guides for the POSH Act 2013, outlining mandatory Internal Committee (IC) filing rights, 90-day timebound inquiry procedures, employer compliance mandates, and Section 16 non-disclosure confidentiality protections, alongside Bharatiya Nyaya Sanhita (BNS) provisions.',
+    question: 'Does Sabhijude support workplace safety and POSH?',
+    answer:
+      'Yes. Our guides cover the POSH Act 2013 — your right to file with the Internal Committee, the 90-day inquiry timeline, employer duties and Section 16 confidentiality — alongside relevant Bharatiya Nyaya Sanhita (BNS) provisions.',
   },
   {
-  question: 'Is Sabhijude free for women and community members?',
-  answer:
-  'Yes, Sabhijude is 100% free and open for public safety. We believe personal safety and community defense are fundamental rights, and our platform is built without paywalls, commercial trackers, or advertising surveillance.',
+    question: 'Is it really free?',
+    answer:
+      'Yes, 100% free. Personal safety is a right, not a product. There are no paywalls, no advertising and no commercial trackers.',
   },
   {
-  question: 'Can I use Sabhijude on my smartphone without installing an app?',
-  answer:
-  'Yes! Sabhijude is built as a progressive, highly responsive web application. You can open it in any mobile browser (Safari, Chrome, Firefox) and add it to your home screen for immediate 1-tap launcher access without going through app store downloads.',
+    question: 'Do I need to install an app?',
+    answer:
+      'No. Sabhijude works in any mobile browser — Chrome, Safari or Firefox. Add it to your home screen for one-tap access, just like an app.',
+  },
+];
+
+const PILLARS = [
+  {
+    icon: Lock,
+    title: 'Privacy first',
+    body: 'Reports are published under pseudonyms and location data is only read when you ask. No data selling, no third-party brokers.',
+    tint: 'bg-brand-tint text-brand',
+  },
+  {
+    icon: Zap,
+    title: 'SOS in seconds',
+    body: 'One tap shares a live map pin over WhatsApp and SMS at the same time, so it still reaches people on weak networks.',
+    tint: 'bg-red-50 text-red-600',
+  },
+  {
+    icon: Scale,
+    title: 'Know your rights',
+    body: 'Plain-language guidance on the POSH Act 2013 and BNS — from Internal Committee complaints to confidentiality protections.',
+    tint: 'bg-emerald-50 text-emerald-700',
+  },
+  {
+    icon: Users,
+    title: 'Community verified',
+    body: 'Members confirm incidents, share safer routes and flag hazards like broken streetlights or isolated bus stops.',
+    tint: 'bg-coral-tint text-coral',
   },
 ];
 
 export default function AboutPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  const toggleFaq = (index: number) => {
-  setOpenFaq(openFaq === index ? null : index);
-  };
-
   return (
-  <div className="relative space-y-12 select-none pb-12">
-  {/* Background Brand Wash */}
-  <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-[800px] h-[360px] bg-[#6d4aff]/5 blur-3xl z-0" />
+    <div className="bg-white">
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div aria-hidden className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[480px] w-[900px] rounded-full bg-gradient-to-r from-brand/10 via-coral/10 to-brand/10 blur-3xl" />
+        </div>
+        <div className="public-container relative pt-20 pb-20 sm:pt-28 sm:pb-24 text-center max-w-4xl space-y-7">
+          <span className="eyebrow justify-center"><Heart className="h-3.5 w-3.5" /> Our mission</span>
+          <h1 className="display-1">
+            Peace of mind for every woman, <span className="text-brand">every step of the way.</span>
+          </h1>
+          <p className="text-lg sm:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
+            Sabhijude is a women-first safety network. We close the gap between that first uneasy feeling and getting real help —
+            with fast alerts, discreet tools and a community that has your back.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
+            <Link href="/signup" className="btn-brand">Join for free <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/safety-measures" className="btn-ghost">Read the safety guide</Link>
+          </div>
+        </div>
+      </section>
 
-  {/* ============================================================ */}
-  {/* 1. HERO HEADER: Mission & Vision */}
-  {/* ============================================================ */}
-  <section className="relative z-10 pt-4 sm:pt-8 text-center max-w-3xl mx-auto space-y-5">
-   
+      {/* The problem */}
+      <section className="bg-ink text-white py-24 sm:py-28">
+        <div className="public-container grid lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-5 space-y-5">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-coral">Why we built this</span>
+            <h2 className="font-display text-3xl sm:text-[2.6rem] leading-[1.12] font-extrabold tracking-[-0.02em]">
+              Most safety apps wake up too late.
+            </h2>
+            <p className="text-white/70 text-lg leading-relaxed">
+              They only help once something has already gone wrong. Sabhijude is designed for the moments before — a dark street,
+              an unverified cab, someone following you.
+            </p>
+          </div>
+          <div className="lg:col-span-7 grid sm:grid-cols-3 gap-4">
+            {[
+              { n: '01', t: 'Calling feels risky', b: 'Typing a message or calling someone can escalate things. Discreet triggers and a fake call help without drawing attention.' },
+              { n: '02', t: 'Tracking feels invasive', b: 'Many women turn off apps that broadcast their whereabouts. We only use your location when you send an alert.' },
+              { n: '03', t: 'Nobody should feel alone', b: 'Shared, anonymous alerts about unlit roads and unsafe spots help thousands of women protect each other.' },
+            ].map((x) => (
+              <div key={x.n} className="rounded-3xl border border-white/10 bg-white/5 p-6 space-y-3">
+                <span className="font-display text-3xl font-extrabold text-coral">{x.n}</span>
+                <h3 className="font-semibold text-lg">{x.t}</h3>
+                <p className="text-sm text-white/65 leading-relaxed">{x.b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-  <h1 className="text-[32px] sm:text-[44px] md:text-[50px] font-[900] tracking-[-1px] leading-[1.15] text-[#16161d]">
-  Engineered for Women&rsquo;s Peace of Mind.{' '}
-  <span className="text-[#6d4aff]">
-  Every Step of the Way.
-  </span>
-  </h1>
+      {/* Pillars */}
+      <section className="py-24 sm:py-32">
+        <div className="public-container space-y-14">
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="eyebrow">What we stand for</span>
+            <h2 className="display-2">Four principles behind everything we build.</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {PILLARS.map((p) => (
+              <div key={p.title} className="card-public p-7 space-y-4 hover:-translate-y-1 transition-transform">
+                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${p.tint}`}>
+                  <p.icon className="h-6 w-6" />
+                </div>
+                <h3 className="font-display text-xl font-bold text-ink">{p.title}</h3>
+                <p className="text-slate-600 leading-relaxed text-[15px]">{p.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-  <p className="text-[15px] sm:text-[17px] text-[#5b5b6e] leading-relaxed max-w-2xl mx-auto font-normal">
-  Sabhijude is a women-first situational safety and community defense network.
-  We bridge the critical gap between early discomfort, immediate deterrence, and emergency rescue
-  with rapid GPS alerts, psychological defense tools, and peer-verified intelligence.
-  </p>
+      {/* Legal alignment */}
+      <section className="bg-mist py-24 sm:py-28">
+        <div className="public-container space-y-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-4 max-w-xl">
+              <span className="eyebrow"><Gavel className="h-3.5 w-3.5" /> Built for India</span>
+              <h2 className="display-2">Aligned with the laws that protect you.</h2>
+            </div>
+            <Link href="/safety-measures" className="inline-flex items-center gap-2 font-semibold text-brand hover:text-brand-deep">
+              See all helplines <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { icon: ShieldCheck, t: 'POSH Act, 2013', b: 'Supports workplace complaints with the Internal Committee, the 90-day inquiry timeline and Section 16 confidentiality.' },
+              { icon: Phone, t: 'Emergency Response (112)', b: 'One-tap dialing to 112, Women Helpline 1091, Women in Distress 181 and Cyber Crime 1930.' },
+              { icon: Scale, t: 'Bharatiya Nyaya Sanhita', b: 'Report categories map to BNS Section 75 (sexual harassment), 78 (stalking) and 79 (insulting modesty).' },
+            ].map((x) => (
+              <div key={x.t} className="rounded-3xl bg-white border border-slate-200 p-7 space-y-3">
+                <x.icon className="h-6 w-6 text-brand" />
+                <h3 className="font-display text-lg font-bold text-ink">{x.t}</h3>
+                <p className="text-slate-600 text-[15px] leading-relaxed">{x.b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-  {/* Quick Nav Action Buttons */}
-  <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-  <Link
-  href="/safety-measures"
-  className="px-5 py-2.5 rounded-[14px] bg-[#6d4aff] hover:bg-[#5325e8] text-white font-bold text-xs shadow-md transition flex items-center gap-1.5"
-  >
-  <ShieldCheck className="h-4 w-4" />
-  <span>Explore Safety Measures</span>
-  <ArrowRight className="h-3.5 w-3.5" />
-  </Link>
-  <Link
-  href="/signup"
-  className="px-5 py-2.5 rounded-[14px] bg-white border border-[#e8e8f0] hover:border-[#6d4aff] text-[#16161d] font-bold text-xs shadow-2xs transition flex items-center gap-1.5"
-  >
-  <UserPlus className="h-4 w-4 text-[#6d4aff]" />
-  <span>Create Free Account</span>
-  </Link>
-  </div>
-  </section>
+      {/* FAQ */}
+      <section className="py-24 sm:py-32">
+        <div className="public-container grid lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-4 space-y-4">
+            <span className="eyebrow">FAQ</span>
+            <h2 className="display-2">Questions, answered.</h2>
+            <p className="text-slate-600 text-lg">Still unsure? Create a free account and explore at your own pace.</p>
+          </div>
+          <div className="lg:col-span-8 divide-y divide-slate-200 border-y border-slate-200">
+            {FAQ_LIST.map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div key={faq.question}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? null : index)}
+                    aria-expanded={isOpen}
+                    className="w-full py-6 text-left flex items-center justify-between gap-6 group"
+                  >
+                    <span className="font-display text-lg font-semibold text-ink group-hover:text-brand transition-colors">{faq.question}</span>
+                    <span className={`h-9 w-9 shrink-0 rounded-full border flex items-center justify-center transition ${isOpen ? 'bg-ink border-ink text-white rotate-180' : 'border-slate-300 text-ink'}`}>
+                      <ChevronDown className="h-4 w-4" />
+                    </span>
+                  </button>
+                  {isOpen && <p className="pb-6 pr-14 text-slate-600 leading-relaxed">{faq.answer}</p>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-  {/* ============================================================ */}
-  {/* 2. THE PROBLEM WE SOLVE */}
-  {/* ============================================================ */}
-  <section className="relative z-10 bg-white rounded-[24px] border border-[#e8e8f0] p-6 sm:p-9 shadow-sm space-y-6">
-  <div className="max-w-2xl space-y-2">
-  <span className="text-[11px] font-black uppercase text-[#e11d48] tracking-[1.5px] block">
-  WHY CONVENTIONAL SAFETY APPS FALL SHORT
-  </span>
-  <h2 className="text-[22px] sm:text-[26px] font-black text-[#16161d] tracking-tight">
-  The Critical 90 Seconds Before Escalation
-  </h2>
-  <p className="text-[13.5px] text-[#5b5b6e] leading-relaxed">
-  Most emergency tools only activate when physical violence is already underway.
-  Sabhijude was engineered from the ground up to address the <em>pre-crisis window</em>—when you notice
-  a dark alley, an unverified cab driver, a pursuer, or a tense transit interchange.
-  </p>
-  </div>
-
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-  <div className="p-5 rounded-[20px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-3">
-  <div className="w-10 h-10 rounded-[12px] bg-[#fdeef6] text-[#e11d48] flex items-center justify-center font-black">
-  01
-  </div>
-  <h3 className="text-[16px] font-bold text-[#16161d]">
-  Too Late For Calls
-  </h3>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
-  When followed or cornered, typing a message or calling relatives often provokes immediate aggression.
-  Discreet haptic triggers and synthesized dialogue neutralize threats without raising suspicion.
-  </p>
-  </div>
-
-  <div className="p-5 rounded-[20px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-3">
-  <div className="w-10 h-10 rounded-[12px] bg-[#f1edff] text-[#6d4aff] flex items-center justify-center font-black">
-  02
-  </div>
-  <h3 className="text-[16px] font-bold text-[#16161d]">
-  Invasive Tracking Fears
-  </h3>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
-  Women frequently disable legacy tracking apps because they broadcast daily whereabouts.
-  Sabhijude strictly practices Zero-Knowledge privacy—your location is only accessed when you explicitly dispatch SOS.
-  </p>
-  </div>
-
-  <div className="p-5 rounded-[20px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-3">
-  <div className="w-10 h-10 rounded-[12px] bg-[#ecfdf5] text-[#059669] flex items-center justify-center font-black">
-  03
-  </div>
-  <h3 className="text-[16px] font-bold text-[#16161d]">
-  Isolated Individuals
-  </h3>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
-  Safety isn&rsquo;t just personal; it&rsquo;s collective. By pooling anonymous alerts about unlit roads,
-  suspicious vehicles, and safe shelters, thousands of women protect each other before incidents happen.
-  </p>
-  </div>
-  </div>
-  </section>
-
-  {/* ============================================================ */}
-  {/* 3. CORE ARCHITECTURAL PILLARS */}
-  {/* ============================================================ */}
-  <section className="space-y-6">
-  <div className="text-center max-w-xl mx-auto space-y-2">
-  <span className="text-[11px] font-black uppercase text-[#6d4aff] tracking-[1.5px] block">
-  HOW SABHIJUDE PROTECTS YOU
-  </span>
-  <h2 className="text-[24px] sm:text-[28px] font-black text-[#16161d] tracking-tight">
-  Our Four Core Defense Pillars
-  </h2>
-  </div>
-
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  {/* Pillar 1 */}
-  <div className="p-6 rounded-[22px] bg-white border border-[#e8e8f0] shadow-sm space-y-3 flex flex-col justify-between">
-  <div className="space-y-2.5">
-  <div className="w-11 h-11 rounded-[14px] bg-[#f1edff] text-[#6d4aff] flex items-center justify-center">
-  <Lock className="h-5 w-5" />
-  </div>
-  <h3 className="text-[18px] font-bold text-[#16161d]">
-  1. Zero-Knowledge Identity &amp; Privacy
-  </h3>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
-  Your personal details never leak. Incident reports are published under cryptographic pseudonyms,
-  and location metadata is scrubbed after emergency delivery. Zero data monetization, zero third-party brokers.
-  </p>
-  </div>
-  <div className="pt-2 text-xs font-bold text-[#6d4aff] flex items-center gap-1">
-  <span>Cryptographic Anonymity</span>
-  </div>
-  </div>
-
-  {/* Pillar 2 */}
-  <div className="p-6 rounded-[22px] bg-white border border-[#e8e8f0] shadow-sm space-y-3 flex flex-col justify-between">
-  <div className="space-y-2.5">
-  <div className="w-11 h-11 rounded-[14px] bg-[#fdeef6] text-[#e11d48] flex items-center justify-center">
-  <Zap className="h-5 w-5" />
-  </div>
-  <h3 className="text-[18px] font-bold text-[#16161d]">
-  2. Sub-3-Second Dual-Channel SOS
-  </h3>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
-  A single tap initiates our low-latency distress protocol. Live GPS pins with Google Maps integration
-  broadcast simultaneously through WhatsApp and native SMS, guaranteeing reach even in low-data network zones.
-  </p>
-  </div>
-  <div className="pt-2 text-xs font-bold text-[#e11d48] flex items-center gap-1">
-  <span>Instant Emergency Escalation</span>
-  </div>
-  </div>
-
-  {/* Pillar 3 */}
-  <div className="p-6 rounded-[22px] bg-white border border-[#e8e8f0] shadow-sm space-y-3 flex flex-col justify-between">
-  <div className="space-y-2.5">
-  <div className="w-11 h-11 rounded-[14px] bg-[#ecfdf5] text-[#059669] flex items-center justify-center">
-  <ShieldCheck className="h-5 w-5" />
-  </div>
-  <h3 className="text-[18px] font-bold text-[#16161d]">
-  3. Statutory POSH & Legal Compliance
-  </h3>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
-  Clear statutory guidance under the POSH Act 2013 and Bharatiya Nyaya Sanhita (BNS). Access structured frameworks for Internal Committee escalations, 90-day timebound inquiries, and strict Section 16 identity confidentiality.
-  </p>
-  </div>
-  <div className="pt-2 text-xs font-bold text-[#059669] flex items-center gap-1">
-  <span>Statutory Legal Protection</span>
-  </div>
-  </div>
-
-  {/* Pillar 4 */}
-  <div className="p-6 rounded-[22px] bg-white border border-[#e8e8f0] shadow-sm space-y-3 flex flex-col justify-between">
-  <div className="space-y-2.5">
-  <div className="w-11 h-11 rounded-[14px] bg-[#f1f1f6] text-[#e0308e] flex items-center justify-center">
-  <Users className="h-5 w-5" />
-  </div>
-  <h3 className="text-[18px] font-bold text-[#16161d]">
-  4. Peer-Verified Collective Mesh
-  </h3>
-  <p className="text-xs text-[#5b5b6e] leading-relaxed">
-  A community-moderated safety feed where verified members confirm incidents, share safe alternative paths,
-  and flag infrastructure hazards like malfunctioning street lighting or isolated bus stations.
-  </p>
-  </div>
-  <div className="pt-2 text-xs font-bold text-[#e0308e] flex items-center gap-1">
-  <span>Community-Driven Defense</span>
-  </div>
-  </div>
-  </div>
-  </section>
-
-  {/* ============================================================ */}
-  {/* 4. TECHNICAL & INDUSTRIAL COMPLIANCE */}
-  {/* ============================================================ */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-6 sm:p-8 shadow-sm space-y-5">
-  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-  <div>
-  <span className="text-[11px] font-black uppercase text-[#6d4aff] tracking-[1.5px] block">
-  INDUSTRIAL STANDARDS &amp; ARCHITECTURE
-  </span>
-  <h3 className="text-[20px] font-black text-[#16161d]">
-  Built with Modern Resilience
-  </h3>
-  </div>
-  <span className="px-3 py-1 rounded-full bg-[#ecfdf5] text-[#059669] text-xs font-bold self-start sm:self-auto">
-  100% Cloud Native &amp; Encrypted
-  </span>
-  </div>
-
-  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1">
-  <span className="text-xs font-bold text-[#16161d] block">Google Cloud Run</span>
-  <p className="text-[11px] text-[#5b5b6e]">Auto-scaling backend with 99.9% uptime</p>
-  </div>
-
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1">
-  <span className="text-xs font-bold text-[#16161d] block">Geolocation API</span>
-  <p className="text-[11px] text-[#5b5b6e]">Hardware GPS lock with pinpoint precision</p>
-  </div>
-
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1">
-  <span className="text-xs font-bold text-[#16161d] block">Speech Synthesis</span>
-  <p className="text-[11px] text-[#5b5b6e]">Dynamic audio dialogue for deterrence calls</p>
-  </div>
-
-  <div className="p-3.5 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1">
-  <span className="text-xs font-bold text-[#16161d] block">JWT &amp; PostgreSQL</span>
-  <p className="text-[11px] text-[#5b5b6e]">Row-level security and encrypted storage</p>
-  </div>
-  </div>
-  </section>
-
-  {/* ============================================================ */}
-  {/* 4B. NATIONAL LEGAL ALIGNMENT & INDIA INFRASTRUCTURE */}
-  {/* ============================================================ */}
-  <section className="bg-white rounded-[24px] border border-[#e8e8f0] p-6 sm:p-8 shadow-sm space-y-4">
-  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-  <div>
-  <span className="text-[11px] font-black uppercase text-[#e11d48] tracking-[1.5px] block">
-  NATIONAL COMPLIANCE &amp; LEGAL PROTECTIONS
-  </span>
-  <h3 className="text-[20px] font-black text-[#16161d]">
-  Aligned with Indian Statutory Frameworks
-  </h3>
-  </div>
-  <Link
-  href="/safety-measures"
-  className="text-xs font-bold text-[#6d4aff] hover:underline flex items-center gap-1"
-  >
-  <span>View all 8 Indian Helplines &rarr;</span>
-  </Link>
-  </div>
-
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1 text-xs text-[#5b5b6e]">
-  <div className="p-4 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1.5">
-  <span className="font-bold text-[#16161d] block text-sm">
-  The POSH Act, 2013
-  </span>
-  <p className="leading-relaxed text-[11px]">
-  Supports workplace safety documentation. Aligned with Internal Committee (IC) 90-day inquiry protocols and Section 16 strict confidentiality protections.
-  </p>
-  </div>
-
-  <div className="p-4 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1.5">
-  <span className="font-bold text-[#16161d] block text-sm">
-  Emergency Response Support (112)
-  </span>
-  <p className="leading-relaxed text-[11px]">
-  Direct cellular speed-dials to National ERSS 112, Women Safety 1091, Women in Distress 181, and Cyber Crime Helpline 1930.
-  </p>
-  </div>
-
-  <div className="p-4 rounded-[16px] bg-[#f7f7fa] border border-[#e8e8f0] space-y-1.5">
-  <span className="font-bold text-[#16161d] block text-sm">
-  BNS &amp; IPC Criminal Codes
-  </span>
-  <p className="leading-relaxed text-[11px]">
-  Incident categories are mapped directly against Section 75 (Sexual Harassment), Section 78 (Stalking), and Section 79 (Insult to Modesty) of Bharatiya Nyaya Sanhita.
-  </p>
-  </div>
-  </div>
-  </section>
-
-  {/* ============================================================ */}
-  {/* 5. FREQUENTLY ASKED QUESTIONS (FAQ) */}
-  {/* ============================================================ */}
-  <section className="space-y-4">
-  <div className="text-center max-w-xl mx-auto space-y-1">
-  <span className="text-[11px] font-black uppercase text-[#6d4aff] tracking-[1.5px] block">
-  QUESTIONS &amp; CLARIFICATIONS
-  </span>
-  <h2 className="text-[22px] sm:text-[26px] font-black text-[#16161d] tracking-tight">
-  Frequently Asked Questions
-  </h2>
-  </div>
-
-  <div className="space-y-2.5 max-w-3xl mx-auto">
-  {FAQ_LIST.map((faq, index) => {
-  const isOpen = openFaq === index;
-  return (
-  <div
-  key={faq.question}
-  className="rounded-[18px] bg-white border border-[#e8e8f0] overflow-hidden transition-all shadow-2xs"
-  >
-  <button
-  type="button"
-  onClick={() => toggleFaq(index)}
-  className="w-full p-4.5 text-left flex items-center justify-between gap-3 cursor-pointer hover:bg-[#f7f7fa] transition-colors"
-  >
-  <span className="text-[14px] font-bold text-[#16161d]">
-  {faq.question}
-  </span>
-  <ChevronDown
-  className={`h-4 w-4 text-[#6d4aff] shrink-0 transition-transform duration-200 ${
-  isOpen ? 'rotate-180' : ''
-  }`}
-  />
-  </button>
-  {isOpen && (
-  <div className="px-4.5 pb-4 pt-1 text-[13px] text-[#5b5b6e] leading-relaxed border-t border-[#f1f1f6]">
-  {faq.answer}
-  </div>
-  )}
-  </div>
-  );
-  })}
-  </div>
-  </section>
-
-  {/* ============================================================ */}
-  {/* 6. CONVERSION FOOTER BANNER */}
-  {/* ============================================================ */}
-  <section className="relative rounded-[24px] bg-[#6d4aff] text-white p-7 sm:p-10 shadow-lg text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden">
-  <div className="pointer-events-none absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl" />
-
-  <div className="relative z-10 space-y-2 max-w-xl">
-  <h3 className="text-[24px] sm:text-[28px] font-black tracking-tight leading-tight">
-  Ready to explore our complete defense suite?
-  </h3>
-  <p className="text-white/85 text-[13.5px]">
-  Test our live emergency triggers, deterrence tools, and verified hotlines on the Safety Measures page.
-  </p>
-  </div>
-
-  <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
-  <Link
-  href="/safety-measures"
-  className="w-full sm:w-auto px-6 py-3.5 rounded-[16px] bg-white text-[#6d4aff] font-black text-xs hover:bg-[#f7f7fa] transition shadow-md active:scale-95 text-center"
-  >
-  Safety Measures Guide
-  </Link>
-  <Link
-  href="/signup"
-  className="w-full sm:w-auto px-6 py-3.5 rounded-[16px] bg-white/15 hover:bg-white/25 text-white font-bold text-xs border border-white/20 transition text-center"
-  >
-  Join Free
-  </Link>
-  </div>
-  </section>
-  </div>
+      {/* CTA */}
+      <section className="pb-24 sm:pb-32">
+        <div className="public-container">
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand to-brand-deep px-8 py-14 sm:px-14 text-white flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+            <div aria-hidden className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-coral/30 blur-3xl" />
+            <div className="relative space-y-3 max-w-xl">
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight">Safety is better together.</h2>
+              <p className="text-white/80 text-lg">Set up your trusted circle in under two minutes. It&rsquo;s free, forever.</p>
+            </div>
+            <div className="relative flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <Link href="/signup" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 font-semibold text-ink hover:bg-brand-tint transition">
+                Create free account <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/safety-measures" className="inline-flex items-center justify-center rounded-full border border-white/30 px-7 py-4 font-semibold hover:bg-white/10 transition">
+                Safety guide
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

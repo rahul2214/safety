@@ -35,6 +35,8 @@ import { api, type BackendPost } from '@/lib/api-client';
 import { Button } from '@/components/ui/Button';
 import { PageShellSkeleton } from '@/components/ui/Skeleton';
 import { Logo } from '@/components/ui/Logo';
+import { PublicHeader } from '@/components/public/PublicHeader';
+import { PublicFooter } from '@/components/public/PublicFooter';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -235,194 +237,15 @@ export function AppShell({ children }: AppShellProps) {
       return <>{children}</>;
     }
 
-    // Public Pages (/ , /about , /safety-measures): Public Navbar Only (No sidebar, no search, no dashboard links)
+    // Public Pages: marketing header + footer. Marketing pages are full-bleed; the feed keeps a content container.
+    const isFullBleed = pathname !== '/feed';
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900">
-        <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-xs">
-          <div className="flex h-16 items-center justify-between px-4 sm:px-6 max-w-7xl mx-auto w-full">
-            {/* Left: Mobile Menu Toggle + Platform Logo */}
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-                aria-label="Toggle navigation menu"
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-
-              <Link href="/" className="flex items-center gap-2.5 group">
-                <Logo size={36} />
-                <div>
-                  <span className="font-bold text-slate-900 text-base tracking-tight flex items-center gap-1.5 group-hover:text-purple-600 transition-colors">
-                    Sabhijude
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" title="Operational" />
-                  </span>
-                  <p className="text-[10px] text-slate-500 font-medium -mt-0.5 hidden xs:block">
-                    Personal Safety Platform
-                  </p>
-                </div>
-              </Link>
-            </div>
-
-            {/* Center: Public Links (Home, Feed, About & Safety Measures) */}
-            <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600">
-              <Link
-                href="/"
-                className={`hover:text-slate-900 transition-colors ${
-                  pathname === '/' ? 'text-blue-600 font-bold' : ''
-                }`}
-              >
-                Home
-              </Link>
-              <Link
-                href="/feed"
-                className={`hover:text-slate-900 transition-colors flex items-center gap-1.5 ${
-                  pathname === '/feed' ? 'text-blue-600 font-bold' : ''
-                }`}
-              >
-                <Radio className="h-3.5 w-3.5 text-red-500 animate-pulse" />
-                <span>Feed</span>
-              </Link>
-              <Link
-                href="/about"
-                className={`hover:text-slate-900 transition-colors ${
-                  pathname === '/about' ? 'text-blue-600 font-bold' : ''
-                }`}
-              >
-                About
-              </Link>
-              <Link
-                href="/safety-measures"
-                className={`hover:text-slate-900 transition-colors ${
-                  pathname === '/safety-measures' ? 'text-blue-600 font-bold' : ''
-                }`}
-              >
-                Safety Measures
-              </Link>
-              <Link
-                href="/organization-request"
-                className={`hover:text-slate-900 transition-colors ${
-                  pathname === '/organization-request' ? 'text-blue-600 font-bold' : ''
-                }`}
-              >
-                Campus & Orgs
-              </Link>
-            </nav>
-
-            {/* Right: Login & Signup */}
-            <div className="flex items-center gap-2 sm:gap-2.5">
-              <Link
-                href="/login"
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors shadow-xs"
-              >
-                Sign up
-              </Link>
-            </div>
-          </div>
-
-          {/* Mobile Drawer for Public View */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-2">
-              <nav className="flex flex-col space-y-1 text-sm font-semibold">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2 rounded-lg transition-colors ${
-                    pathname === '/' ? 'text-blue-600 bg-blue-50 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/feed"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                    pathname === '/feed' ? 'text-blue-600 bg-blue-50 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <Radio className="h-4 w-4 text-red-500" />
-                  <span>Feed (Public Incidents)</span>
-                </Link>
-                <Link
-                  href="/about"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2 rounded-lg transition-colors ${
-                    pathname === '/about' ? 'text-blue-600 bg-blue-50 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  About
-                </Link>
-                <Link
-                  href="/safety-measures"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2 rounded-lg transition-colors ${
-                    pathname === '/safety-measures' ? 'text-blue-600 bg-blue-50 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  Safety Measures
-                </Link>
-                <Link
-                  href="/organization-request"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2 rounded-lg transition-colors ${
-                    pathname === '/organization-request' ? 'text-blue-600 bg-blue-50 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  Campus & Organizations
-                </Link>
-
-                {/* Direct Police & Emergency Helplines in Drawer */}
-                <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-                  <a
-                    href="tel:112"
-                    className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-50 text-red-700 font-bold text-xs border border-red-200"
-                  >
-                    <Phone className="h-4 w-4 text-red-600" />
-                    <span>Call Police: 112 (National Emergency)</span>
-                  </a>
-                  <a
-                    href="tel:1091"
-                    className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-amber-50 text-amber-800 font-semibold text-xs border border-amber-200"
-                  >
-                    <Phone className="h-4 w-4 text-amber-600" />
-                    <span>Call Women Helpline: 1091</span>
-                  </a>
-                </div>
-              </nav>
-            </div>
-          )}
-        </header>
-
-        {/* Public Content (Full width, No sidebar) */}
-        <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 overflow-x-hidden">
+      <div className="min-h-screen bg-white flex flex-col text-ink">
+        <PublicHeader />
+        <main className={isFullBleed ? 'flex-1 w-full overflow-x-hidden' : 'flex-1 w-full public-container py-8 overflow-x-hidden'}>
           {children}
         </main>
-
-        {/* Public Footer */}
-        <footer className="border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-            <div>
-              <p>&copy; 2026 Sabhijude. 24/7 Verified Emergency Safety Infrastructure.</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Police &amp; Emergency: <a href="tel:112" className="text-red-600 font-bold hover:underline">112</a> &bull; Women Helpline: <a href="tel:1091" className="text-slate-600 font-semibold hover:underline">1091</a> &bull; Cyber Crime: <a href="tel:1930" className="text-slate-600 font-semibold hover:underline">1930</a>
-              </p>
-            </div>
-            <div className="flex items-center gap-4 font-semibold text-slate-600">
-              <Link href="/" className="hover:underline">Home</Link>
-              <Link href="/about" className="hover:underline">About</Link>
-              <Link href="/safety-measures" className="hover:underline">Safety Measures</Link>
-              <Link href="/login" className="hover:underline">Log in</Link>
-              <Link href="/signup" className="hover:underline">Sign up</Link>
-            </div>
-          </div>
-        </footer>
+        <PublicFooter />
       </div>
     );
   }

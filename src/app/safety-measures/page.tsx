@@ -43,7 +43,7 @@ const INDIA_HELPLINES = [
     title: 'National Emergency (ERSS)',
     authority: 'Ministry of Home Affairs, Govt. of India',
     purpose: 'All-in-one unified emergency response: Police, Fire, Ambulance, and Disaster Support across all States & UTs.',
-    timing: '24/7 &bull; Toll-Free',
+    timing: '24/7 · Toll-free',
     type: 'POLICE',
     badge: 'ALL-IN-ONE',
   },
@@ -52,7 +52,7 @@ const INDIA_HELPLINES = [
     title: 'Women Safety Helpline',
     authority: 'State Police Departments',
     purpose: 'Dedicated women safety rapid response teams, mobile PCR dispatch, and instant distress intervention.',
-    timing: '24/7 &bull; Toll-Free',
+    timing: '24/7 · Toll-free',
     type: 'WOMEN_POLICE',
     badge: 'RAPID PATROL',
   },
@@ -61,7 +61,7 @@ const INDIA_HELPLINES = [
     title: 'Women in Distress Helpline',
     authority: 'Ministry of Women and Child Development',
     purpose: 'Confidential support, counseling, domestic violence intervention, rescue shelter, and legal guidance.',
-    timing: '24/7 &bull; Toll-Free',
+    timing: '24/7 · Toll-free',
     type: 'CRISIS_AID',
     badge: 'DOMESTIC & CRISIS',
   },
@@ -70,7 +70,7 @@ const INDIA_HELPLINES = [
     title: 'Women Power Line',
     authority: 'Special Crime Branch / Police',
     purpose: 'Anti-harassment unit for stalking, obscene calls, cyber bullying, and street intimidation without revealing victim identity.',
-    timing: '24/7 &bull; Toll-Free',
+    timing: '24/7 · Toll-free',
     type: 'ANTI_STALKING',
     badge: 'STALKING & CYBER',
   },
@@ -79,7 +79,7 @@ const INDIA_HELPLINES = [
     title: 'National Cyber Crime Helpline',
     authority: 'Indian Cyber Crime Coordination Centre (I4C)',
     purpose: 'Reporting online harassment, cyber stalking, image morphing, doxxing, fake social profiles, and financial extortion.',
-    timing: '24/7 &bull; Toll-Free',
+    timing: '24/7 · Toll-free',
     type: 'CYBER',
     badge: 'CYBER SAFETY',
   },
@@ -88,7 +88,7 @@ const INDIA_HELPLINES = [
     title: 'NCW 24/7 Crisis Line',
     authority: 'National Commission for Women (NCW)',
     purpose: 'Direct central intervention for women facing violence, dowry harassment, acid attacks, or institutional denial of justice.',
-    timing: '24/7 &bull; Standard Call',
+    timing: '24/7 · Standard call',
     type: 'LEGAL',
     badge: 'LEGAL ESCALATION',
   },
@@ -97,7 +97,7 @@ const INDIA_HELPLINES = [
     title: 'Emergency Medical & Ambulance',
     authority: 'National Health Mission',
     purpose: 'Emergency trauma care, ambulance dispatch, and disaster medical assistance.',
-    timing: '24/7 &bull; Toll-Free',
+    timing: '24/7 · Toll-free',
     type: 'MEDICAL',
     badge: 'AMBULANCE',
   },
@@ -106,7 +106,7 @@ const INDIA_HELPLINES = [
     title: 'Childline India',
     authority: 'Ministry of Women & Child Development',
     purpose: 'Emergency protection for minors, runaway girls, child abuse, and trafficking defense.',
-    timing: '24/7 &bull; Toll-Free',
+    timing: '24/7 · Toll-free',
     type: 'CHILDREN',
     badge: 'MINORS / YOUTH',
   },
@@ -183,327 +183,260 @@ export default function SafetyMeasuresPage() {
   };
 
   return (
-    <div className="space-y-12 max-w-5xl mx-auto pb-12 select-none">
-      {/* ============================================================ */}
-      {/* 1. HERO HEADER: Defense Matrix Overview                      */}
-      {/* ============================================================ */}
-      <section className="pt-2 sm:pt-6 text-center max-w-3xl mx-auto space-y-4">
-      
-
-        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900 leading-tight">
-          Practical Safety Protocols, Official Helplines &amp; Workplace Rights
-        </h1>
-
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto">
-          Equip yourself with validated legal protections under the POSH Act, official Government of India emergency hotlines,
-          and situational defense tools designed for transit and workplaces.
-        </p>
-      </section>
-
-      {/* ============================================================ */}
-      {/* 2. OFFICIAL INDIA EMERGENCY & SAFETY HELPLINE DIRECTORY      */}
-      {/* ============================================================ */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-2 border-b border-slate-200">
-          <div>
-            <span className="text-[10px] font-bold uppercase text-red-600 tracking-wider block">
-              OFFICIAL GOVERNMENT OF INDIA DIRECTORY
-            </span>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
-              National Emergency &amp; Women Safety Numbers
-            </h2>
-          </div>
-          <span className="text-xs text-slate-500">
-            Toll-Free &bull; 24/7 Verified Emergency Dispatch
-          </span>
+    <div className="bg-white">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-ink text-white">
+        <div aria-hidden className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand/40 blur-3xl" />
+          <div className="absolute bottom-0 -left-24 h-80 w-80 rounded-full bg-coral/20 blur-3xl" />
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          {INDIA_HELPLINES.map((hl) => (
-            <div
-              key={hl.number}
-              className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs hover:border-slate-300 transition-colors flex flex-col justify-between space-y-3 group"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors">
-                    {hl.number}
-                  </span>
-                  <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                    {hl.badge}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-bold text-slate-900">{hl.title}</h3>
-                  <p className="text-[11px] text-slate-500 font-medium">{hl.authority}</p>
-                </div>
-
-                <p className="text-[11px] text-slate-600 leading-relaxed">
-                  {hl.purpose}
-                </p>
+        <div className="public-container relative pt-20 pb-16 sm:pt-24 sm:pb-20 grid lg:grid-cols-12 gap-10 items-end">
+          <div className="lg:col-span-7 space-y-6">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-coral">Safety guide</span>
+            <h1 className="font-display text-[2.5rem] sm:text-6xl leading-[1.05] font-extrabold tracking-[-0.03em]">
+              Know who to call. Know your rights.
+            </h1>
+            <p className="text-lg sm:text-xl text-white/70 leading-relaxed max-w-xl">
+              Official Indian helplines, workplace protections under the POSH Act and BNS, and tools you can try right now.
+            </p>
+          </div>
+          <div className="lg:col-span-5 grid grid-cols-2 gap-3">
+            <a href="tel:112" className="col-span-2 rounded-3xl bg-red-600 hover:bg-red-700 transition p-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/80">In danger right now?</p>
+                <p className="font-display text-4xl font-extrabold">Call 112</p>
               </div>
-
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span className="text-[10px] text-emerald-700 font-semibold">{hl.timing}</span>
-                <a
-                  href={`tel:${hl.number}`}
-                  className="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-700 hover:underline"
-                >
-                  <Phone className="h-3 w-3" />
-                  <span>Call {hl.number}</span>
-                </a>
-              </div>
-            </div>
+              <span className="h-14 w-14 rounded-full bg-white/15 flex items-center justify-center"><Phone className="h-6 w-6" /></span>
+            </a>
+            <a href="tel:1091" className="rounded-3xl bg-white/10 hover:bg-white/15 border border-white/10 transition p-5">
+              <p className="font-display text-2xl font-extrabold">1091</p>
+              <p className="text-sm text-white/65">Women helpline</p>
+            </a>
+            <a href="tel:181" className="rounded-3xl bg-white/10 hover:bg-white/15 border border-white/10 transition p-5">
+              <p className="font-display text-2xl font-extrabold">181</p>
+              <p className="text-sm text-white/65">Women in distress</p>
+            </a>
+          </div>
+        </div>
+        <nav className="public-container relative pb-8 flex flex-wrap gap-2 text-sm" aria-label="On this page">
+          {[
+            ['#helplines', 'Helplines'],
+            ['#habits', 'Everyday habits'],
+            ['#rights', 'Workplace rights'],
+            ['#tools', 'Try the tools'],
+          ].map(([href, label]) => (
+            <a key={href} href={href} className="rounded-full border border-white/15 px-4 py-2 text-white/80 hover:text-white hover:border-white/40 transition">
+              {label}
+            </a>
           ))}
+        </nav>
+      </section>
+
+      {/* Helplines */}
+      <section id="helplines" className="py-24 sm:py-28 scroll-mt-28">
+        <div className="public-container space-y-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-4 max-w-xl">
+              <span className="eyebrow">Official directory</span>
+              <h2 className="display-2">National emergency &amp; women safety numbers.</h2>
+            </div>
+            <p className="text-slate-500">Tap any number to call. Most are toll-free and open 24/7.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {INDIA_HELPLINES.map((hl) => (
+              <a
+                key={hl.number}
+                href={`tel:${hl.number}`}
+                className={`group card-public p-6 flex flex-col justify-between gap-6 hover:-translate-y-1 hover:border-brand/40 transition ${hl.number === '112' ? 'ring-2 ring-red-500/70' : ''}`}
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className={`font-display text-3xl font-extrabold tracking-tight ${hl.number === '112' ? 'text-red-600' : 'text-ink'}`}>
+                      {hl.number}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider rounded-full bg-mist px-2.5 py-1 text-slate-600">{hl.badge}</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-ink">{hl.title}</h3>
+                    <p className="text-xs text-slate-500">{hl.authority}</p>
+                  </div>
+                  <p className="text-sm text-slate-600 leading-relaxed">{hl.purpose}</p>
+                </div>
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100 text-sm">
+                  <span className="text-emerald-700 font-medium">{hl.timing}</span>
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-brand group-hover:gap-2.5 transition-all">
+                    <Phone className="h-3.5 w-3.5" /> Call
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* 3. WORKPLACE LAWS & LEGAL PROTECTIONS (POSH, BNS, LABOR)      */}
-      {/* ============================================================ */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-2 border-b border-slate-200">
-          <div>
-            <span className="text-[10px] font-bold uppercase text-blue-600 tracking-wider block">
-              STATUTORY WORKPLACE RIGHTS IN INDIA
-            </span>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
-              Workplace Safety, POSH Act &amp; Criminal Penalties
-            </h2>
+      {/* Everyday habits */}
+      <section id="habits" className="bg-mist py-24 sm:py-28 scroll-mt-28">
+        <div className="public-container space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="eyebrow">Everyday habits</span>
+            <h2 className="display-2">Small habits that make a big difference.</h2>
           </div>
-          <span className="text-xs text-slate-500">
-            Know your legal rights under Indian Law
-          </span>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: MapPin, t: 'Share your trip', b: 'Before a late cab or a long walk, share your route and expected arrival time with someone you trust.' },
+              { icon: Users, t: 'Keep your circle current', b: 'Make sure at least three trusted contacts are saved and know they might get an alert from you.' },
+              { icon: Clock, t: 'Check before you go', b: 'Look at recent community alerts for the area — broken lights, harassment hotspots or closed routes.' },
+              { icon: EyeOff, t: 'Trust your instincts', b: 'If something feels off, leave. A fake call is a perfectly good reason to step away.' },
+              { icon: Briefcase, t: 'Document everything', b: 'Note dates, times, words and witnesses. Screenshots saved to a personal drive can matter later.' },
+              { icon: Lock, t: 'Lock down your profiles', b: 'Limit who can see your location, workplace and daily routine on social media.' },
+            ].map((x) => (
+              <div key={x.t} className="rounded-3xl bg-white border border-slate-200 p-7 space-y-3">
+                <span className="h-11 w-11 rounded-2xl bg-brand-tint text-brand flex items-center justify-center">
+                  <x.icon className="h-5 w-5" />
+                </span>
+                <h3 className="font-display text-lg font-bold text-ink">{x.t}</h3>
+                <p className="text-slate-600 text-[15px] leading-relaxed">{x.b}</p>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div className="space-y-3">
-          {WORKPLACE_LAWS.map((law, idx) => {
-            const isExpanded = expandedLaw === idx;
-            return (
-              <div
-                key={law.act}
-                className="rounded-xl bg-white border border-slate-200 shadow-xs overflow-hidden"
-              >
-                <button
-                  type="button"
-                  onClick={() => setExpandedLaw(isExpanded ? null : idx)}
-                  className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
-                      <Scale className="h-5 w-5" />
-                    </div>
+      {/* Workplace rights */}
+      <section id="rights" className="py-24 sm:py-28 scroll-mt-28">
+        <div className="public-container grid lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-32 self-start">
+            <span className="eyebrow"><Scale className="h-3.5 w-3.5" /> Your rights</span>
+            <h2 className="display-2">Workplace safety &amp; the law.</h2>
+            <p className="text-slate-600 text-lg leading-relaxed">
+              What the POSH Act, the Bharatiya Nyaya Sanhita and labour laws guarantee you — in plain language.
+            </p>
+          </div>
+
+          <div className="lg:col-span-8 space-y-4">
+            {WORKPLACE_LAWS.map((law, idx) => {
+              const isExpanded = expandedLaw === idx;
+              return (
+                <div key={law.act} className={`rounded-3xl border transition-colors ${isExpanded ? 'border-brand/30 bg-brand-tint/40' : 'border-slate-200 bg-white'}`}>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedLaw(isExpanded ? null : idx)}
+                    aria-expanded={isExpanded}
+                    className="w-full p-6 flex items-center justify-between gap-4 text-left"
+                  >
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900">{law.act}</h3>
-                      <p className="text-xs text-slate-500 mt-0.5">{law.fullName}</p>
+                      <h3 className="font-display text-lg font-bold text-ink">{law.act}</h3>
+                      <p className="text-sm text-slate-500 mt-1">{law.fullName}</p>
                     </div>
-                  </div>
-
-                  <div className="text-slate-400 p-1">
-                    {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                  </div>
-                </button>
-
-                {isExpanded && (
-                  <div className="px-5 pb-5 pt-2 border-t border-slate-100 bg-slate-50/40 space-y-3">
-                    <div className="space-y-2 text-xs">
+                    <span className={`h-9 w-9 shrink-0 rounded-full border flex items-center justify-center transition ${isExpanded ? 'bg-ink border-ink text-white rotate-180' : 'border-slate-300 text-ink'}`}>
+                      <ChevronDown className="h-4 w-4" />
+                    </span>
+                  </button>
+                  {isExpanded && (
+                    <ul className="px-6 pb-6 space-y-3">
                       {law.keyPoints.map((point, pIdx) => {
-                        const [title, desc] = point.split(':');
+                        const sep = point.indexOf(':');
+                        const title = sep > -1 ? point.slice(0, sep) : '';
+                        const desc = sep > -1 ? point.slice(sep + 1) : point;
                         return (
-                          <div
-                            key={pIdx}
-                            className="p-3 rounded-lg bg-white border border-slate-200 text-slate-700 leading-relaxed flex items-start gap-2.5"
-                          >
-                            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                            <div>
-                              {desc ? (
-                                <>
-                                  <strong className="text-slate-900">{title}:</strong>
-                                  <span>{desc}</span>
-                                </>
-                              ) : (
-                                <span>{point}</span>
-                              )}
-                            </div>
-                          </div>
+                          <li key={pIdx} className="flex items-start gap-3 rounded-2xl bg-white border border-slate-200 p-4 text-[15px] leading-relaxed text-slate-700">
+                            <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>
+                              {title && <strong className="text-ink">{title}:</strong>}
+                              {desc}
+                            </span>
+                          </li>
                         );
                       })}
-                    </div>
-                  </div>
-                )}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+
+            <div className="rounded-3xl bg-ink text-white p-7 sm:p-8 space-y-6 mt-8">
+              <div className="flex items-center gap-3">
+                <span className="h-11 w-11 rounded-2xl bg-white/10 flex items-center justify-center"><Briefcase className="h-5 w-5" /></span>
+                <div>
+                  <h3 className="font-display text-lg font-bold">How to file a POSH complaint</h3>
+                  <p className="text-sm text-white/60">Four steps to make sure your case is documented and heard.</p>
+                </div>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Step-by-Step SOP Card: How to file a POSH complaint */}
-        <div className="p-5 sm:p-6 rounded-xl bg-blue-50/40 border border-blue-200 space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-blue-100 text-blue-700 shrink-0">
-              <Briefcase className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">
-                Standard Operating Procedure: How to File a POSH Complaint
-              </h3>
-              <p className="text-xs text-slate-600 mt-0.5">
-                Recommended legal steps to ensure your case is documented and investigated without prejudice.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
-            <div className="p-3.5 rounded-lg bg-white border border-blue-100 space-y-1">
-              <span className="font-bold text-blue-700 text-[10px] uppercase">Step 1 &bull; Document</span>
-              <p className="font-semibold text-slate-900">Contemporaneous Records</p>
-              <p className="text-slate-600 text-[11px] leading-relaxed">
-                Log exact dates, times, statements, locations, and any bystander witnesses. Save screenshots to a personal drive.
-              </p>
-            </div>
-
-            <div className="p-3.5 rounded-lg bg-white border border-blue-100 space-y-1">
-              <span className="font-bold text-blue-700 text-[10px] uppercase">Step 2 &bull; Submit</span>
-              <p className="font-semibold text-slate-900">Submit to IC / LC</p>
-              <p className="text-slate-600 text-[11px] leading-relaxed">
-                Submit a written complaint to the Internal Committee within 3 months of incident. Request written acknowledgment.
-              </p>
-            </div>
-
-            <div className="p-3.5 rounded-lg bg-white border border-blue-100 space-y-1">
-              <span className="font-bold text-blue-700 text-[10px] uppercase">Step 3 &bull; Safeguard</span>
-              <p className="font-semibold text-slate-900">Request Interim Relief</p>
-              <p className="text-slate-600 text-[11px] leading-relaxed">
-                Exercise right to up to 3 months paid leave or transfer if continued proximity causes distress or appraisal threats.
-              </p>
-            </div>
-
-            <div className="p-3.5 rounded-lg bg-white border border-blue-100 space-y-1">
-              <span className="font-bold text-blue-700 text-[10px] uppercase">Step 4 &bull; Inquire</span>
-              <p className="font-semibold text-slate-900">90-Day Closure</p>
-              <p className="text-slate-600 text-[11px] leading-relaxed">
-                IC must conclude inquiry within 90 days. Management must enforce penalties or action within 60 days of report.
-              </p>
+              <ol className="grid sm:grid-cols-2 gap-4">
+                {[
+                  ['Document', 'Log dates, times, statements, places and witnesses. Save screenshots somewhere personal.'],
+                  ['Submit', 'File a written complaint with the Internal Committee within 3 months. Ask for written acknowledgement.'],
+                  ['Safeguard', 'Request interim relief — up to 3 months of paid leave or a transfer if needed.'],
+                  ['Follow up', 'The inquiry must finish within 90 days, and management must act within 60 days of the report.'],
+                ].map(([t, b], i) => (
+                  <li key={t} className="rounded-2xl bg-white/5 border border-white/10 p-5 space-y-2">
+                    <span className="text-xs font-bold text-coral">Step {i + 1}</span>
+                    <p className="font-semibold">{t}</p>
+                    <p className="text-sm text-white/65 leading-relaxed">{b}</p>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* 4. INTERACTIVE PREPAREDNESS LAB: SOS & Hardware Simulation   */}
-      {/* ============================================================ */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-2 border-b border-slate-200">
-          <div>
-            <span className="text-[10px] font-bold uppercase text-blue-600 tracking-wider block">
-              INTERACTIVE PREPAREDNESS LAB
-            </span>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
-              Test Emergency Hardware &amp; Deterrence Tools
-            </h2>
+      {/* Try the tools */}
+      <section id="tools" className="pb-24 sm:pb-32 scroll-mt-28">
+        <div className="public-container space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="eyebrow">Practice makes calm</span>
+            <h2 className="display-2">Try the tools before you need them.</h2>
+            <p className="text-slate-600 text-lg">Nothing here contacts anyone — it&rsquo;s a safe rehearsal.</p>
           </div>
-          <span className="text-xs text-slate-500">
-            Zero-risk browser simulation
-          </span>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Module 1: SOS Simulator */}
-          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold">
-                <AlertTriangle className="h-5 w-5" />
+          <div className="grid md:grid-cols-3 gap-5">
+            <div className="card-public p-7 flex flex-col justify-between gap-6">
+              <div className="space-y-3">
+                <span className="h-12 w-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center"><AlertTriangle className="h-6 w-6" /></span>
+                <h3 className="font-display text-xl font-bold text-ink">SOS countdown</h3>
+                <p className="text-slate-600 leading-relaxed">See how the 3-second cancel window works before an alert goes out.</p>
               </div>
-              <h3 className="text-sm font-bold text-slate-900">SOS Dispatch Simulator</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Tests the 3-second abort guard, GPS lock telemetry, and simulated contact dispatch.
-              </p>
-            </div>
-
-            <div className="pt-2">
               {simulatingSos ? (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-center space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-red-600 text-white font-bold text-lg flex items-center justify-center mx-auto animate-pulse">
-                    {countdown}
-                  </div>
-                  <p className="text-xs font-semibold text-red-700">Arming GPS broadcast...</p>
-                  <button
-                    onClick={handleStartSosSimulation}
-                    className="text-xs text-slate-600 underline"
-                  >
-                    Abort
-                  </button>
+                <div className="rounded-2xl bg-red-50 border border-red-200 p-4 text-center space-y-2">
+                  <div className="h-12 w-12 rounded-full bg-red-600 text-white font-display font-extrabold text-xl flex items-center justify-center mx-auto animate-pulse">{countdown}</div>
+                  <p className="text-sm font-semibold text-red-700">Preparing alert…</p>
+                  <button onClick={handleStartSosSimulation} className="text-sm text-slate-600 underline">Cancel</button>
                 </div>
               ) : simDispatched ? (
-                <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-center space-y-1">
-                  <CheckCircle2 className="h-6 w-6 text-emerald-600 mx-auto" />
-                  <p className="text-xs font-bold text-emerald-800">Distress Dispatched (Simulated)</p>
-                  <button
-                    onClick={handleStartSosSimulation}
-                    className="text-xs text-blue-600 font-semibold underline pt-1 block mx-auto"
-                  >
-                    Reset
-                  </button>
+                <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-center space-y-1">
+                  <CheckCircle2 className="h-7 w-7 text-emerald-600 mx-auto" />
+                  <p className="text-sm font-semibold text-emerald-800">Alert sent (practice only)</p>
+                  <button onClick={handleStartSosSimulation} className="text-sm text-brand font-semibold underline">Reset</button>
                 </div>
               ) : (
-                <button
-                  onClick={handleStartSosSimulation}
-                  className="w-full py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs transition-colors"
-                >
-                  Test 3s SOS Trigger
-                </button>
+                <button onClick={handleStartSosSimulation} className="btn-sos w-full">Start practice SOS</button>
               )}
             </div>
-          </div>
 
-          {/* Module 2: National Helpline 112 */}
-          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
-                <ShieldCheck className="h-5 w-5" />
+            <div className="card-public p-7 flex flex-col justify-between gap-6">
+              <div className="space-y-3">
+                <span className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center"><Phone className="h-6 w-6" /></span>
+                <h3 className="font-display text-xl font-bold text-ink">Fake incoming call</h3>
+                <p className="text-slate-600 leading-relaxed">A realistic call screen with a voice on the line — your polite exit.</p>
               </div>
-              <h3 className="text-sm font-bold text-slate-900">National Emergency Line (112)</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Integrated Emergency Response Support System (ERSS) across India for police, fire, and medical aid.
-              </p>
-            </div>
-
-            <div className="pt-2">
-              <a
-                href="tel:112"
-                className="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Phone className="h-3.5 w-3.5" />
-                <span>Call Emergency 112</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Module 3: Discreet Fake Call */}
-          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                <Phone className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-bold text-slate-900">Discreet Fake Call</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Realistic incoming phone screen with synthesized conversation to deter followers.
-              </p>
-            </div>
-
-            <div className="pt-2">
-              <button
-                onClick={() => setFakeCallOpen(true)}
-                className="w-full py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition-colors"
-              >
-                Simulate Incoming Call
+              <button onClick={() => setFakeCallOpen(true)} className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 px-6 py-3.5 text-sm font-semibold text-white transition">
+                Ring my phone
               </button>
+            </div>
+
+            <div className="card-public p-7 flex flex-col justify-between gap-6">
+              <div className="space-y-3">
+                <span className="h-12 w-12 rounded-2xl bg-brand-tint text-brand flex items-center justify-center"><ShieldCheck className="h-6 w-6" /></span>
+                <h3 className="font-display text-xl font-bold text-ink">Set up your circle</h3>
+                <p className="text-slate-600 leading-relaxed">Add trusted contacts so a real SOS reaches the right people instantly.</p>
+              </div>
+              <Link href="/signup" className="btn-brand w-full">Create free account <ArrowRight className="h-4 w-4" /></Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Global Modals for interactive testing */}
       <SosModal isOpen={sosModalOpen} onClose={() => setSosModalOpen(false)} />
       <FakeCallModal isOpen={fakeCallOpen} onClose={() => setFakeCallOpen(false)} />
     </div>

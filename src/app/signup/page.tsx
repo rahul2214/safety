@@ -27,6 +27,7 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api-client';
 import { Logo } from '@/components/ui/Logo';
+import { AuthLayout } from '@/components/public/AuthLayout';
 
 function SignupFormContent() {
   const router = useRouter();
@@ -190,186 +191,15 @@ function SignupFormContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between text-slate-900">
-      {/* 1. URGENT CRISIS ESCALATION BANNER (Life-Safety Priority) */}
-      <div className="bg-red-700 text-white border-b border-red-800 px-4 py-2.5 text-xs font-medium">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-center sm:text-left">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-red-200" />
-            <span>
-              <strong>Immediate danger?</strong> You do not need an account to call emergency services.
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <a
-              href="tel:112"
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-red-700 hover:bg-red-50 font-bold rounded shadow-xs text-xs transition-colors"
-            >
-              <Phone className="h-3 w-3" />
-              Dial 112 (National ERSS)
-            </a>
-            <a
-              href="tel:1091"
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-800 hover:bg-red-900 text-white font-bold rounded border border-red-600 text-xs transition-colors"
-            >
-              <Phone className="h-3 w-3" />
-              1091 (Women Police)
-            </a>
-            <Link
-              href="/safety-measures"
-              className="underline hover:text-red-100 hidden md:inline-block"
-            >
-              View directory &amp; legal rights →
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. MAIN WORKSPACE CONTAINER */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex items-center justify-center">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch max-w-5xl">
-          {/* LEFT COLUMN: Why Join Sabhijude & Safety Commitments (Desktop) */}
-          <div className="hidden lg:flex lg:col-span-5 flex-col justify-between bg-slate-900 text-white rounded-2xl p-8 border border-slate-800 shadow-sm relative overflow-hidden">
-            <div className="relative z-10 space-y-6">
-              {/* Brand Header */}
-              <div className="flex items-center gap-3">
-                <Logo size={42} />
-                <div>
-                  <h2 className="text-lg font-bold tracking-tight text-white">Sabhijude Portal</h2>
-                  <p className="text-xs text-slate-400">National Personal Safety &amp; Legal Network</p>
-                </div>
-              </div>
-
-              {/* Step indicator overview */}
-              <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-2">
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <span className="text-slate-300">Registration Progress</span>
-                  <span className="text-blue-400">{stage === 1 ? '50% Complete' : '100% Complete'}</span>
-                </div>
-                <div className="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-blue-500 transition-all duration-300 rounded-full"
-                    style={{ width: stage === 1 ? '50%' : '100%' }}
-                  />
-                </div>
-                <div className="flex justify-between text-[11px] text-slate-400 pt-1">
-                  <span className={stage === 1 ? 'text-white font-medium' : 'text-slate-400'}>
-                    1. Account Credentials
-                  </span>
-                  <span className={stage === 2 ? 'text-white font-medium' : 'text-slate-400'}>
-                    2. Safety Profile
-                  </span>
-                </div>
-              </div>
-
-              {/* Core Features */}
-              <div className="space-y-4 pt-1">
-                <h3 className="text-xs font-semibold text-slate-300 tracking-wider uppercase">
-                  Included Member Protections
-                </h3>
-
-                <div className="space-y-3.5 text-xs">
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
-                      <Phone className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">1-Touch Emergency Broadcast</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        Dispatch high-priority SMS and location telemetry to your trusted emergency contacts
-                        with single-touch confirmation.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
-                      <Scale className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">POSH Act &amp; Statutory Evidence Locker</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        Log timestamped incident records admissible for internal inquiry committees (IC) and
-                        police complaint filings.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <MapPin className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">Privacy-Safe Geo Safety Map</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        Explore street lighting reports, verified transit hubs, and harassment alerts aggregated
-                        to protect home privacy.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
-                      <Users className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">Zero-Judgment Community Support</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        Share advice and practical safety guidance under verified pseudonyms without exposing
-                        your personal contact details.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Institutional Seal */}
-            <div className="relative z-10 pt-6 mt-6 border-t border-slate-800/80">
-              <div className="flex items-center justify-between text-[11px] text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Government Standards Aligned
-                </span>
-                <span>DPDP Act 2023 Compliant</span>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN: Senior Enterprise Sign-Up & Onboarding Card */}
-          <div className="lg:col-span-7 flex flex-col justify-center">
-            {/* Top Navigation Row */}
-            <div className="mb-4 flex items-center justify-between">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Back to Public Portal
-              </Link>
-              <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
-                {stage === 1 ? 'Step 1 of 2: Account' : 'Step 2 of 2: Profile'}
-              </span>
-            </div>
-
-            {/* White Form Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-              {/* Header Title & Subtitle */}
-              <div className="mb-6">
-                <div className="lg:hidden flex items-center gap-2.5 mb-3">
-                  <Logo size={32} />
-                  <span className="text-sm font-bold text-slate-900">Sabhijude</span>
-                </div>
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                  {stage === 1 ? 'Create Member Account' : 'Set Up Your Safety Profile'}
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                  {stage === 1
-                    ? 'A protected, encrypted space to access safety tools, manage trusted contacts, and report incidents.'
-                    : 'This shapes relevant safety alerts and workplace guidance for your demographic. You can modify this at any time.'}
-                </p>
-              </div>
-
+    <AuthLayout
+      title={stage === 1 ? 'Create your free account' : 'Set up your safety profile'}
+      subtitle={stage === 1 ? 'Takes under two minutes. Your details stay private.' : 'This helps us show alerts and guidance that matter to you. You can change it anytime.'}
+      badge={
+        <span className="inline-flex items-center rounded-full bg-brand-tint px-3 py-1 text-xs font-semibold text-brand">
+          Step {stage} of 2
+        </span>
+      }
+    >
               {/* Error Callout Banner */}
               {errorMsg && (
                 <div
@@ -416,7 +246,7 @@ function SignupFormContent() {
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         required
-                        className="w-full h-11 bg-white border border-slate-300 rounded-lg pl-10 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors"
+                        className="w-full h-12 bg-white border border-slate-300 rounded-xl pl-10 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors"
                       />
                     </div>
                   </div>
@@ -438,7 +268,7 @@ function SignupFormContent() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full h-11 bg-white border border-slate-300 rounded-lg pl-10 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors"
+                        className="w-full h-12 bg-white border border-slate-300 rounded-xl pl-10 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors"
                       />
                     </div>
                   </div>
@@ -448,7 +278,7 @@ function SignupFormContent() {
                     <label htmlFor="phone" className="block text-xs font-semibold text-slate-700">
                       Mobile Number (India)
                     </label>
-                    <div className="flex items-center h-11 bg-white border border-slate-300 rounded-lg px-3 focus-within:ring-2 focus-within:ring-blue-600/20 focus-within:border-blue-600 transition-colors">
+                    <div className="flex items-center h-12 bg-white border border-slate-300 rounded-lg px-3 focus-within:ring-2 focus-within:ring-blue-600/20 focus-within:border-blue-600 transition-colors">
                       <span className="text-xs font-bold text-blue-700 pr-2.5 border-r border-slate-200">
                         +91
                       </span>
@@ -487,7 +317,7 @@ function SignupFormContent() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="w-full h-11 bg-white border border-slate-300 rounded-lg pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors tracking-wide"
+                        className="w-full h-12 bg-white border border-slate-300 rounded-xl pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors tracking-wide"
                       />
                       <button
                         type="button"
@@ -545,7 +375,7 @@ function SignupFormContent() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
-                        className="w-full h-11 bg-white border border-slate-300 rounded-lg pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors tracking-wide"
+                        className="w-full h-12 bg-white border border-slate-300 rounded-xl pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors tracking-wide"
                       />
                       {confirmPassword.length > 0 && (
                         <div className="absolute right-3">
@@ -589,7 +419,7 @@ function SignupFormContent() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full h-11 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-black text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
+                      className="w-full h-12 rounded-full bg-ink hover:bg-ink-soft active:bg-black text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
                     >
                       {isSubmitting ? (
                         <>
@@ -641,7 +471,7 @@ function SignupFormContent() {
                     <label htmlFor="dob" className="block text-xs font-semibold text-slate-700">
                       Date of Birth
                     </label>
-                    <div className="flex items-center h-11 bg-white border border-slate-300 rounded-lg px-3 focus-within:ring-2 focus-within:ring-blue-600/20 focus-within:border-blue-600 transition-colors">
+                    <div className="flex items-center h-12 bg-white border border-slate-300 rounded-lg px-3 focus-within:ring-2 focus-within:ring-blue-600/20 focus-within:border-blue-600 transition-colors">
                       <Calendar className="h-4 w-4 text-slate-400 mr-2 shrink-0" />
                       <input
                         id="dob"
@@ -731,7 +561,7 @@ function SignupFormContent() {
                   Already have an account?{' '}
                   <Link
                     href={`/login?redirect=${encodeURIComponent(redirectPath)}`}
-                    className="text-blue-600 font-bold hover:underline ml-1"
+                    className="text-brand font-semibold hover:underline ml-1"
                   >
                     Sign in to your account
                   </Link>
@@ -741,26 +571,7 @@ function SignupFormContent() {
                   Your phone number and identity remain confidential under DPDP Act 2023 guidelines.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. FOOTER NOTE */}
-      <footer className="py-4 border-t border-slate-200 text-center text-xs text-slate-500 bg-white">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>&copy; {new Date().getFullYear()} Sabhijude National Safety Portal. All rights reserved.</span>
-          <div className="flex items-center gap-4 text-xs">
-            <Link href="/about" className="hover:text-slate-800 transition">
-              About
-            </Link>
-            <Link href="/safety-measures" className="hover:text-slate-800 transition">
-              Indian Helplines &amp; Workplace Laws
-            </Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </AuthLayout>
   );
 }
 

@@ -23,6 +23,7 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { Logo } from '@/components/ui/Logo';
+import { AuthLayout } from '@/components/public/AuthLayout';
 
 function LoginFormContent() {
   const router = useRouter();
@@ -106,161 +107,10 @@ function LoginFormContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between text-slate-900">
-      {/* 1. URGENT CRISIS ESCALATION BANNER (Life-Safety Priority) */}
-      <div className="bg-red-700 text-white border-b border-red-800 px-4 py-2.5 text-xs font-medium">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-center sm:text-left">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-red-200" />
-            <span>
-              <strong>Immediate danger?</strong> You do not need to sign in to get emergency assistance.
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <a
-              href="tel:112"
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-red-700 hover:bg-red-50 font-bold rounded shadow-xs text-xs transition-colors"
-            >
-              <Phone className="h-3 w-3" />
-              Dial 112 (National ERSS)
-            </a>
-            <a
-              href="tel:1091"
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-800 hover:bg-red-900 text-white font-bold rounded border border-red-600 text-xs transition-colors"
-            >
-              <Phone className="h-3 w-3" />
-              1091 (Women Police)
-            </a>
-            <Link
-              href="/safety-measures"
-              className="underline hover:text-red-100 hidden md:inline-block"
-            >
-              View directory &amp; legal rights →
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. MAIN WORKSPACE CONTAINER */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex items-center justify-center">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch max-w-5xl">
-          {/* LEFT COLUMN: Institutional Trust & Legal Protections Panel (Desktop) */}
-          <div className="hidden lg:flex lg:col-span-5 flex-col justify-between bg-slate-900 text-white rounded-2xl p-8 border border-slate-800 shadow-sm relative overflow-hidden">
-            <div className="relative z-10 space-y-6">
-              {/* Brand Header */}
-              <div className="flex items-center gap-3">
-                <Logo size={42} />
-                <div>
-                  <h2 className="text-lg font-bold tracking-tight text-white">Sabhijude Portal</h2>
-                  <p className="text-xs text-slate-400">National Personal Safety &amp; Legal Network</p>
-                </div>
-              </div>
-
-              {/* Core Security & Privacy Guarantees */}
-              <div className="space-y-4 pt-2">
-                <h3 className="text-xs font-semibold text-slate-300 tracking-wider uppercase">
-                  Protected System Guarantees
-                </h3>
-
-                <div className="space-y-3.5 text-xs">
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
-                      <Shield className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">Zero Public Identity Exposure</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        Community posts, area hazard alerts, and emergency markers preserve strict
-                        anonymity. Your legal identity is never broadcast.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
-                      <Scale className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">POSH Act 2013 &amp; BNS Compliance</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        Formal workplace incident records include tamper-evident timestamping and
-                        confidentiality under Section 16 of the POSH Act.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <Phone className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">National ERSS 112 Dispatch Ready</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        Direct SOS dispatch capability connecting to local police control rooms and
-                        designated emergency contacts.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
-                      <Lock className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-200">DPDP Act 2023 Encrypted Storage</h4>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">
-                        256-bit AES encryption at rest and in transit. Your contact numbers and location logs
-                        are never sold, rented, or monetized.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Institutional Seal */}
-            <div className="relative z-10 pt-6 mt-6 border-t border-slate-800/80">
-              <div className="flex items-center justify-between text-[11px] text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  API Gateway Operational
-                </span>
-                <span>ISO 27001 &bull; DPDP Certified</span>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN: Senior Enterprise Sign-In Card */}
-          <div className="lg:col-span-7 flex flex-col justify-center">
-            {/* Top Navigation Row */}
-            <div className="mb-4 flex items-center justify-between">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Back to Public Portal
-              </Link>
-              <span className="text-[11px] font-medium text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full">
-                Encrypted Session
-              </span>
-            </div>
-
-            {/* White Form Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-              {/* Header Title & Subtitle */}
-              <div className="mb-6">
-                <div className="lg:hidden flex items-center gap-2.5 mb-3">
-                  <Logo size={32} />
-                  <span className="text-sm font-bold text-slate-900">Sabhijude</span>
-                </div>
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Member Sign In</h1>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                  Enter your registered credentials to access your safety dashboard, emergency contacts, and
-                  incident records.
-                </p>
-              </div>
-
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Log in to reach your trusted contacts, safety map and reports."
+    >
               {/* Error Callout Banner */}
               {errorMsg && (
                 <div
@@ -305,11 +155,11 @@ function LoginFormContent() {
                         if (errorMsg) setErrorMsg(null);
                       }}
                       required
-                      className={`w-full h-11 bg-white border ${
+                      className={`w-full h-12 bg-white border ${
                         errorMsg
                           ? 'border-red-500 ring-2 ring-red-500/10 focus:border-red-600 focus:ring-red-600/20'
-                          : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/20'
-                      } rounded-lg pl-10 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors`}
+                          : 'border-slate-300 focus:border-brand focus:ring-brand/15'
+                      } rounded-xl pl-10 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors`}
                     />
                   </div>
                 </div>
@@ -323,7 +173,7 @@ function LoginFormContent() {
                     <button
                       type="button"
                       onClick={() => setShowForgotPasswordModal(true)}
-                      className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors focus:outline-none"
+                      className="text-xs font-semibold text-brand hover:text-brand-deep hover:underline transition-colors focus:outline-none"
                     >
                       Forgot password?
                     </button>
@@ -343,11 +193,11 @@ function LoginFormContent() {
                         if (errorMsg) setErrorMsg(null);
                       }}
                       required
-                      className={`w-full h-11 bg-white border ${
+                      className={`w-full h-12 bg-white border ${
                         errorMsg
                           ? 'border-red-500 ring-2 ring-red-500/10 focus:border-red-600 focus:ring-red-600/20'
-                          : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/20'
-                      } rounded-lg pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors tracking-wide`}
+                          : 'border-slate-300 focus:border-brand focus:ring-brand/15'
+                      } rounded-xl pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors tracking-wide`}
                     />
                     <button
                       type="button"
@@ -378,7 +228,7 @@ function LoginFormContent() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-11 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-black text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
+                    className="w-full h-12 rounded-full bg-ink hover:bg-ink-soft active:bg-black text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
@@ -398,7 +248,7 @@ function LoginFormContent() {
                   Don&apos;t have an account yet?{' '}
                   <Link
                     href={`/signup?redirect=${encodeURIComponent(redirectPath)}`}
-                    className="text-blue-600 font-bold hover:underline ml-1"
+                    className="text-brand font-semibold hover:underline ml-1"
                   >
                     Create a free account
                   </Link>
@@ -408,10 +258,6 @@ function LoginFormContent() {
                   Protected by 256-bit encryption. Real identity remains private on public incident feeds.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* 3. FORGOT PASSWORD MODAL */}
       {showForgotPasswordModal && (
@@ -480,21 +326,7 @@ function LoginFormContent() {
         </div>
       )}
 
-      {/* 4. FOOTER NOTE */}
-      <footer className="py-4 border-t border-slate-200 text-center text-xs text-slate-500 bg-white">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>&copy; {new Date().getFullYear()} Sabhijude National Safety Portal. All rights reserved.</span>
-          <div className="flex items-center gap-4 text-xs">
-            <Link href="/about" className="hover:text-slate-800 transition">
-              About
-            </Link>
-            <Link href="/safety-measures" className="hover:text-slate-800 transition">
-              Indian Helplines &amp; Workplace Laws
-            </Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </AuthLayout>
   );
 }
 
