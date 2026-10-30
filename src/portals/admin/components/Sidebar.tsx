@@ -41,9 +41,11 @@ export default function Sidebar() {
       <div>
         {/* Brand */}
         <div className="h-16 flex items-center px-6 border-b border-[#e8e8f0] gap-3">
-          <div className="h-9 w-9 rounded-[12px] bg-[#6d4aff] flex items-center justify-center text-white shadow-sm">
-            <Shield size={18} className="fill-white/20" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="Sabhijude Logo"
+            className="h-9 w-9 object-contain shrink-0 drop-shadow-xs"
+          />
           <div>
             <div className="font-black text-sm tracking-tight text-[#16161d] flex items-center gap-1.5">
               Sabhijude

@@ -78,7 +78,7 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
             <div>
               <span className="font-black text-[#16161d] dark:text-[#f4f4f8] text-[15px] sm:text-[16px] tracking-tight flex items-center gap-1.5 group-hover:text-[#6d4aff] transition-colors">
                 Sabhijude
-                <span className="h-2 w-2 rounded-full bg-[#10b981]" />
+                
               </span>
               <p className="text-[10px] sm:text-[10.5px] text-[#5b5b6e] dark:text-[#a6a6be] -mt-0.5 font-medium hidden xs:block">
                 Women Safety Network

@@ -48,7 +48,7 @@ export function Logo({
           width={dim}
           height={dim}
           onError={() => setImgError(true)}
-          className="rounded-full shrink-0 shadow-sm object-cover border border-[#6d4aff]/30 transition-transform duration-300 group-hover:scale-105"
+          className="shrink-0 object-contain drop-shadow-xs transition-transform duration-300 group-hover:scale-105"
           style={{ width: `${dim}px`, height: `${dim}px` }}
           loading="eager"
         />
@@ -155,7 +155,7 @@ export function Logo({
         <div className="flex flex-col">
           <span className="font-black text-[#16161d] dark:text-[#f4f4f8] text-[16px] sm:text-[17px] tracking-tight leading-none flex items-center gap-1.5">
             Sabhijude
-            <span className="h-2 w-2 rounded-full bg-[#10b981] animate-pulse" />
+            
           </span>
           <span className="text-[10px] sm:text-[10.5px] font-semibold text-[#5b5b6e] dark:text-[#a6a6be] tracking-wider uppercase mt-0.5">
             Women Safety Network

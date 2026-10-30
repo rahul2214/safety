@@ -93,36 +93,7 @@ export function PublicLanding({
 
   return (
     <div className="space-y-16 pb-20 select-none">
-      {/* ─── 1. TOP STATUTORY HELPLINES & OPERATIONAL STATUS TICKER ────── */}
-      <div className="bg-slate-900 text-slate-200 text-xs py-2.5 px-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto font-medium">
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[11px] uppercase tracking-wider shrink-0">
-            <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-ping" />
-            24/7 Helplines
-          </span>
-          <span className="text-slate-400 hidden md:inline">National Emergency Services:</span>
-          <a href="tel:112" className="text-white hover:text-rose-400 font-semibold underline underline-offset-2 shrink-0">
-            Police 112
-          </a>
-          <span className="text-slate-600">•</span>
-          <a href="tel:1091" className="text-white hover:text-rose-400 font-semibold underline underline-offset-2 shrink-0">
-            Women Helpline 1091
-          </a>
-          <span className="text-slate-600">•</span>
-          <a href="tel:181" className="text-white hover:text-rose-400 font-semibold underline underline-offset-2 shrink-0">
-            Domestic Distress 181
-          </a>
-          <span className="text-slate-600">•</span>
-          <a href="tel:1098" className="text-white hover:text-rose-400 font-semibold underline underline-offset-2 shrink-0">
-            Childline 1098
-          </a>
-        </div>
 
-        <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium shrink-0">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
-          <span>Sabhijude Mesh: Operational</span>
-        </div>
-      </div>
 
       {/* Backend Connection Error Banner (if offline/disconnected) */}
       {error && (
@@ -148,13 +119,7 @@ export function PublicLanding({
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
         {/* Left Hero Content (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="inline-flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-slate-900 text-white shadow-md border border-slate-800">
-            <Logo size={24} />
-            <span className="text-xs font-bold tracking-wide">
-              Sabhijude Women Safety Network
-            </span>
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          </div>
+          
 
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
             Real-Time Emergency SOS, Geofenced Campus Response & Anonymous Alerts
