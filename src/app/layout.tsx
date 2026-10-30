@@ -13,7 +13,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const [sosOpen, setSosOpen] = useState(false);
   const [fakeCallOpen, setFakeCallOpen] = useState(false);
   const pathname = usePathname();
-  const isPortalRoute = pathname?.startsWith('/admin') || pathname?.startsWith('/org');
+  const isPortalRoute =
+    pathname === '/admin' ||
+    pathname?.startsWith('/admin/') ||
+    pathname === '/org' ||
+    pathname?.startsWith('/org/');
 
   return (
     <html lang="en">

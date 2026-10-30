@@ -4,7 +4,8 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ─── Server-Side Route Guards (SEC-08) ───────────────────────────────────
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+  const isAdminPortal = pathname === '/admin' || pathname.startsWith('/admin/');
+  if (isAdminPortal && pathname !== '/admin/login') {
     const adminSession = request.cookies.get('admin_session');
     if (!adminSession?.value) {
       const loginUrl = new URL('/admin/login', request.url);
@@ -12,8 +13,14 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  const publicOrgPaths = ['/org/login', '/org/register', '/org/request', '/org/request-access'];
-  if (pathname.startsWith('/org') && !publicOrgPaths.some((p) => pathname.startsWith(p))) {
+  // Handle aliases for organization enrollment
+  if (pathname === '/org/request' || pathname === '/org/request-access') {
+    return NextResponse.redirect(new URL('/organization-request', request.url));
+  }
+
+  const isOrgPortal = pathname === '/org' || pathname.startsWith('/org/');
+  const publicOrgPaths = ['/org/login', '/org/register'];
+  if (isOrgPortal && !publicOrgPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
     const orgSession = request.cookies.get('org_session');
     if (!orgSession?.value) {
       const loginUrl = new URL('/org/login', request.url);
