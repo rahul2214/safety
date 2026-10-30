@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { REFRESH_TOKEN_KEY } from '@/lib/api-client';
 
 export interface AuthUser {
   id: string;
@@ -59,6 +60,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // api-client renews expired tokens and ends dead sessions; keep React state in step with it
+  useEffect(() => {
+    const onRefreshed = () => setToken(localStorage.getItem('safecircle_token'));
+    const onExpired = () => {
+      setToken(null);
+      setUser(null);
+    };
+    window.addEventListener('safecircle_token_refreshed', onRefreshed);
+    window.addEventListener('safecircle_auth_expired', onExpired);
+    return () => {
+      window.removeEventListener('safecircle_token_refreshed', onRefreshed);
+      window.removeEventListener('safecircle_auth_expired', onExpired);
+    };
+  }, []);
+
+  const storeRefreshToken = (data: any) => {
+    const refreshToken = data.data?.refreshToken || data.data?.refresh_token || data.refreshToken || data.refresh_token;
+    if (refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  };
+
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -94,6 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(accessToken);
         setUser(userData);
         localStorage.setItem('safecircle_token', accessToken);
+        storeRefreshToken(data);
         localStorage.setItem('safecircle_user', JSON.stringify(userData));
         return { success: true };
       } else {
@@ -156,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (accessToken) {
           setToken(accessToken);
           localStorage.setItem('safecircle_token', accessToken);
+          storeRefreshToken(data);
         }
         setUser(userData);
         localStorage.setItem('safecircle_user', JSON.stringify(userData));
@@ -178,6 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
     localStorage.removeItem('safecircle_token');
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem('safecircle_user');
   };
 

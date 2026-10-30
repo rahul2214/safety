@@ -47,7 +47,7 @@ const NAV_GROUPS = [
   { label: 'Overview', hrefs: ['/', '/feed', '/map'] },
   { label: 'Take action', hrefs: ['/report', '/myposts', '/contacts', '/emergency'] },
   { label: 'Learn & get help', hrefs: ['/resources', '/support'] },
-  { label: 'Account', hrefs: ['/notifications', '/profile', '/settings'] },
+  { label: 'Account', hrefs: ['/profile', '/settings'] },
 ];
 
 const PUBLIC_ROUTES = ['/', '/feed', '/about', '/safety-measures', '/organization-request', '/login', '/signup'];
@@ -65,7 +65,9 @@ export function AppShell({ children }: AppShellProps) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  // Single posts are shareable, so /posts/<id> is readable without signing in
+  const isPostPage = pathname?.startsWith('/posts/') ?? false;
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isPostPage;
   const isAuthPage = pathname === '/login' || pathname === '/signup';
 
   // Close menus and search dropdown on route change
@@ -247,7 +249,7 @@ export function AppShell({ children }: AppShellProps) {
     }
 
     // Public Pages: marketing header + footer. Marketing pages are full-bleed; the feed keeps a content container.
-    const isFullBleed = pathname !== '/feed';
+    const isFullBleed = pathname !== '/feed' && !isPostPage;
     return (
       <div className="min-h-screen bg-white flex flex-col text-ink">
         <PublicHeader />

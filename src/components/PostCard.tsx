@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from'react';
+import { useRouter } from'next/navigation';
 import {
   Heart,
   MessageSquare,
@@ -16,7 +17,6 @@ import {
 import { api, hashtagText, type PostHashtag } from'@/lib/api-client';
 import { useAuth } from'@/lib/auth-context';
 import { useToast } from'@/components/Toast';
-import { PostDetailModal } from'@/components/PostDetailModal';
 
 export interface PostItem {
   id: number;
@@ -91,6 +91,8 @@ function formatTimeAgo(dateStr?: string): string {
 export function PostCard({ post }: { post: PostItem }) {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const router = useRouter();
+  const openPost = () => router.push(`/posts/${post.id}`);
 
   const isAnon = post.isAnonymous ?? false;
   const displayName = getAuthorName(post);
@@ -107,7 +109,6 @@ export function PostCard({ post }: { post: PostItem }) {
   const [supportCount, setSupportCount] = useState<number>(initialSupport);
   const [facedThis, setFacedThis] = useState<boolean>(post.hasFacedThis || (post as any).hasFacedThisToo || false);
   const [similarCount, setSimilarCount] = useState<number>(initialSimilar);
-  const [detailOpen, setDetailOpen] = useState(false);
 
   const toggleSupport = async (e: React.MouseEvent) => {
   e.stopPropagation();
@@ -182,7 +183,16 @@ export function PostCard({ post }: { post: PostItem }) {
   return (
   <>
   <article
-  onClick={() => setDetailOpen(true)}
+  onClick={openPost}
+  onKeyDown={(e) => {
+  if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+  e.preventDefault();
+  openPost();
+  }
+  }}
+  role="link"
+  tabIndex={0}
+  aria-label={`Open post: ${post.content.slice(0, 60)}`}
   className={`relative bg-white rounded-[20px] border border-slate-200 border-l-4 ${stripeColor} p-4 sm:p-5 space-y-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group`}
   >
   {/* 1. Author row */}
@@ -306,7 +316,7 @@ export function PostCard({ post }: { post: PostItem }) {
   </button>
   </div>
 
-  {/* Solutions button (opens detail modal) */}
+  {/* Solutions count (whole card opens the post page) */}
   <div className="flex items-center gap-1.5 text-[#0891b2] font-semibold group-hover:underline">
   <MessageSquare className="h-4 w-4" />
   <span>
@@ -315,13 +325,6 @@ export function PostCard({ post }: { post: PostItem }) {
   </div>
   </div>
   </article>
-
-  {/* Post Detail & Community Solutions Modal */}
-  <PostDetailModal
-  post={post}
-  isOpen={detailOpen}
-  onClose={() => setDetailOpen(false)}
-  />
   </>
   );
 }

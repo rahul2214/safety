@@ -203,11 +203,52 @@ export interface RequestCacheOptions {
   ttlMs?: number;
 }
 
+export const REFRESH_TOKEN_KEY = 'safecircle_refresh_token';
+
+// Concurrent 401s share one refresh call, since Supabase rotates the refresh token on use
+let refreshInFlight: Promise<boolean> | null = null;
+
+/**
+ * Swaps the stored refresh token for a new access token (they expire after about an hour).
+ * Returns false when there is no refresh token or the session is truly over.
+ */
+async function refreshSession(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+  if (!refreshToken) return false;
+
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+        const json = await res.json().catch(() => null);
+        const accessToken: string | undefined = json?.data?.accessToken;
+        if (!res.ok || !accessToken) return false;
+
+        localStorage.setItem('safecircle_token', accessToken);
+        if (json.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, json.data.refreshToken);
+        window.dispatchEvent(new Event('safecircle_token_refreshed'));
+        return true;
+      } catch {
+        return false;
+      } finally {
+        refreshInFlight = null;
+      }
+    })();
+  }
+  return refreshInFlight;
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
   retries = 1,
-  cacheOptions?: RequestCacheOptions
+  cacheOptions?: RequestCacheOptions,
+  isRetryAfterRefresh = false
 ): Promise<{ ok: boolean; data?: T; error?: string; status: number; cached?: boolean }> {
   const method = (options.method || 'GET').toUpperCase();
   const isGet = method === 'GET' || method === 'HEAD';
@@ -235,16 +276,15 @@ async function request<T>(
 
     const status = res.status;
 
-    if (status === 401) {
-      // Token expired or invalid
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('safecircle_token');
-        if (token && !token.startsWith('local_')) {
-          localStorage.removeItem('safecircle_token');
-          localStorage.removeItem('safecircle_user');
-          window.dispatchEvent(new Event('safecircle_auth_expired'));
-        }
+    if (status === 401 && typeof window !== 'undefined' && localStorage.getItem('safecircle_token')) {
+      // Access token expired: renew it once and replay the request before giving up
+      if (!isRetryAfterRefresh && !endpoint.startsWith('/api/auth/') && (await refreshSession())) {
+        return request<T>(endpoint, options, retries, cacheOptions, true);
       }
+      localStorage.removeItem('safecircle_token');
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem('safecircle_user');
+      window.dispatchEvent(new Event('safecircle_auth_expired'));
     }
 
     let json: any = null;
@@ -374,20 +414,10 @@ export const api = {
     });
   },
 
-  async getMyPosts(params?: {
-    limit?: number;
-    postIds?: (string | number)[];
-    authorId?: number;
-    authorName?: string;
-    forceRefresh?: boolean;
-  }) {
+  /** The signed-in user's own posts. The server identifies the user from the session token. */
+  async getMyPosts(params?: { limit?: number; forceRefresh?: boolean }) {
     const qs = new URLSearchParams();
     if (params?.limit) qs.set('limit', params.limit.toString());
-    if (params?.postIds && params.postIds.length > 0) {
-      qs.set('postIds', params.postIds.join(','));
-    }
-    if (params?.authorId) qs.set('authorId', params.authorId.toString());
-    if (params?.authorName) qs.set('authorName', params.authorName);
     const queryStr = qs.toString() ? `?${qs.toString()}` : '';
     const res = await request<any>(`/api/posts/mine${queryStr}`, {}, 1, { forceRefresh: params?.forceRefresh });
     if (res.ok && res.data) {
@@ -399,6 +429,16 @@ export const api = {
       return { ok: true, data: items, status: res.status };
     }
     return { ok: false, error: res.error, status: res.status, data: [] };
+  },
+
+  /** One post by id. Authors can read their own posts in any moderation state. */
+  async getPost(postId: number, forceRefresh = false) {
+    return request<BackendPost & { similarExperienceCount?: number; hasFacedThisToo?: boolean; solutionCount?: number; author?: { displayName?: string }; category?: { name?: string } }>(
+      `/api/posts/${postId}`,
+      {},
+      1,
+      { forceRefresh }
+    );
   },
 
   async supportPost(postId: number) {
@@ -474,6 +514,19 @@ export const api = {
     return request<EmergencyContact>(`/api/emergencycontacts/${encodeURIComponent(phoneNumber)}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
+    });
+  },
+
+  /** Permanently deletes one of the signed-in user's own posts. */
+  async deletePost(postId: number) {
+    return request(`/api/posts/${postId}`, { method: 'DELETE' });
+  },
+
+  /** Sets the status of one of the signed-in user's own posts (e.g. 'RESOLVED'). */
+  async updatePostStatus(postId: number, status: string) {
+    return request<{ status: string; postStatusId: number }>(`/api/posts/${postId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
     });
   },
 

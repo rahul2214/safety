@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   FileText,
   Search,
@@ -24,6 +25,8 @@ import {
   RefreshCw,
   Tag,
   Radio,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -31,6 +34,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Modal } from '@/components/ui/Modal';
 import { api, BackendPost, hashtagText } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/components/Toast';
 import { PostCardSkeleton, Skeleton } from '@/components/ui/Skeleton';
 
 export default function MyPostsPage() {
@@ -40,18 +44,41 @@ export default function MyPostsPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedPost, setSelectedPost] = useState<BackendPost | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<BackendPost | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { showToast } = useToast();
+  const router = useRouter();
+
+  const handleDeletePost = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const res = await api.deletePost(deleteTarget.id);
+    setIsDeleting(false);
+    if (!res.ok) {
+      showToast(res.error || 'Could not delete this post. Please try again.', 'error');
+      return;
+    }
+    const removedId = deleteTarget.id;
+    setPosts((prev) => prev.filter((p) => p.id !== removedId));
+    // The report form also keeps a local copy of the user's posts
+    try {
+      const ids: number[] = JSON.parse(localStorage.getItem('safecircle_my_post_ids') || '[]');
+      localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.filter((id) => id !== removedId)));
+      const cached: any[] = JSON.parse(localStorage.getItem('safecircle_my_posted_posts') || '[]');
+      localStorage.setItem('safecircle_my_posted_posts', JSON.stringify(cached.filter((p) => p?.id !== removedId)));
+    } catch {
+      // Local cache is best-effort
+    }
+    setDeleteTarget(null);
+    showToast('Post deleted.', 'success');
+  };
 
   const loadUserPosts = async () => {
     setLoading(true);
     setError(null);
     try {
       // Fetch authenticated posts directly and strictly from the database for this user
-      const res = await api.getMyPosts({
-        limit: 50,
-        authorId: user?.id && !isNaN(Number(user.id)) ? Number(user.id) : undefined,
-        authorName: user?.displayName,
-      });
+      const res = await api.getMyPosts({ limit: 50 });
 
       let backendPosts: BackendPost[] = [];
       if (res.ok && res.data && Array.isArray(res.data)) {
@@ -296,7 +323,7 @@ export default function MyPostsPage() {
             <Card
               key={post.id}
               className="p-4 sm:p-5 hover:border-blue-300 transition-colors cursor-pointer group"
-              onClick={() => setSelectedPost(post)}
+              onClick={() => router.push(`/posts/${post.id}`)}
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 {/* Left: ID, Badges, Content & Metadata */}
@@ -364,7 +391,19 @@ export default function MyPostsPage() {
                 </div>
 
                 {/* Right: CTA */}
-                <div className="flex items-center gap-1 shrink-0 self-end sm:self-center">
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTarget(post);
+                    }}
+                    className="h-9 w-9 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    aria-label={`Delete post #${post.id}`}
+                    title="Delete post"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                   <span className="text-xs font-semibold text-blue-600 group-hover:underline flex items-center gap-1">
                     <span>View Post</span>
                     <ChevronRight className="h-4 w-4" />
@@ -396,113 +435,33 @@ export default function MyPostsPage() {
         </Card>
       )}
 
-      {/* Post Details Modal */}
-      {selectedPost && (
-        <Modal
-          isOpen={!!selectedPost}
-          onClose={() => setSelectedPost(null)}
-          title={`Post #${selectedPost.id}`}
-          size="lg"
-        >
+      {/* Delete confirmation */}
+      <Modal
+        isOpen={!!deleteTarget}
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        title="Delete this post?"
+        size="sm"
+      >
+        {deleteTarget && (
           <div className="space-y-5">
-            {/* Header info */}
-            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  {selectedPost.categoryName && (
-                    <span className="text-xs font-bold text-slate-900">{selectedPost.categoryName}</span>
-                  )}
-                  {getSeverityBadge(selectedPost.severity)}
-                  {getModerationBadge(selectedPost)}
-                </div>
-                <span className="text-[11px] text-slate-500">
-                  {new Date(selectedPost.createdAt).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1 text-slate-600">
-                {selectedPost.location && (
-                  <div>
-                    <span className="text-slate-400">Location: </span>
-                    <span className="font-medium text-slate-800">{selectedPost.location}</span>
-                  </div>
-                )}
-                {selectedPost.incidentDateTime && (
-                  <div>
-                    <span className="text-slate-400">Incident Time: </span>
-                    <span className="font-medium text-slate-800">{selectedPost.incidentDateTime}</span>
-                  </div>
-                )}
-                <div>
-                  <span className="text-slate-400">Privacy: </span>
-                  <span className="font-medium text-slate-800">
-                    {selectedPost.isAnonymous ? 'Shared Anonymously' : 'Shared with Profile'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400">Target Audience: </span>
-                  <span className="font-medium text-slate-800">
-                    {selectedPost.postVisibilityId === 2
-                      ? 'Women Only'
-                      : selectedPost.postVisibilityId === 3
-                      ? 'Men Only'
-                      : 'Everyone'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Post Description */}
-            <div>
-              <p className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-1.5">
-                Post Content
+            <div className="flex items-start gap-3 rounded-2xl bg-red-50 border border-red-200 p-4">
+              <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-red-900 leading-relaxed">
+                This permanently removes the post and its supports and solutions from Sabhijude. It can&rsquo;t be undone.
               </p>
-              <div className="p-4 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 leading-relaxed whitespace-pre-wrap">
-                {selectedPost.content}
-              </div>
             </div>
-
-            {/* AI Safety Advice if present */}
-            {selectedPost.safetyAdvice && (
-              <div className="p-3.5 rounded-lg bg-emerald-50/70 border border-emerald-200 space-y-1">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-900">
-                  <Shield className="h-4 w-4 text-emerald-600" />
-                  <span>Safety Advisory</span>
-                </div>
-                <p className="text-xs text-emerald-800 leading-relaxed">
-                  {selectedPost.safetyAdvice}
-                </p>
-              </div>
-            )}
-
-            {/* Engagement Stats */}
-            <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100 text-xs text-slate-700">
-              <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1.5">
-                  <ThumbsUp className="h-4 w-4 text-blue-600" />
-                  <strong>{selectedPost.supportCount || 0}</strong> supports
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <MessageSquare className="h-4 w-4 text-purple-600" />
-                  <strong>{selectedPost.solutionsCount || (selectedPost as any).solutionCount || 0}</strong> solutions
-                </span>
-              </div>
-              <Link
-                href={`/feed?q=${encodeURIComponent(selectedPost.content.slice(0, 30))}`}
-                onClick={() => setSelectedPost(null)}
-                className="text-blue-600 font-semibold hover:underline flex items-center gap-1"
-              >
-                <span>Find in Feed</span>
-                <ChevronRight className="h-3.5 w-3.5" />
-              </Link>
+            <p className="text-sm text-slate-600 line-clamp-3 rounded-xl bg-mist p-3 italic">&ldquo;{deleteTarget.content}&rdquo;</p>
+            <div className="flex items-center justify-end gap-2.5">
+              <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={isDeleting}>
+                Keep it
+              </Button>
+              <Button variant="emergency" onClick={handleDeletePost} loading={isDeleting} leftIcon={<Trash2 className="h-4 w-4" />}>
+                Delete permanently
+              </Button>
             </div>
           </div>
-        </Modal>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }

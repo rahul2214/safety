@@ -150,7 +150,7 @@ export function NotificationSkeleton() {
 }
 
 /**
- * Skeleton for Community Solutions in PostDetailModal
+ * Skeleton for Community Solutions on the post page
  */
 export function SolutionSkeleton() {
   return (

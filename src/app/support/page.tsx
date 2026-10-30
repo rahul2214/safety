@@ -56,7 +56,7 @@ const FAQS = [
   },
   {
     q: 'Can I delete or withdraw a filed report?',
-    a: 'Yes. You can request case file sealing or deletion at any time by opening a support ticket referencing your Report ID.',
+    a: 'Yes. Open My Posts and tap the bin icon on the report, or open it and choose Delete post. Deleting is permanent. If the issue has been sorted out, you can choose Mark as resolved instead to keep it visible to others.',
   },
 ];
 
