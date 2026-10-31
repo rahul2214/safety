@@ -5,20 +5,23 @@ import {
   getOrganizationSchema,
   getWebSiteSchema,
   getSoftwareApplicationSchema,
+  getFaqSchema,
+  HOMEPAGE_FAQS,
+  SITE_URL,
 } from '@/lib/seo-schemas';
 
 export const metadata: Metadata = {
-  title: 'Sabhijude — Personal Safety App & Emergency SOS Platform',
+  title: 'Sabhijude — Feel Safe, Wherever You Go | Personal Safety App',
   description:
-    'Protect yourself, your family, and your campus with Sabhijude. Instant emergency SOS alerts, live GPS location sharing, discreet fake call exits, and verified safety reports.',
+    'One tap sends your live location to the people you trust. A fake call gets you out of uncomfortable moments. And a community of women keeps each other informed.',
   alternates: {
-    canonical: 'https://sabhijude.com/',
+    canonical: '/',
   },
   openGraph: {
-    title: 'Sabhijude — Personal Safety App & Emergency SOS Platform',
+    title: 'Sabhijude — Feel Safe, Wherever You Go',
     description:
-      'Instant emergency SOS alerts, live GPS location sharing, discreet exit tools, and verified community safety defense for everyone.',
-    url: 'https://sabhijude.com',
+      'One tap sends your live location to the people you trust. A fake call gets you out of uncomfortable moments. And a community of women keeps each other informed.',
+    url: SITE_URL,
     type: 'website',
   },
 };
@@ -29,6 +32,7 @@ export default function HomePage() {
       <JsonLd data={getOrganizationSchema()} />
       <JsonLd data={getWebSiteSchema()} />
       <JsonLd data={getSoftwareApplicationSchema()} />
+      <JsonLd data={getFaqSchema(HOMEPAGE_FAQS)} />
       <HomePageClient />
     </>
   );

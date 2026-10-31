@@ -192,76 +192,9 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   // =========================================================================
-  // 1. INITIAL SESSION LOADING STATE
+  // 1. PUBLIC MARKETING & INFORMATIONAL PAGES (SSR-first, never blocked by auth loading)
   // =========================================================================
-  if (isLoading) {
-    return <PageShellSkeleton />;
-  }
-
-  // =========================================================================
-  // 2. UNAUTHENTICATED GUEST: STRICT ACCESS CONTROL
-  // =========================================================================
-  if (!isAuthenticated) {
-    // If guest attempts to open any private route, block & show authentication gate
-    if (!isPublicRoute) {
-      return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-sm text-center space-y-5">
-            <div className="w-16 h-16 flex items-center justify-center mx-auto">
-              <Logo size={56} />
-            </div>
-
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                Authentication Required
-              </span>
-              <h2 className="text-lg font-bold text-slate-900">
-                Sign in to Access User Portal
-              </h2>
-              <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
-                Dashboard features, incident tracking, emergency circles, and confidential case records are protected.
-                Please sign in to proceed.
-              </p>
-            </div>
-
-            <div className="space-y-2 pt-2">
-              <Link
-                href={`/login?redirect=${encodeURIComponent(pathname)}`}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors"
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Log in to Sabhijude</span>
-              </Link>
-
-              <Link
-                href={`/signup?redirect=${encodeURIComponent(pathname)}`}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs transition-colors"
-              >
-                <UserPlus className="h-4 w-4 text-blue-600" />
-                <span>Create Sabhijude Account</span>
-              </Link>
-            </div>
-
-            <div className="pt-2 border-t border-slate-100">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                <span>Return to Public Safety Home</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Auth Pages (/login and /signup): Dedicated secure viewport layout
-    if (isAuthPage) {
-      return <>{children}</>;
-    }
-
-    // Public Pages: marketing header + footer. Marketing pages are full-bleed; the feed keeps a content container.
+  if (isPublicRoute && !isAuthenticated) {
     const isFullBleed = pathname !== '/feed' && !isPostPage;
     return (
       <div className="min-h-screen bg-white flex flex-col text-ink">
@@ -270,6 +203,69 @@ export function AppShell({ children }: AppShellProps) {
           {children}
         </main>
         <PublicFooter />
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // 2. INITIAL SESSION LOADING STATE (Only for private dashboard routes)
+  // =========================================================================
+  if (isLoading) {
+    return <PageShellSkeleton />;
+  }
+
+  // =========================================================================
+  // 3. UNAUTHENTICATED GUEST: ACCESS CONTROL GATE FOR PRIVATE ROUTES
+  // =========================================================================
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-sm text-center space-y-5">
+          <div className="w-16 h-16 flex items-center justify-center mx-auto">
+            <Logo size={56} />
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+              Authentication Required
+            </span>
+            <h2 className="text-lg font-bold text-slate-900">
+              Sign in to Access User Portal
+            </h2>
+            <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
+              Dashboard features, incident tracking, emergency circles, and confidential case records are protected.
+              Please sign in to proceed.
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <Link
+              href={`/login?redirect=${encodeURIComponent(pathname)}`}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Log in to Sabhijude</span>
+            </Link>
+
+            <Link
+              href={`/signup?redirect=${encodeURIComponent(pathname)}`}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs transition-colors"
+            >
+              <UserPlus className="h-4 w-4 text-blue-600" />
+              <span>Create Sabhijude Account</span>
+            </Link>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Return to Public Safety Home</span>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }

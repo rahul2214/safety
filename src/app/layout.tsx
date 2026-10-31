@@ -23,7 +23,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://sabhijude.com'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sabhijude.com')
+  ),
   title: {
     default: 'Sabhijude — Personal & Community Safety Platform',
     template: '%s | Sabhijude',

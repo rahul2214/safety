@@ -18,10 +18,13 @@ import {
   BellRing,
   Navigation,
   Sparkles,
+  HelpCircle,
+  ChevronDown,
 } from 'lucide-react';
 import { PostCard, type PostItem, getCategoryName } from '@/components/PostCard';
 import { type Category } from '@/lib/api-client';
 import { PostCardSkeleton } from '@/components/ui/Skeleton';
+import { HOMEPAGE_FAQS } from '@/lib/seo-schemas';
 
 interface PublicLandingProps {
   posts?: PostItem[];
@@ -92,8 +95,6 @@ export function PublicLanding({
 
         <div className="public-container relative grid lg:grid-cols-12 gap-14 lg:gap-8 items-center pt-14 pb-20 sm:pt-20 lg:pt-24 lg:pb-28">
           <div className="lg:col-span-7 space-y-8">
-            
-
             <h1 className="display-1">
               Feel safe,{' '}
               <span className="relative whitespace-nowrap">
@@ -357,6 +358,50 @@ export function PublicLanding({
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FREQUENTLY ASKED QUESTIONS (SEO & USER CLARITY) ── */}
+      <section className="py-20 sm:py-24 bg-mist/60 border-t border-slate-200/60" id="faqs" aria-labelledby="faq-heading">
+        <div className="public-container">
+          <div className="max-w-3xl mx-auto text-center space-y-4 mb-14">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-brand">
+              <HelpCircle className="h-4 w-4" /> Frequently Asked Questions
+            </span>
+            <h2 id="faq-heading" className="display-2">
+              Everything you need to know about Sabhijude
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+              Learn how Sabhijude safeguards your everyday commute, privacy, family, and campus with instant SOS alerts, live GPS location sharing, and verified incident response.
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto divide-y divide-slate-200/80 rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+            {HOMEPAGE_FAQS.map((faq, index) => (
+              <details
+                key={faq.question}
+                className="group py-5 first:pt-0 last:pb-0"
+                open={index === 0}
+              >
+                <summary className="flex cursor-pointer items-center justify-between text-left font-display text-lg font-bold text-ink hover:text-brand transition-colors list-none">
+                  <span className="pr-4">{faq.question}</span>
+                  <span className="ml-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-mist text-slate-500 group-open:rotate-180 group-open:bg-brand-tint group-open:text-brand transition-transform">
+                    <ChevronDown className="h-4 w-4" />
+                  </span>
+                </summary>
+                <div className="mt-3 text-sm sm:text-base text-slate-600 leading-relaxed pr-6 space-y-3">
+                  <p>{faq.answer}</p>
+                  {faq.linkHref && faq.linkText && (
+                    <p>
+                      <Link href={faq.linkHref} className="inline-flex items-center gap-1 font-semibold text-brand hover:text-brand-deep hover:underline">
+                        {faq.linkText} <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </p>
+                  )}
+                </div>
+              </details>
+            ))}
           </div>
         </div>
       </section>

@@ -3,8 +3,63 @@
  * Validated against Google Search Central Rich Results standards.
  */
 
-export const SITE_URL = 'https://sabhijude.com';
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sabhijude.com')
+).replace(/\/+$/, '');
 export const SITE_NAME = 'Sabhijude';
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+  linkHref?: string;
+  linkText?: string;
+}
+
+export const HOMEPAGE_FAQS: FaqItem[] = [
+  {
+    question: 'What is Sabhijude and how does it protect me?',
+    answer:
+      'Sabhijude is a comprehensive personal safety app and emergency SOS platform designed for individuals, students, employees, and families. With one tap, users can trigger instant emergency SOS alerts, broadcast live GPS location coordinates to trusted contacts, access discreet fake call exits, and reach official national emergency helplines (112, 1091, 181, 1930).',
+    linkHref: '/about',
+    linkText: 'Learn more about Sabhijude',
+  },
+  {
+    question: 'Is Sabhijude completely free to use for personal safety?',
+    answer:
+      'Yes, Sabhijude is 100% free for individual users, families, and students. There are no subscription fees, advertisements, or paywalls for core safety features such as emergency SOS, live GPS location sharing, discreet exit tools, and public incident feeds.',
+    linkHref: '/emergency',
+    linkText: 'Explore emergency SOS features',
+  },
+  {
+    question: 'How does the emergency SOS alert work?',
+    answer:
+      'When you trigger an SOS alert, Sabhijude immediately captures your real-time GPS coordinates and dispatches an emergency notification to your designated emergency contacts and connected campus/organization security desks. The alert includes your live location map link and safety status, enabling immediate response.',
+    linkHref: '/safety-measures',
+    linkText: 'View emergency helpline directory',
+  },
+  {
+    question: 'Does Sabhijude constantly track my location in the background?',
+    answer:
+      'No. Sabhijude strictly respects your privacy. Your GPS location is accessed only when you actively trigger an emergency SOS alert or explicitly choose to share your journey with trusted contacts. We never track your movements in the background, nor do we sell or monetize your location data.',
+    linkHref: '/privacy',
+    linkText: 'Read our privacy safeguards',
+  },
+  {
+    question: 'How does the Fake Call feature help in uncomfortable situations?',
+    answer:
+      'The Fake Call simulation lets you schedule or immediately trigger an incoming call interface that looks and sounds authentic. It provides an immediate, discreet, and socially acceptable reason to step away from uncomfortable conversations, unsafe environments, or suspicious encounters without escalating conflict.',
+    linkHref: '/emergency',
+    linkText: 'Try the discreet exit tool',
+  },
+  {
+    question: 'Can colleges, universities, and corporate offices integrate with Sabhijude?',
+    answer:
+      'Yes. Sabhijude offers dedicated security desk consoles for universities, corporate campuses, and residential communities. Security teams can monitor campus incident reports, dispatch emergency responders in real time, and verify student or employee requests with institutional email domains.',
+    linkHref: '/organization-request',
+    linkText: 'Request organization onboarding',
+  },
+];
 
 export function getOrganizationSchema() {
   return {
