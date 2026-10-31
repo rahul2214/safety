@@ -50,7 +50,20 @@ const NAV_GROUPS = [
   { label: 'Account', hrefs: ['/profile', '/settings'] },
 ];
 
-const PUBLIC_ROUTES = ['/', '/feed', '/about', '/safety-measures', '/organization-request', '/login', '/signup'];
+const PUBLIC_ROUTES = [
+  '/',
+  '/feed',
+  '/about',
+  '/safety-measures',
+  '/organization-request',
+  '/resources',
+  '/privacy',
+  '/support',
+  '/emergency',
+  '/map',
+  '/login',
+  '/signup',
+];
 
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();

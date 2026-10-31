@@ -189,7 +189,7 @@ export default function SafetyReportsPage() {
 
         {/* Pagination */}
         <div className="p-4 border-t border-[#e8e8f0] bg-[#fafafc] flex items-center justify-between text-xs text-[#5b5b6e]">
-          <span className="font-medium">Total {pagination.total} reports</span>
+          <span className="font-medium">Total {pagination.total ?? 0} reports</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
@@ -199,7 +199,7 @@ export default function SafetyReportsPage() {
               <ChevronLeft size={16} />
             </button>
             <span className="font-semibold text-[#16161d]">
-              Page {pagination.page} of {pagination.totalPages || 1}
+              Page {pagination.page || page} of {pagination.totalPages || 1}
             </span>
             <button
               disabled={page >= pagination.totalPages}

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Loader2,
   X,
+  Trash2,
 } from 'lucide-react';
 
 export default function UsersManagementPage() {
@@ -32,6 +33,8 @@ export default function UsersManagementPage() {
   const [banReason, setBanReason] = useState('');
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [newRole, setNewRole] = useState('USER');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchUsers = async () => {
@@ -99,6 +102,24 @@ export default function UsersManagementPage() {
     if (res.ok) {
       setRoleModalOpen(false);
       fetchUsers();
+    }
+    setActionLoading(false);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setActionLoading(true);
+
+    const res = await adminFetch(`/api/admin/users/${userToDelete.id}`, {
+      method: 'DELETE',
+    });
+
+    if (res.ok) {
+      setDeleteModalOpen(false);
+      setUserToDelete(null);
+      fetchUsers();
+    } else {
+      alert(res.error?.message || 'Failed to delete user.');
     }
     setActionLoading(false);
   };
@@ -214,7 +235,7 @@ export default function UsersManagementPage() {
                     <td className="px-5 py-3.5 text-[#717184] text-[11.5px]">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-3.5 text-right space-x-2">
+                    <td className="px-5 py-3.5 text-right space-x-1.5 whitespace-nowrap">
                       <button
                         onClick={() => {
                           setSelectedUser(u);
@@ -222,6 +243,7 @@ export default function UsersManagementPage() {
                           setRoleModalOpen(true);
                         }}
                         className="px-2.5 py-1 rounded-[8px] bg-white border border-[#e8e8f0] hover:bg-[#f7f7fa] text-[#16161d] text-[11.5px] font-semibold transition-colors shadow-2xs"
+                        title="Change Role"
                       >
                         Role
                       </button>
@@ -234,10 +256,21 @@ export default function UsersManagementPage() {
                         className={`px-2.5 py-1 rounded-[8px] text-[11.5px] font-bold transition-colors shadow-2xs ${
                           u.isBanned
                             ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'
-                            : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
+                            : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200'
                         }`}
+                        title={u.isBanned ? 'Unban Account' : 'Suspend Account'}
                       >
                         {u.isBanned ? 'Unban' : 'Ban'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setUserToDelete(u);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="p-1 rounded-[8px] bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors shadow-2xs inline-flex items-center justify-center align-middle"
+                        title="Permanently Delete User"
+                      >
+                        <Trash2 size={13} />
                       </button>
                     </td>
                   </tr>
@@ -249,7 +282,7 @@ export default function UsersManagementPage() {
 
         {/* Pagination Footer */}
         <div className="p-4 border-t border-[#e8e8f0] bg-[#fafafc] flex items-center justify-between text-xs text-[#5b5b6e]">
-          <span className="font-medium">Total {pagination.total} registered users</span>
+          <span className="font-medium">Total {pagination.total ?? 0} registered users</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
@@ -259,7 +292,7 @@ export default function UsersManagementPage() {
               <ChevronLeft size={16} />
             </button>
             <span className="font-semibold text-[#16161d]">
-              Page {pagination.page} of {pagination.totalPages || 1}
+              Page {pagination.page || page} of {pagination.totalPages || 1}
             </span>
             <button
               disabled={page >= pagination.totalPages}
@@ -375,6 +408,51 @@ export default function UsersManagementPage() {
                 }`}
               >
                 {actionLoading ? 'Processing...' : selectedUser.isBanned ? 'Confirm Unban' : 'Confirm Suspension'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete User Modal */}
+      {deleteModalOpen && userToDelete && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-[#e8e8f0] rounded-[22px] max-w-sm w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-rose-600 flex items-center gap-1.5">
+                <Trash2 size={16} /> Permanently Delete User
+              </h3>
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="p-1 rounded-lg text-[#9797ab] hover:text-[#16161d] hover:bg-[#f7f7fa]"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#5b5b6e] leading-relaxed">
+              Are you sure you want to permanently delete{' '}
+              <strong className="text-[#16161d]">{userToDelete.displayName || userToDelete.email}</strong> (User #{userToDelete.id})?
+            </p>
+
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-[12px] text-rose-800 text-[11px] leading-relaxed">
+              <p className="font-bold mb-0.5">Warning: Irreversible Action</p>
+              This will remove the user account, their distress logs, posted safety reports, and emergency preferences from the database.
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 rounded-[10px] text-xs font-semibold text-[#5b5b6e] hover:bg-[#f7f7fa] border border-[#e8e8f0]"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={actionLoading}
+                onClick={handleDeleteUser}
+                className="px-4 py-2 rounded-[10px] text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-xs"
+              >
+                {actionLoading ? 'Deleting...' : 'Confirm Delete'}
               </button>
             </div>
           </div>

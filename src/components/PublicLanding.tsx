@@ -106,25 +106,24 @@ export function PublicLanding({
             </h1>
 
             <p className="text-lg sm:text-xl text-slate-600 leading-relaxed max-w-xl">
-              One tap sends your live location to the people you trust. A fake call gets you out of uncomfortable moments.
-              And a community of women keeps each other informed.
+              One tap sends your live location to the people you trust. A fake call gets you out of uncomfortable moments. And a community of women keeps each other informed.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <button type="button" onClick={onOpenSos} className="btn-sos text-base px-7 py-4">
-                <ShieldAlert className="h-5 w-5" />
+              <button type="button" onClick={onOpenSos} className="btn-sos text-base px-7 py-4" aria-label="Send Emergency SOS Alert">
+                <ShieldAlert className="h-5 w-5" aria-hidden="true" />
                 Send SOS now
               </button>
               <Link href="/signup" className="btn-brand text-base px-7 py-4 bg-ink hover:bg-ink-soft shadow-none">
                 Create free account
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2 text-[14px] text-slate-600">
-              {['Location shared only when you choose', 'Anonymous reporting', 'Works in any browser'].map((t) => (
+              {['Location shared only when you choose', 'Anonymous reporting', 'Works in any browser', 'For individuals, students & workplaces'].map((t) => (
                 <span key={t} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden="true" />
                   {t}
                 </span>
               ))}
@@ -286,7 +285,7 @@ export function PublicLanding({
                 </span>
                 Live from the community
               </span>
-              <h2 className="display-2">What women are reporting right now.</h2>
+              <h2 className="display-2">What the community is reporting right now.</h2>
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
               {FEED_FILTERS.map((cat) => (

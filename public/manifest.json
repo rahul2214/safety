@@ -1,7 +1,7 @@
 {
-  "name": "Sabhijude — Women Safety Network",
+  "name": "Sabhijude — Personal & Community Safety Platform",
   "short_name": "Sabhijude",
-  "description": "Rapid response safety network, emergency SOS, and discreet deterrence for women.",
+  "description": "Rapid emergency SOS with live location sharing, fake call exits, verified community alerts, and organizational safety desks.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",

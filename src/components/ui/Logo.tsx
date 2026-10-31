@@ -158,7 +158,7 @@ export function Logo({
    
   </span>
   <span className="text-[10px] sm:text-[10.5px] font-semibold text-[#5b5b6e] tracking-wider uppercase mt-0.5">
-  Women Safety Network
+  Personal &amp; Community Safety
   </span>
   </div>
   )}

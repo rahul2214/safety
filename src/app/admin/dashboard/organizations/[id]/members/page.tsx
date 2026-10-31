@@ -232,10 +232,16 @@ export default function OrganizationMembersRosterPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e8e8f0]">
-              {filteredMembers.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-[#5b5b6e]">
+                    Loading enrolled members roster...
+                  </td>
+                </tr>
+              ) : filteredMembers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center py-10 text-[#747488]">
-                    No members match your criteria.
+                    No members match your criteria or enrolled in this organization yet.
                   </td>
                 </tr>
               ) : (

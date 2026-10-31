@@ -131,6 +131,12 @@ export default function AdminStaffManagementPage() {
                     Loading staff directory...
                   </td>
                 </tr>
+              ) : admins.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-5 py-12 text-center text-[#747488]">
+                    No administrative staff records found in the database.
+                  </td>
+                </tr>
               ) : (
                 admins.map((item) => (
                   <tr key={item.id} className="hover:bg-[#fafafc] transition-colors">

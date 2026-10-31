@@ -71,8 +71,8 @@ export default function OrgCommandCenterPage() {
   // Interactive Live Triage Drawer & Dispatch Modals
   const [selectedIncident, setSelectedIncident] = useState<OrgIncident | null>(null);
   const [dispatchModalOpen, setDispatchModalOpen] = useState(false);
-  const [dispatchUnit, setDispatchUnit] = useState('Patrol Unit Alpha-1');
-  const [dispatchOfficer, setDispatchOfficer] = useState('Officer Marcus Vance');
+  const [dispatchUnit, setDispatchUnit] = useState('');
+  const [dispatchOfficer, setDispatchOfficer] = useState('');
   const [dispatchPriority, setDispatchPriority] = useState('HIGH');
   const [dispatchInstructions, setDispatchInstructions] = useState('');
   const [dispatching, setDispatching] = useState(false);
@@ -309,11 +309,15 @@ export default function OrgCommandCenterPage() {
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-emerald-600">{stats?.safetyScore ?? 96}%</span>
-            <span className="text-[10px] text-emerald-600 font-bold uppercase">Grade A+</span>
+            <span className="text-2xl font-black text-emerald-600">
+              {stats?.safetyScore != null ? `${stats.safetyScore}%` : (loading ? '…' : '—')}
+            </span>
+            <span className="text-[10px] text-emerald-600 font-bold uppercase">
+              {stats?.safetyScore ? (stats.safetyScore >= 90 ? 'Grade A' : 'Grade B') : 'Not Rated'}
+            </span>
           </div>
           <div className="w-full bg-[#f1f1f6] h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${stats?.safetyScore ?? 96}%` }} />
+            <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${stats?.safetyScore ?? 0}%` }} />
           </div>
         </div>
 
@@ -326,12 +330,12 @@ export default function OrgCommandCenterPage() {
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-amber-600">{stats?.activeIncidents ?? 3}</span>
+            <span className="text-2xl font-black text-amber-600">{stats?.activeIncidents ?? (loading ? '…' : 0)}</span>
             <span className="text-[10px] text-[#5b5b6e]">Under Action</span>
           </div>
           <p className="text-[10px] text-[#5b5b6e] mt-2 flex items-center gap-1 font-medium">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
-            <span>2 units in field</span>
+            <span>{incidents.filter((i) => i.status === 'DISPATCHED').length} dispatched in field</span>
           </p>
         </div>
 
@@ -344,12 +348,12 @@ export default function OrgCommandCenterPage() {
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-rose-600">{stats?.sosAlertsToday ?? 1}</span>
+            <span className="text-2xl font-black text-rose-600">{stats?.sosAlertsToday ?? (loading ? '…' : 0)}</span>
             <span className="text-[10px] text-rose-600 font-semibold">Today</span>
           </div>
           <p className="text-[10px] text-emerald-600 mt-2 flex items-center gap-1 font-semibold">
             <CheckCircle2 size={11} />
-            <span>Avg response: 4.2m</span>
+            <span>{stats?.sosAlertsToday ? 'Active SOS response' : 'No SOS alerts active'}</span>
           </p>
         </div>
 
@@ -365,11 +369,11 @@ export default function OrgCommandCenterPage() {
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-[#16161d]">{stats?.totalMembers ?? 64}</span>
+            <span className="text-2xl font-black text-[#16161d]">{stats?.totalMembers ?? (loading ? '…' : members.length)}</span>
             <span className="text-[10px] text-[#5b5b6e]">Enrolled</span>
           </div>
           <p className="text-[10px] text-[#6d4aff] mt-2 flex items-center justify-between font-semibold">
-            <span>100% telemetry synced</span>
+            <span>Roster coverage active</span>
             <span className="underline text-[9px]">View Roster &rarr;</span>
           </p>
         </Link>
@@ -383,11 +387,13 @@ export default function OrgCommandCenterPage() {
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-[#6d4aff]">{stats?.avgResolutionTimeHours ?? 0.8}h</span>
+            <span className="text-2xl font-black text-[#6d4aff]">
+              {stats?.avgResolutionTimeHours != null ? `${stats.avgResolutionTimeHours.toFixed(1)}h` : (loading ? '…' : '0.0h')}
+            </span>
             <span className="text-[10px] text-[#5b5b6e]">per case</span>
           </div>
           <p className="text-[10px] text-[#5b5b6e] mt-2 font-medium">
-            <span className="text-emerald-600 font-bold">+{stats?.resolvedIncidentsThisMonth ?? 42}</span> resolved this month
+            <span className="text-emerald-600 font-bold">+{stats?.resolvedIncidentsThisMonth ?? 0}</span> resolved this month
           </p>
         </div>
       </div>
@@ -577,22 +583,26 @@ export default function OrgCommandCenterPage() {
             <p className="text-[11px] text-[#5b5b6e] mb-4">Distribution of reported safety events</p>
 
             <div className="space-y-2.5">
-              {(stats?.incidentsByCategory || []).map((cat) => {
-                const total = (stats?.incidentsByCategory || []).reduce((a, b) => a + b.count, 0) || 1;
-                const pct = Math.round((cat.count / total) * 100);
+              {(stats?.incidentsByCategory || []).length === 0 ? (
+                <div className="py-6 text-center text-xs text-[#747488]">No categorized incidents logged yet.</div>
+              ) : (
+                (stats?.incidentsByCategory || []).map((cat) => {
+                  const total = (stats?.incidentsByCategory || []).reduce((a, b) => a + b.count, 0) || 1;
+                  const pct = Math.round((cat.count / total) * 100);
 
-                return (
-                  <div key={cat.category} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-[#16161d]">
-                      <span>{cat.category}</span>
-                      <span className="font-mono text-[#5b5b6e]">{cat.count} ({pct}%)</span>
+                  return (
+                    <div key={cat.category} className="space-y-1">
+                      <div className="flex justify-between text-xs font-semibold text-[#16161d]">
+                        <span>{cat.category}</span>
+                        <span className="font-mono text-[#5b5b6e]">{cat.count} ({pct}%)</span>
+                      </div>
+                      <div className="w-full bg-[#f1f1f6] h-2 rounded-full overflow-hidden border border-[#ececf2]">
+                        <div className="bg-[#6d4aff] h-full rounded-full" style={{ width: `${pct}%` }} />
+                      </div>
                     </div>
-                    <div className="w-full bg-[#f1f1f6] h-2 rounded-full overflow-hidden border border-[#ececf2]">
-                      <div className="bg-[#6d4aff] h-full rounded-full" style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -601,7 +611,7 @@ export default function OrgCommandCenterPage() {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-sm font-bold text-[#16161d]">Campus Safety Team</h3>
-                <p className="text-[11px] text-[#5b5b6e]">{members.length} Officers & Admins</p>
+                <p className="text-[11px] text-[#5b5b6e]">{members.length} Officers &amp; Admins</p>
               </div>
               <button
                 onClick={() => setMemberModalOpen(true)}
@@ -613,23 +623,27 @@ export default function OrgCommandCenterPage() {
             </div>
 
             <div className="space-y-2.5">
-              {members.slice(0, 4).map((m) => (
-                <div key={m.id} className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#fafafc] border border-[#ececf2]">
-                  <div className="flex items-center gap-2.5">
-                    <div className="h-7 w-7 rounded-[10px] bg-[#f1edff] text-[#6d4aff] flex items-center justify-center font-bold text-xs">
-                      {m.displayName[0]?.toUpperCase() || 'U'}
+              {members.length === 0 ? (
+                <div className="py-6 text-center text-xs text-[#747488]">No safety officers or admins enrolled yet.</div>
+              ) : (
+                members.slice(0, 4).map((m) => (
+                  <div key={m.id} className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#fafafc] border border-[#ececf2]">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-7 w-7 rounded-[10px] bg-[#f1edff] text-[#6d4aff] flex items-center justify-center font-bold text-xs">
+                        {m.displayName ? m.displayName[0]?.toUpperCase() : 'U'}
+                      </div>
+                      <div>
+                        <h5 className="text-xs font-semibold text-[#16161d]">{m.displayName}</h5>
+                        <span className="text-[10px] text-[#5b5b6e]">{m.title || m.role}</span>
+                      </div>
                     </div>
-                    <div>
-                      <h5 className="text-xs font-semibold text-[#16161d]">{m.displayName}</h5>
-                      <span className="text-[10px] text-[#5b5b6e]">{m.title || m.role}</span>
-                    </div>
-                  </div>
 
-                  <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-[6px] bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    Active
-                  </span>
-                </div>
-              ))}
+                    <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-[6px] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Active
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

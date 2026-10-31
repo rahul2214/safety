@@ -318,7 +318,7 @@ export default function OrganizationsPage() {
             <div className="text-[11px] font-bold text-[#747488] uppercase tracking-wider">
               Protected Members
             </div>
-            <div className="text-2xl font-black text-[#16161d] mt-1">{totalMembers || 68}</div>
+            <div className="text-2xl font-black text-[#16161d] mt-1">{loadingOrgs ? '…' : totalMembers}</div>
           </div>
           <div className="w-10 h-10 rounded-[12px] bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <Users size={18} />
@@ -330,7 +330,7 @@ export default function OrganizationsPage() {
             <div className="text-[11px] font-bold text-[#747488] uppercase tracking-wider">
               Active Incidents
             </div>
-            <div className="text-2xl font-black text-amber-600 mt-1">{totalActiveIncidents || 7}</div>
+            <div className="text-2xl font-black text-amber-600 mt-1">{loadingOrgs ? '…' : totalActiveIncidents}</div>
           </div>
           <div className="w-10 h-10 rounded-[12px] bg-amber-50 text-amber-600 flex items-center justify-center">
             <ShieldAlert size={18} />
@@ -430,21 +430,21 @@ export default function OrganizationsPage() {
                       <div className="bg-[#fafafc] p-2.5 rounded-[14px] border border-[#ececf2]">
                         <div className="text-[10px] text-[#747488] font-semibold uppercase">Safety</div>
                         <div className="text-sm font-black text-emerald-600 mt-0.5">
-                          {org.safetyScore || 95}%
+                          {org.safetyScore != null ? `${org.safetyScore}%` : '—'}
                         </div>
                       </div>
 
                       <div className="bg-[#fafafc] p-2.5 rounded-[14px] border border-[#ececf2]">
                         <div className="text-[10px] text-[#747488] font-semibold uppercase">Members</div>
                         <div className="text-sm font-bold text-[#16161d] mt-0.5">
-                          {org.memberCount || 3}
+                          {org.memberCount ?? 0}
                         </div>
                       </div>
 
                       <div className="bg-[#fafafc] p-2.5 rounded-[14px] border border-[#ececf2]">
                         <div className="text-[10px] text-[#747488] font-semibold uppercase">Active</div>
                         <div className="text-sm font-bold text-amber-600 mt-0.5">
-                          {org.activeIncidentsCount || 2}
+                          {org.activeIncidentsCount ?? 0}
                         </div>
                       </div>
                     </div>

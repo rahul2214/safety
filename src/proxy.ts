@@ -58,7 +58,7 @@ export function proxy(request: NextRequest) {
   response.headers.set('Content-Security-Policy', csp);
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('Referrer-Policy', 'no-referrer');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=()');
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
@@ -67,5 +67,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon|manifest\\.json|apple-touch-icon|.*\\.(?:ico|png|svg|jpg|jpeg|webp)).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon|manifest\\.json|robots\\.txt|sitemap\\.xml|apple-touch-icon|.*\\.(?:ico|png|svg|jpg|jpeg|webp)).*)'],
 };

@@ -9,6 +9,10 @@ const TITLE_MAP: Record<string, { title: string; subtitle: string }> = {
     title: 'Platform Overview',
     subtitle: 'System telemetry, safety incidents, and live health metrics',
   },
+  '/admin/dashboard/support': {
+    title: 'Support & Help Desk Operations',
+    subtitle: 'Manage user inquiries, technical tickets, and grievance workflows',
+  },
   '/admin/dashboard/organizations': {
     title: 'Organizations & Campuses',
     subtitle: 'Verified campus security teams, workplace hubs, and NGO networks',

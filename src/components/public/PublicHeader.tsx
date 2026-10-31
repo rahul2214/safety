@@ -8,8 +8,10 @@ import { Logo } from '@/components/ui/Logo';
 
 export const PUBLIC_NAV = [
   { href: '/', label: 'Home' },
+  { href: '/emergency', label: 'Emergency SOS' },
   { href: '/feed', label: 'Live feed' },
-  { href: '/safety-measures', label: 'Safety guide' },
+  { href: '/safety-measures', label: 'Helplines' },
+  { href: '/resources', label: 'Safety guides' },
   { href: '/about', label: 'About' },
   { href: '/organization-request', label: 'For campuses' },
 ];

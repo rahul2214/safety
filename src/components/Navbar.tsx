@@ -81,7 +81,7 @@ export function Navbar({ onOpenSos, onOpenFakeCall }: NavbarProps) {
    
   </span>
   <p className="text-[10px] sm:text-[10.5px] text-slate-600 -mt-0.5 font-medium hidden xs:block">
-  Women Safety Network
+  Personal &amp; Community Safety
   </p>
   </div>
   </Link>

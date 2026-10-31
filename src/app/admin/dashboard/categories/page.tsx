@@ -107,6 +107,12 @@ export default function CategoriesManagementPage() {
             <Loader2 size={24} className="animate-spin inline-block text-[#6d4aff] mb-2" />
             <p>Loading category list...</p>
           </div>
+        ) : categories.length === 0 ? (
+          <div className="col-span-full py-16 text-center text-[#5b5b6e] text-xs bg-white border border-[#e8e8f0] rounded-[18px]">
+            <Tags size={28} className="mx-auto text-[#9797ab] mb-2" />
+            <p className="font-semibold text-[#16161d]">No safety categories found in database.</p>
+            <p className="text-[11px] text-[#747488] mt-1">Click &quot;Add Category&quot; to create your first report classification.</p>
+          </div>
         ) : (
           categories.map((cat) => (
             <div

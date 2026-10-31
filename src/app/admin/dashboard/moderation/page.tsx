@@ -145,7 +145,7 @@ export default function ModerationQueuePage() {
                       Post #{post.id} &bull; {new Date(post.createdAt).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-sm font-semibold text-[#16161d] leading-relaxed whitespace-pre-wrap">{post.content}</p>
+                  <p className="text-sm font-semibold text-[#16161d] leading-relaxed whitespace-pre-wrap">{post.title || post.content}</p>
                 </div>
 
                 {/* Quick Action Buttons */}
@@ -193,7 +193,7 @@ export default function ModerationQueuePage() {
 
       {/* Pagination Footer */}
       <div className="bg-white border border-[#e8e8f0] rounded-[16px] p-4 flex items-center justify-between text-xs text-[#5b5b6e] shadow-xs">
-        <span className="font-medium">Total {pagination.total} queue records</span>
+        <span className="font-medium">Total {pagination.total ?? 0} queue records</span>
         <div className="flex items-center gap-2">
           <button
             disabled={page <= 1}
@@ -203,7 +203,7 @@ export default function ModerationQueuePage() {
             <ChevronLeft size={16} />
           </button>
           <span className="font-semibold text-[#16161d]">
-            Page {pagination.page} of {pagination.totalPages || 1}
+            Page {pagination.page || page} of {pagination.totalPages || 1}
           </span>
           <button
             disabled={page >= pagination.totalPages}

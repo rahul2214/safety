@@ -28,58 +28,30 @@ interface IncidentTriageItem {
   recommendedAction: string;
 }
 
-const SAMPLE_TRIAGE: IncidentTriageItem[] = [
-  {
-    id: 'inc_101',
-    category: 'Stalking',
-    excerpt: 'Someone followed me from metro to PG for three days, matched pace.',
-    author: 'Anonymous',
-    timeAgo: '12m ago',
-    openJevRiskScore: 92,
-    threatLevel: 'CRITICAL',
-    recommendedAction: 'Dispatch Campus Security & Verify Student Safe',
-  },
-  {
-    id: 'inc_102',
-    category: 'Public Transport',
-    excerpt: 'Crowding and physical discomfort near back exit on Route 42A past 9pm.',
-    author: 'Ananya S.',
-    timeAgo: '45m ago',
-    openJevRiskScore: 74,
-    threatLevel: 'HIGH',
-    recommendedAction: 'Alert Transport Marshals for Route 42A',
-  },
-  {
-    id: 'inc_103',
-    category: 'Campus Safety',
-    excerpt: 'East gate streetlight repaired and verified functional.',
-    author: 'Priya M.',
-    timeAgo: '2h ago',
-    openJevRiskScore: 15,
-    threatLevel: 'LOW',
-    recommendedAction: 'Resolved · Auto-archive to verified success',
-  },
-];
-
 export default function DashboardOverviewPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    adminFetch('/api/admin/dashboard/stats')
+  const fetchStats = () => {
+    setLoading(true);
+    adminFetch('/api/admin/dashboard/stats', { forceRefresh: true })
       .then((res) => {
         if (res.ok && res.data) setStats(res.data);
       })
-      .catch((err) => console.warn('Using default metrics', err))
+      .catch((err) => console.warn('Failed to load dashboard stats', err))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchStats();
   }, []);
 
-  const totalUsers = stats?.totalUsers || 248;
-  const totalPosts = stats?.totalPosts || 112;
-  const moderationQueue = stats?.pendingModerationQueue || 2;
-  const pendingReports = stats?.pendingReports || 1;
-  const totalGuardians = stats?.totalEmergencyContacts || 418;
-  const totalSolutions = stats?.totalSolutions || 84;
+  const totalUsers = stats?.totalUsers ?? (loading ? '…' : 0);
+  const totalPosts = stats?.totalPosts ?? (loading ? '…' : 0);
+  const moderationQueue = stats?.pendingModerationQueue ?? (loading ? '…' : 0);
+  const pendingReports = stats?.pendingReports ?? (loading ? '…' : 0);
+  const totalGuardians = stats?.totalEmergencyContacts ?? (loading ? '…' : 0);
+  const totalSolutions = stats?.totalSolutions ?? (loading ? '…' : 0);
 
   const triageList: IncidentTriageItem[] =
     stats?.recentAlerts && stats.recentAlerts.length > 0
@@ -88,17 +60,28 @@ export default function DashboardOverviewPage() {
           category: a.category || 'Community Alert',
           excerpt: a.title || 'Live incident reported in database',
           author: a.authorName || 'Verified User',
-          timeAgo: a.createdAt ? 'Recently' : 'Just now',
+          timeAgo: a.createdAt
+            ? new Date(a.createdAt).toLocaleDateString([], {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : 'Recently',
           openJevRiskScore:
             a.severity === 'IMMEDIATE_DANGER' ? 95 : a.severity === 'SERIOUS' ? 78 : 55,
           threatLevel:
-            a.severity === 'IMMEDIATE_DANGER' ? 'CRITICAL' : a.severity === 'SERIOUS' ? 'HIGH' : 'MODERATE',
+            a.severity === 'IMMEDIATE_DANGER'
+              ? 'CRITICAL'
+              : a.severity === 'SERIOUS'
+              ? 'HIGH'
+              : 'MODERATE',
           recommendedAction:
             a.severity === 'IMMEDIATE_DANGER'
               ? 'Priority 1: Immediate dispatch & location trace'
               : 'Priority 2: Review incident log & notify safe circle',
         }))
-      : SAMPLE_TRIAGE;
+      : [];
 
   const kpis = [
     {
@@ -234,58 +217,83 @@ export default function DashboardOverviewPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e8e8f0]">
-              {triageList.map((item) => {
-                const isCrit = item.threatLevel === 'CRITICAL';
-                const isHigh = item.threatLevel === 'HIGH';
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="py-12 px-3 text-center text-[#5b5b6e]">
+                    <div className="flex items-center justify-center gap-2">
+                      <Clock size={16} className="animate-spin text-[#6d4aff]" />
+                      <span>Loading real-time triage telemetry from database...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : triageList.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 px-4 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2 text-[#5b5b6e]">
+                      <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <ShieldCheck size={20} />
+                      </div>
+                      <p className="font-bold text-[#16161d] text-xs">No Critical Incidents Pending</p>
+                      <p className="text-[11px] text-[#9797ab] max-w-sm">
+                        All community posts and reports are resolved or operating within normal safety parameters.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                triageList.map((item) => {
+                  const isCrit = item.threatLevel === 'CRITICAL';
+                  const isHigh = item.threatLevel === 'HIGH';
 
-                return (
-                  <tr key={item.id} className="hover:bg-[#f7f7fa] transition">
-                    <td className="py-3 px-3">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider ${
+                  return (
+                    <tr key={item.id} className="hover:bg-[#f7f7fa] transition">
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider ${
+                              isCrit
+                                ? 'bg-[#e11d48]/10 text-[#e11d48]'
+                                : isHigh
+                                ? 'bg-[#d97706]/10 text-[#d97706]'
+                                : 'bg-[#059669]/10 text-[#059669]'
+                            }`}
+                          >
+                            {item.threatLevel}
+                          </span>
+                          <span className="font-bold text-[#16161d]">{item.openJevRiskScore}%</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="font-semibold text-[#6d4aff] bg-[#f1edff] px-2 py-0.5 rounded-full text-[11px]">
+                          {item.category}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 max-w-xs">
+                        <p className="font-medium text-[#16161d] line-clamp-1">{item.excerpt}</p>
+                        <p className="text-[10.5px] text-[#9797ab]">{item.timeAgo}</p>
+                      </td>
+                      <td className="py-3 px-3 font-medium text-[#5b5b6e]">{item.author}</td>
+                      <td className="py-3 px-3">
+                        <span className="text-[11.5px] font-semibold text-[#16161d] block">
+                          {item.recommendedAction}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <Link
+                          href={`/admin/dashboard/posts?search=${encodeURIComponent(item.id)}`}
+                          className={`inline-block px-2.5 py-1 rounded-[10px] text-xs font-bold transition ${
                             isCrit
-                              ? 'bg-[#e11d48]/10 text-[#e11d48]'
-                              : isHigh
-                              ? 'bg-[#d97706]/10 text-[#d97706]'
-                              : 'bg-[#059669]/10 text-[#059669]'
+                              ? 'bg-[#e11d48] text-white hover:bg-[#be123c]'
+                              : 'bg-[#f1f1f6] hover:bg-[#e6e6ee] text-[#16161d]'
                           }`}
                         >
-                          {item.threatLevel}
-                        </span>
-                        <span className="font-bold text-[#16161d]">{item.openJevRiskScore}%</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-3">
-                      <span className="font-semibold text-[#6d4aff] bg-[#f1edff] px-2 py-0.5 rounded-full text-[11px]">
-                        {item.category}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 max-w-xs">
-                      <p className="font-medium text-[#16161d] line-clamp-1">{item.excerpt}</p>
-                      <p className="text-[10.5px] text-[#9797ab]">{item.timeAgo}</p>
-                    </td>
-                    <td className="py-3 px-3 font-medium text-[#5b5b6e]">{item.author}</td>
-                    <td className="py-3 px-3">
-                      <span className="text-[11.5px] font-semibold text-[#16161d] block">
-                        {item.recommendedAction}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 text-right">
-                      <button
-                        onClick={() => alert(`Escalated incident ${item.id} to emergency responders.`)}
-                        className={`px-2.5 py-1 rounded-[10px] text-xs font-bold transition ${
-                          isCrit
-                            ? 'bg-[#e11d48] text-white hover:bg-[#be123c]'
-                            : 'bg-[#f1f1f6] hover:bg-[#e6e6ee] text-[#16161d]'
-                        }`}
-                      >
-                        {isCrit ? 'Escalate' : 'Review'}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                          {isCrit ? 'Review Alert' : 'View Post'}
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -306,7 +314,7 @@ export default function DashboardOverviewPage() {
               href="/admin/dashboard/organizations"
               className="text-xs font-bold text-[#6d4aff] hover:underline inline-flex items-center gap-1"
             >
-              <span>Manage 12 Organizations</span>
+              <span>Manage Campus &amp; Workplace Hubs</span>
               <ArrowRight size={14} />
             </Link>
           </div>
