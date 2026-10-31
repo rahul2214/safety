@@ -98,11 +98,15 @@ export interface EmergencyContact {
 
 export interface NotificationItem {
   id: string | number;
-  type: 'SUPPORT' | 'SOLUTION' | 'RESOLVED' | 'SIMILAR' | 'REVIEW';
+  type: string;
   title: string;
-  message: string;
-  timeAgo: string;
+  message?: string;
+  body?: string;
+  timeAgo?: string;
+  createdAt?: string;
   isRead: boolean;
+  referenceType?: string;
+  referenceId?: string | number;
   link?: string;
 }
 
@@ -538,7 +542,41 @@ export const api = {
 
   // Notifications
   async getNotifications(forceRefresh = false) {
-    return request<NotificationItem[]>('/api/notifications', {}, 1, { forceRefresh });
+    const res = await request<any[]>('/api/notifications', {}, 1, { forceRefresh });
+    if (res.ok && Array.isArray(res.data)) {
+      const normalized: NotificationItem[] = res.data.map((n: any) => {
+        const dateStr = n.createdAt;
+        let timeAgoStr = 'Recently';
+        if (dateStr) {
+          const diff = Date.now() - new Date(dateStr).getTime();
+          if (!Number.isNaN(diff)) {
+            const m = Math.floor(diff / 60000);
+            if (m < 1) timeAgoStr = 'Just now';
+            else if (m < 60) timeAgoStr = `${m} min ago`;
+            else {
+              const h = Math.floor(m / 60);
+              if (h < 24) timeAgoStr = `${h} h ago`;
+              else timeAgoStr = `${Math.floor(h / 24)} d ago`;
+            }
+          }
+        }
+        return {
+          id: n.id?.toString() || `n-${Math.random()}`,
+          type: n.type || 'SYSTEM',
+          title: n.title || 'Notification',
+          body: n.body || n.message || '',
+          message: n.body || n.message || '',
+          createdAt: dateStr || new Date().toISOString(),
+          timeAgo: timeAgoStr,
+          isRead: Boolean(n.isRead),
+          referenceType: n.referenceType,
+          referenceId: n.referenceId,
+          link: n.referenceType === 'CONTACTS' ? '/contacts' : n.referenceId ? `/feed` : undefined,
+        };
+      });
+      return { ...res, data: normalized };
+    }
+    return res as { ok: boolean; data?: NotificationItem[]; error?: string; status: number };
   },
 
   async markAllNotificationsRead() {

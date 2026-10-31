@@ -51,6 +51,38 @@ function timeAgo(iso?: string) {
   return `${Math.floor(h / 24)} d ago`;
 }
 
+const DEFAULT_DASHBOARD_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: 'def-1',
+    type: 'SYSTEM',
+    title: 'Welcome to Sabhijude Safety Network',
+    message: 'Your personal safety account is active. Instant Emergency SOS, live GPS location sharing, and fake call exits are ready to protect you.',
+    body: 'Your personal safety account is active. Instant Emergency SOS, live GPS location sharing, and fake call exits are ready to protect you.',
+    timeAgo: 'Just now',
+    isRead: false,
+    link: '/emergency',
+  },
+  {
+    id: 'def-2',
+    type: 'SAFETY',
+    title: 'Emergency Circle Setup',
+    message: 'Add at least 1 trusted emergency contact to receive live location SMS & WhatsApp links during distress.',
+    body: 'Add at least 1 trusted emergency contact to receive live location SMS & WhatsApp links during distress.',
+    timeAgo: '15 min ago',
+    isRead: false,
+    link: '/contacts',
+  },
+  {
+    id: 'def-3',
+    type: 'SAFETY',
+    title: 'Discreet Exit Strategy',
+    message: 'Try a practice fake call from your dashboard to see how the realistic audio and screen look before you need it.',
+    body: 'Try a practice fake call from your dashboard to see how the realistic audio and screen look before you need it.',
+    timeAgo: '1 hour ago',
+    isRead: true,
+  },
+];
+
 export function HomePageClient() {
   const { user, isAuthenticated } = useAuth();
   const { showToast } = useToast();
@@ -104,10 +136,20 @@ export function HomePageClient() {
       .then((res) => setContacts(res.ok && Array.isArray(res.data) ? res.data : []))
       .catch(() => setContacts([]));
     api
-      .getNotifications()
-      .then((res) => res.ok && Array.isArray(res.data) && setNotifications(res.data))
+      .getNotifications(true)
+      .then((res) => res.ok && Array.isArray(res.data) && res.data.length > 0 && setNotifications(res.data))
       .catch(() => undefined);
   }, [isAuthenticated]);
+
+  const handleMarkAllNotificationsRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    try {
+      await api.markAllNotificationsRead();
+      showToast('All notifications marked as read.', 'success');
+    } catch {
+      // Local fallback
+    }
+  };
 
   const handleShareLiveLocation = async () => {
     setShareLocationLoading(true);
@@ -144,7 +186,8 @@ export function HomePageClient() {
 
   const firstName = (user?.displayName || 'there').split(' ')[0];
   const contactCount = contacts?.length ?? 0;
-  const unread = notifications.filter((n) => !n.isRead).length;
+  const displayNotifications = notifications.length > 0 ? notifications : DEFAULT_DASHBOARD_NOTIFICATIONS;
+  const unread = displayNotifications.filter((n) => !n.isRead).length;
 
   const checklist = [
     { done: contactCount > 0, label: 'Add a trusted contact', hint: contactCount > 0 ? `${contactCount} saved` : 'They get your SOS alerts', href: '/contacts' },
@@ -355,25 +398,7 @@ export function HomePageClient() {
             </ul>
           </div>
 
-          {/* Notifications teaser */}
-          <Link
-            href="/notifications"
-            className="flex items-center gap-4 rounded-3xl bg-white border border-slate-200/80 p-5 hover:border-slate-300 transition group"
-          >
-            <span className="relative h-11 w-11 rounded-2xl bg-brand-tint text-brand flex items-center justify-center">
-              <Bell className="h-5 w-5" />
-              {unread > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-coral text-white text-[11px] font-bold flex items-center justify-center">
-                  {unread}
-                </span>
-              )}
-            </span>
-            <span className="flex-1">
-              <span className="block font-semibold text-ink">Notifications</span>
-              <span className="block text-xs text-slate-500">{unread > 0 ? `${unread} unread updates` : 'You’re all caught up'}</span>
-            </span>
-            <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-ink transition" />
-          </Link>
+ 
 
           {/* Guides */}
           <Link
