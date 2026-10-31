@@ -41,6 +41,47 @@ const HELPLINES = [
   { n: '1930', l: 'Cyber Crime Helpline' },
 ];
 
+function InstagramIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+const INSTAGRAM_URL = process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/sabhijude';
+const LINKEDIN_URL = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/company/veltria';
+
 export function PublicFooter() {
   return (
     <footer className="bg-ink text-white" aria-labelledby="footer-heading">
@@ -73,6 +114,29 @@ export function PublicFooter() {
               >
                 Emergency SOS
               </Link>
+            </div>
+
+            {/* Social media links */}
+            <div className="pt-2 flex items-center gap-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-white/50">Follow us:</span>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow Sabhijude on Instagram"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-gradient-to-tr hover:from-amber-500 hover:via-rose-500 hover:to-purple-600 hover:text-white transition-all shadow-xs"
+              >
+                <InstagramIcon className="h-4 w-4" />
+              </a>
+              <a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Connect with Sabhijude on LinkedIn"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-[#0077b5] hover:text-white transition-all shadow-xs"
+              >
+                <LinkedinIcon className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
@@ -114,9 +178,9 @@ export function PublicFooter() {
           </div>
         </div>
 
-        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between gap-3 text-[13px] text-white/50">
+        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] text-white/50">
           <p>&copy; {new Date().getFullYear()} Sabhijude. Open, free, and privacy-protected for everyone, always.</p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Link href="/privacy" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>
@@ -124,6 +188,28 @@ export function PublicFooter() {
             <Link href="/support" className="hover:text-white transition-colors">
               Help &amp; Support
             </Link>
+            <span>&bull;</span>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors inline-flex items-center gap-1.5"
+              aria-label="Instagram"
+            >
+              <InstagramIcon className="h-3.5 w-3.5" />
+              <span>Instagram</span>
+            </a>
+            <span>&bull;</span>
+            <a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors inline-flex items-center gap-1.5"
+              aria-label="LinkedIn"
+            >
+              <LinkedinIcon className="h-3.5 w-3.5" />
+              <span>LinkedIn</span>
+            </a>
             <span>&bull;</span>
             <span>Made in India</span>
           </div>

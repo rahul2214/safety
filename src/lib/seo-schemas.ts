@@ -75,7 +75,10 @@ export function getOrganizationSchema() {
     },
     description:
       'Sabhijude is a comprehensive personal and community safety platform delivering instant emergency SOS alerts, live GPS location sharing, discreet exit tools, and verified safety reports for individuals, campuses, and workplaces.',
-    sameAs: [],
+    sameAs: [
+      process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/sabhijude',
+      process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/company/sabhijude',
+    ],
     contactPoint: [
       {
         '@type': 'ContactPoint',
