@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Browse real-time, verified community safety reports, hazard warnings, and neighborhood incidents. Filter by category, location, and severity.',
   alternates: {
-    canonical: 'https://sabhijude.com/feed',
+    canonical: '/feed',
   },
   openGraph: {
     title: 'Live Community Safety Feed & Verified Local Alerts | Sabhijude',
     description:
       'Real-time, verified community safety reports and neighborhood alerts to help you stay informed and travel safely.',
-    url: 'https://sabhijude.com/feed',
+    url: '/feed',
     type: 'website',
   },
 };

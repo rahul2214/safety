@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Sabhijude Privacy Policy: zero commercial data selling, no background location tracking, default anonymous incident reporting, and encrypted emergency telemetry.',
   alternates: {
-    canonical: 'https://sabhijude.com/privacy',
+    canonical: '/privacy',
   },
   openGraph: {
     title: 'Privacy Policy & Personal Data Safeguards | Sabhijude',
     description:
       'Zero commercial data selling, strict purpose-limited GPS access, anonymous community reporting, and DPDP Act compliance.',
-    url: 'https://sabhijude.com/privacy',
+    url: '/privacy',
     type: 'website',
   },
 };

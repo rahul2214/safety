@@ -11,16 +11,16 @@ import {
 } from '@/lib/seo-schemas';
 
 export const metadata: Metadata = {
-  title: 'Sabhijude — Feel Safe, Wherever You Go | Personal Safety App',
+  title: 'Sabhijude — Women & Safety App | Emergency SOS & Live Location',
   description:
-    'One tap sends your live location to the people you trust. A fake call gets you out of uncomfortable moments. And a community of women keeps each other informed.',
+    'Sabhijude is a personal safety app for women: one tap sends your emergency live location to people you trust, with fake calls and verified community reports.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Sabhijude — Feel Safe, Wherever You Go',
+    title: 'Sabhijude — Women & Safety App | Emergency SOS & Live Location',
     description:
-      'One tap sends your live location to the people you trust. A fake call gets you out of uncomfortable moments. And a community of women keeps each other informed.',
+      'Sabhijude is a personal safety app for women: one tap sends your emergency live location to people you trust, with fake calls and verified community reports.',
     url: SITE_URL,
     type: 'website',
   },

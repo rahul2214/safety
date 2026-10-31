@@ -30,11 +30,19 @@ export function ClientProviders({ children }: ClientProvidersProps) {
       document.querySelectorAll('iframe[title*="Netlify" i]').forEach((el) => el.remove());
     };
     removeNetlifyHud();
-    const observer = new MutationObserver(() => removeNetlifyHud());
-    if (document.body) {
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
-    return () => observer.disconnect();
+
+    // Prevent AbortError or background network retry errors from polluting DevTools console
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (
+        event.reason?.name === 'AbortError' ||
+        event.reason?.message?.includes?.('aborted') ||
+        event.reason?.message?.includes?.('Failed to fetch')
+      ) {
+        event.preventDefault();
+      }
+    };
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
   }, []);
 
   if (isPortalRoute) {

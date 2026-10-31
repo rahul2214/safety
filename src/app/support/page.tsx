@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   description:
     'Need help? Access the Sabhijude 24/7 support desk, browse safety and privacy FAQs, submit assistance tickets, and connect with platform administrators.',
   alternates: {
-    canonical: 'https://sabhijude.com/support',
+    canonical: '/support',
   },
   openGraph: {
     title: 'Help Center & Contact Support | Sabhijude',
     description:
       '24/7 assistance, response triage, support ticket submission, and verified helpline contacts.',
-    url: 'https://sabhijude.com/support',
+    url: '/support',
     type: 'website',
   },
 };

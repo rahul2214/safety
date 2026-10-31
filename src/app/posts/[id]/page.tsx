@@ -15,7 +15,7 @@ export async function generateMetadata({
     title: `Safety Report #${id} | Sabhijude Community`,
     description: `Verified community safety report #${id} on Sabhijude. View neighborhood hazard details, community solutions, and real-time updates.`,
     alternates: {
-      canonical: `https://sabhijude.com/posts/${id}`,
+      canonical: `/posts/${id}`,
     },
     robots: {
       index: true,
@@ -24,7 +24,7 @@ export async function generateMetadata({
     openGraph: {
       title: `Safety Report #${id} | Sabhijude Community`,
       description: `Verified community safety report #${id} on Sabhijude.`,
-      url: `https://sabhijude.com/posts/${id}`,
+      url: `/posts/${id}`,
       type: 'article',
     },
   };

@@ -1,6 +1,9 @@
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://sabhijude.com';
+const BASE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sabhijude.veltria.in')
+).replace(/\/+$/, '');
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const currentDate = new Date().toISOString();

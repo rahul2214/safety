@@ -37,7 +37,7 @@ export function Logo({
   const glowId = `sabhijude_glow_${reactId}`;
 
   const shouldRenderImage = useImage && !imgError && variant !== 'vector';
-  const imgSrc = variant === 'shield' ? '/logo-shield.png' : '/logo.png';
+  const imgSrc = variant === 'shield' ? '/logo-shield.webp' : '/logo.webp';
 
   return (
   <div className={`inline-flex items-center gap-2.5 ${className}`}>
@@ -49,8 +49,9 @@ export function Logo({
   height={dim}
   onError={() => setImgError(true)}
   className="shrink-0 object-contain drop-shadow-xs transition-transform duration-300 group-hover:scale-105"
-  style={{ width: `${dim}px`, height: `${dim}px` }}
+  style={{ width: `${dim}px`, height: `${dim}px`, aspectRatio: '1 / 1' }}
   loading="eager"
+  decoding="async"
   />
   ) : (
   <svg

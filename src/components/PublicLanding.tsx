@@ -162,7 +162,7 @@ export function PublicLanding({
         <div className="public-container space-y-14">
           <div className="max-w-2xl space-y-4">
             <span className="eyebrow"><span className="h-px w-6 bg-brand" />What you get</span>
-            <h2 className="display-2">Built for the moments when seconds matter.</h2>
+            <h2 className="display-2">Emergency SOS &amp; instant safety tools built for seconds that matter.</h2>
             <p className="text-lg text-slate-600 leading-relaxed">
               Four simple tools that work together — from the first feeling that something is off, to getting help fast.
             </p>
@@ -286,7 +286,7 @@ export function PublicLanding({
                 </span>
                 Live from the community
               </span>
-              <h2 className="display-2">What the community is reporting right now.</h2>
+              <h2 className="display-2">Verified community safety alerts &amp; women&rsquo;s incident reports.</h2>
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
               {FEED_FILTERS.map((cat) => (
@@ -304,27 +304,29 @@ export function PublicLanding({
             </div>
           </div>
 
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-            </div>
-          ) : filteredPosts.length === 0 ? (
-            <div className="rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center space-y-3">
-              <Radio className="h-8 w-8 text-slate-400 mx-auto" />
-              <h4 className="font-display text-lg font-bold text-ink">No reports in this category yet</h4>
-              <p className="text-slate-500 max-w-sm mx-auto">Every report is checked by moderators before it appears here.</p>
-              <Link href="/report" className="inline-flex mt-2 btn-brand py-2.5 text-sm">
-                Report something anonymously
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {filteredPosts.slice(0, 4).map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          )}
+          <div className="min-h-[280px]">
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <PostCardSkeleton />
+                <PostCardSkeleton />
+              </div>
+            ) : filteredPosts.length === 0 ? (
+              <div className="rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center space-y-3">
+                <Radio className="h-8 w-8 text-slate-400 mx-auto" />
+                <h4 className="font-display text-lg font-bold text-ink">No reports in this category yet</h4>
+                <p className="text-slate-500 max-w-sm mx-auto">Every report is checked by moderators before it appears here.</p>
+                <Link href="/report" className="inline-flex mt-2 btn-brand py-2.5 text-sm">
+                  Report something anonymously
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {filteredPosts.slice(0, 4).map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
+            )}
+          </div>
 
           <div className="flex justify-center">
             <Link href="/feed" className="btn-ghost">
@@ -340,7 +342,7 @@ export function PublicLanding({
           <div className="rounded-[2rem] bg-gradient-to-br from-brand-tint via-white to-coral-tint border border-slate-200 p-8 sm:p-14 grid lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-5 space-y-4">
               <span className="eyebrow"><Lock className="h-3.5 w-3.5" /> Privacy by design</span>
-              <h2 className="display-2">Your safety app shouldn&rsquo;t track you.</h2>
+              <h2 className="display-2">Private live location sharing: your safety app shouldn&rsquo;t track you.</h2>
               <p className="text-lg text-slate-600 leading-relaxed">
                 We built Sabhijude so you stay in control — of your location, your identity and your data.
               </p>
@@ -370,7 +372,7 @@ export function PublicLanding({
               <HelpCircle className="h-4 w-4" /> Frequently Asked Questions
             </span>
             <h2 id="faq-heading" className="display-2">
-              Everything you need to know about Sabhijude
+              Sabhijude FAQs: Personal, Campus &amp; Women&rsquo;s Safety
             </h2>
             <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
               Learn how Sabhijude safeguards your everyday commute, privacy, family, and campus with instant SOS alerts, live GPS location sharing, and verified incident response.
@@ -445,7 +447,7 @@ export function PublicLanding({
 /* Hero visual: an illustrative phone showing the SOS screen. Buttons open the real SOS / fake-call flows. */
 function PhoneMockup({ onOpenSos, onOpenFakeCall }: { onOpenSos: () => void; onOpenFakeCall: () => void }) {
   return (
-    <div className="relative">
+    <div className="relative min-h-[580px] w-full flex items-center justify-center">
       <div className="relative w-[300px] sm:w-[320px] rounded-[3rem] bg-ink p-3 shadow-[0_40px_80px_-30px_rgba(11,22,48,0.55)] animate-float">
         <div className="rounded-[2.4rem] bg-gradient-to-b from-white to-mist overflow-hidden">
           <div className="flex items-center justify-between px-7 pt-4 text-[11px] font-semibold text-ink">

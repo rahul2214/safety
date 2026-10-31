@@ -42,8 +42,10 @@ export default function Sidebar() {
         {/* Brand */}
         <div className="h-16 flex items-center px-6 border-b border-[#e8e8f0] gap-3">
           <img
-            src="/logo.png"
+            src="/logo.webp"
             alt="Sabhijude Logo"
+            width={36}
+            height={36}
             className="h-9 w-9 object-contain shrink-0 drop-shadow-xs"
           />
           <div>

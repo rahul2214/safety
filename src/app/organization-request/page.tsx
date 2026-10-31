@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Equip your university, college, or corporate campus with real-time geofenced incident dispatch, dedicated security desks, and verified member safety with Sabhijude.',
   alternates: {
-    canonical: 'https://sabhijude.com/organization-request',
+    canonical: '/organization-request',
   },
   openGraph: {
     title: 'Campus & Workplace Safety Platform | Sabhijude for Organizations',
     description:
       'Empower on-ground campus security with geofenced incident dispatch, anonymous reporting, and real-time response consoles.',
-    url: 'https://sabhijude.com/organization-request',
+    url: '/organization-request',
     type: 'website',
   },
 };

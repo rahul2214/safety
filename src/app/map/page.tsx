@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Explore verified neighborhood safety zones, local police stations, 24/7 hospitals, women shelters, and live incident markers across India on Sabhijude.',
   alternates: {
-    canonical: 'https://sabhijude.com/map',
+    canonical: '/map',
   },
   openGraph: {
     title: 'Interactive Safety Map & Incident Zones | Sabhijude',
     description:
       'Explore verified safety zones, police stations, 24/7 hospitals, and live incident markers.',
-    url: 'https://sabhijude.com/map',
+    url: '/map',
     type: 'website',
   },
 };

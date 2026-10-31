@@ -251,7 +251,7 @@ export default function AdminStaffManagementPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="moderator@sabhijude.com"
+                  placeholder="moderator@veltria.in"
                   className="w-full bg-white border border-[#e2e2ec] text-[#16161d] rounded-[12px] pl-9 pr-3 py-2 text-xs font-medium focus:outline-none focus:border-[#6d4aff] focus:ring-2 focus:ring-[#6d4aff]/15 shadow-2xs placeholder-[#9797ab]"
                 />
               </div>

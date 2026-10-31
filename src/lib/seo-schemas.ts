@@ -5,7 +5,7 @@
 
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sabhijude.com')
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sabhijude.veltria.in')
 ).replace(/\/+$/, '');
 export const SITE_NAME = 'Sabhijude';
 

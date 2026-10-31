@@ -28,6 +28,12 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // ─── URL Canonicalization ────────────────────────────────────────────────
+  if (pathname !== '/' && pathname.endsWith('/')) {
+    const cleanUrl = new URL(pathname.slice(0, -1) + request.nextUrl.search, request.url);
+    return NextResponse.redirect(cleanUrl, 301);
+  }
+
   const isDev = process.env.NODE_ENV === 'development';
   const defaultApiOrigin = isDev
     ? 'http://localhost:5000'
@@ -41,7 +47,7 @@ export function proxy(request: NextRequest) {
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https:;
     font-src 'self' data: https://fonts.gstatic.com;
-    connect-src 'self' ${apiOrigin} ${apiSocketOrigin} https://safecircle-api-752721321209.asia-south1.run.app wss://safecircle-api-752721321209.asia-south1.run.app https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org;
+    connect-src 'self' ${apiOrigin} ${apiSocketOrigin} https://safecircle-api-752721321209.asia-south1.run.app wss://safecircle-api-752721321209.asia-south1.run.app https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;
     object-src 'none';
     base-uri 'self';
     form-action 'self';

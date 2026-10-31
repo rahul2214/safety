@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   description:
     'Comprehensive safety guides and legal protections: POSH Act 2013 workplace rights, Bharatiya Nyaya Sanhita (BNS) penal codes, college anti-ragging protocols, and cyber safety.',
   alternates: {
-    canonical: 'https://sabhijude.com/resources',
+    canonical: '/resources',
   },
   openGraph: {
     title: 'Safety Guides, POSH Act & Legal Rights in India | Sabhijude',
     description:
       'Explore verified safety guides covering workplace POSH compliance, Indian criminal safety laws (BNS), campus regulations, and cyber safety.',
-    url: 'https://sabhijude.com/resources',
+    url: '/resources',
     type: 'article',
   },
 };

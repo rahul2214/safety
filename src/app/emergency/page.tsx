@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Instant emergency SOS dispatch tool. Share your real-time GPS coordinates with trusted contacts via WhatsApp and SMS, and connect directly to 112 emergency services.',
   alternates: {
-    canonical: 'https://sabhijude.com/emergency',
+    canonical: '/emergency',
   },
   openGraph: {
     title: 'Emergency SOS & Live GPS Location Alert | Sabhijude',
     description:
       'Instant emergency SOS dispatch tool with live location sharing and direct 112 calling.',
-    url: 'https://sabhijude.com/emergency',
+    url: '/emergency',
     type: 'website',
   },
 };

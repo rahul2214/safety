@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Complete directory of official 24/7 emergency helplines in India including Police 112, Women Helpline 1091, Distress 181, and Cyber Crime 1930, with actionable emergency safety measures.',
   alternates: {
-    canonical: 'https://sabhijude.com/safety-measures',
+    canonical: '/safety-measures',
   },
   openGraph: {
     title: 'India Emergency Helplines & Safety Measures | Sabhijude',
     description:
       'Official 24/7 emergency helplines in India including 112, 1091, 181, and 1930, with practical safety guidelines and tools.',
-    url: 'https://sabhijude.com/safety-measures',
+    url: '/safety-measures',
     type: 'website',
   },
 };

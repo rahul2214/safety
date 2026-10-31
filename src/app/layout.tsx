@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '@/components/ClientProviders';
@@ -25,7 +26,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sabhijude.com')
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sabhijude.veltria.in')
   ),
   title: {
     default: 'Sabhijude — Personal & Community Safety Platform',
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
     'campus safety management',
     'neighborhood safety alerts',
   ],
-  authors: [{ name: 'Sabhijude Safety Team', url: 'https://sabhijude.com' }],
+  authors: [{ name: 'Sabhijude Safety Team', url: 'https://sabhijude.veltria.in' }],
   creator: 'Sabhijude',
   publisher: 'Sabhijude',
   formatDetection: {
@@ -69,7 +70,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://sabhijude.com',
+    url: '/',
     siteName: 'Sabhijude',
     title: 'Sabhijude — Personal & Community Safety Platform',
     description:
@@ -104,6 +105,8 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-SABHIJUDE01';
+
 export default function RootLayout({
   children,
 }: {
@@ -112,6 +115,20 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable}`}>
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

@@ -36,8 +36,10 @@ export default function OrgSidebar() {
         <div className="p-6 border-b border-[#e8e8f0]">
           <div className="flex items-center gap-3">
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="Sabhijude Logo"
+              width={36}
+              height={36}
               className="h-9 w-9 object-contain shrink-0 drop-shadow-xs"
             />
             <div>

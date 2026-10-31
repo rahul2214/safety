@@ -35,6 +35,11 @@
   .animate-float, .animate-marquee, .animate-ring { animation: none !important; }
 }
 
+.animate-float {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
 /* Member dashboard: map Tailwind's stock blues and radii onto the brand so every inner page matches */
 .app-shell {
   --color-blue-50: #eaf1ff;

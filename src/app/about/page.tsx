@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   description:
     'Discover why Sabhijude was built: a privacy-first, community-powered personal safety platform offering emergency SOS dispatch, discreet tools, and verified safety defense.',
   alternates: {
-    canonical: 'https://sabhijude.com/about',
+    canonical: '/about',
   },
   openGraph: {
     title: 'About Sabhijude | Mission, Principles & Safety Network',
     description:
       'A privacy-first personal safety network delivering rapid emergency SOS alerts, live location sharing, and discreet protection for everyone.',
-    url: 'https://sabhijude.com/about',
+    url: '/about',
     type: 'website',
   },
 };
