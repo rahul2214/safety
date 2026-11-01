@@ -23,7 +23,7 @@ import {
   ShieldCheck,
   FileQuestion,
 } from 'lucide-react';
-import { api, hashtagText, type BackendPost } from '@/lib/api-client';
+import { api, type BackendPost } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { buildWhatsAppLink } from '@/lib/location';
@@ -56,7 +56,7 @@ function timeAgo(iso?: string) {
 
 export function PostDetailClient() {
   const params = useParams<{ id: string }>();
-  const postId = Number(params?.id);
+  const postIdentifier = params?.id ? String(params.id).trim() : '';
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showToast } = useToast();
@@ -80,10 +80,12 @@ export function PostDetailClient() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
 
-  // Load the post once auth has settled, so an author's own unpublished post can be read
+  // Load the post once auth has settled, strictly validating UUID format
   useEffect(() => {
     if (authLoading) return;
-    if (!Number.isFinite(postId) || postId <= 0) {
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!postIdentifier || !uuidRegex.test(postIdentifier)) {
       setNotFound(true);
       setLoading(false);
       return;
@@ -91,7 +93,7 @@ export function PostDetailClient() {
 
     let cancelled = false;
     setLoading(true);
-    api.getPost(postId, true).then((res) => {
+    api.getPost(postIdentifier, true).then((res) => {
       if (cancelled) return;
       if (!res.ok || !res.data) {
         setNotFound(true);
@@ -107,7 +109,7 @@ export function PostDetailClient() {
     });
 
     api
-      .getSolutions(postId)
+      .getSolutions(postIdentifier)
       .then((res) => !cancelled && setSolutions(res.ok && Array.isArray(res.data) ? res.data : []))
       .finally(() => !cancelled && setLoadingSolutions(false));
 
@@ -115,7 +117,12 @@ export function PostDetailClient() {
     if (isAuthenticated) {
       api.getMyPosts({ limit: 100 }).then((res) => {
         if (!cancelled && res.ok && Array.isArray(res.data)) {
-          setIsOwner(res.data.some((p: BackendPost) => p.id === postId));
+          setIsOwner(
+            res.data.some(
+              (p: BackendPost) =>
+                p.uuid && p.uuid.toLowerCase() === postIdentifier.toLowerCase()
+            )
+          );
         }
       });
     }
@@ -123,7 +130,9 @@ export function PostDetailClient() {
     return () => {
       cancelled = true;
     };
-  }, [postId, authLoading, isAuthenticated]);
+  }, [postIdentifier, authLoading, isAuthenticated]);
+
+  const targetPostUuid = post?.uuid || postIdentifier;
 
   const requireSignIn = (message: string) => {
     if (isAuthenticated) return false;
@@ -136,10 +145,16 @@ export function PostDetailClient() {
     const next = !supported;
     setSupported(next);
     setSupportCount((c) => Math.max(0, c + (next ? 1 : -1)));
-    const res = await api.supportPost(postId);
+    const res = await api.supportPost(targetPostUuid);
     if (!res.ok) {
+      showToast(res.error || 'Could not update support.', 'error');
       setSupported(!next);
       setSupportCount((c) => Math.max(0, c + (next ? -1 : 1)));
+    } else if (res.data) {
+      const d = res.data as any;
+      if (typeof d.supported === 'boolean') setSupported(d.supported);
+      if (typeof d.supportCount === 'number') setSupportCount(d.supportCount);
+      else if (typeof d.count === 'number') setSupportCount(d.count);
     }
   };
 
@@ -148,10 +163,15 @@ export function PostDetailClient() {
     const next = !facedThis;
     setFacedThis(next);
     setFacedCount((c) => Math.max(0, c + (next ? 1 : -1)));
-    const res = await api.facedThisPost(postId);
+    const res = await api.facedThisPost(targetPostUuid);
     if (!res.ok) {
+      showToast(res.error || 'Could not update reaction.', 'error');
       setFacedThis(!next);
       setFacedCount((c) => Math.max(0, c + (next ? -1 : 1)));
+    } else if (res.data) {
+      const d = res.data as any;
+      if (typeof d.faced === 'boolean') setFacedThis(d.faced);
+      if (typeof d.count === 'number') setFacedCount(d.count);
     }
   };
 
@@ -161,7 +181,7 @@ export function PostDetailClient() {
     if (requireSignIn('Please sign in to share advice.')) return;
 
     setSubmittingSolution(true);
-    const res = await api.createSolution(postId, newSolution.trim());
+    const res = await api.createSolution(targetPostUuid, newSolution.trim());
     setSubmittingSolution(false);
     if (!res.ok) {
       showToast(res.error || 'Could not post your advice.', 'error');
@@ -169,7 +189,7 @@ export function PostDetailClient() {
     }
     setNewSolution('');
     showToast('Your advice has been added.', 'success');
-    const refreshed = await api.getSolutions(postId, true);
+    const refreshed = await api.getSolutions(targetPostUuid, true);
     if (refreshed.ok && Array.isArray(refreshed.data)) setSolutions(refreshed.data);
   };
 
@@ -180,7 +200,7 @@ export function PostDetailClient() {
 
   const handleMarkResolved = async () => {
     setIsResolving(true);
-    const res = await api.updatePostStatus(postId, 'RESOLVED');
+    const res = await api.updatePostStatus(targetPostUuid, 'RESOLVED');
     setIsResolving(false);
     if (!res.ok) {
       showToast(res.error || 'Could not update this post.', 'error');
@@ -192,7 +212,7 @@ export function PostDetailClient() {
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    const res = await api.deletePost(postId);
+    const res = await api.deletePost(targetPostUuid);
     setIsDeleting(false);
     if (!res.ok) {
       showToast(res.error || 'Could not delete this post.', 'error');
@@ -200,10 +220,16 @@ export function PostDetailClient() {
     }
     // The report form also keeps a local copy of the user's posts
     try {
-      const ids: number[] = JSON.parse(localStorage.getItem('safecircle_my_post_ids') || '[]');
-      localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.filter((id) => id !== postId)));
+      const ids: any[] = JSON.parse(localStorage.getItem('safecircle_my_post_ids') || '[]');
+      localStorage.setItem(
+        'safecircle_my_post_ids',
+        JSON.stringify(ids.filter((id) => id !== post?.id && id !== post?.uuid && String(id) !== postIdentifier))
+      );
       const cached: any[] = JSON.parse(localStorage.getItem('safecircle_my_posted_posts') || '[]');
-      localStorage.setItem('safecircle_my_posted_posts', JSON.stringify(cached.filter((p) => p?.id !== postId)));
+      localStorage.setItem(
+        'safecircle_my_posted_posts',
+        JSON.stringify(cached.filter((p) => p?.id !== post?.id && p?.uuid !== post?.uuid && String(p?.id) !== postIdentifier))
+      );
     } catch {
       // Local cache is best-effort
     }
@@ -250,7 +276,6 @@ export function PostDetailClient() {
   const isAnon = !!post.isAnonymous;
   const author = isOwner && isAnon ? 'You (anonymous)' : getAuthorName(post);
   const category = getCategoryName(post.category || post.categoryName);
-  const tags: string[] = (post.hashtags || []).map(hashtagText).filter(Boolean);
   const pending = post.moderationState && post.moderationState !== 'APPROVED';
 
   return (
@@ -278,7 +303,7 @@ export function PostDetailClient() {
                   <div>
                     <p className="font-semibold text-ink">{author}</p>
                     <p className="text-sm text-slate-500">
-                      Posted {timeAgo(post.createdAt)} · #{post.id}
+                      Posted {timeAgo(post.createdAt)}
                     </p>
                   </div>
                 </div>
@@ -319,9 +344,6 @@ export function PostDetailClient() {
                     {new Date(post.incidentDateTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>
                 )}
-                {tags.map((t) => (
-                  <span key={t} className="rounded-full px-3 py-1.5 text-sm text-slate-500">#{t}</span>
-                ))}
               </div>
 
               {post.safetyAdvice && (
@@ -485,7 +507,7 @@ export function PostDetailClient() {
             <div className="rounded-3xl bg-white border border-slate-200/80 p-6 space-y-3">
               <p className="font-semibold text-ink">Join the conversation</p>
               <p className="text-sm text-slate-500">Sign in to support this report and share advice.</p>
-              <Link href={`/login?redirect=${encodeURIComponent(`/posts/${postId}`)}`} className="btn-brand w-full py-3">
+              <Link href={`/login?redirect=${encodeURIComponent(`/posts/${post?.uuid || postIdentifier}`)}`} className="btn-brand w-full py-3">
                 Sign in
               </Link>
             </div>

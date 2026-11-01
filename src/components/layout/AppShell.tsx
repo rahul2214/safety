@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -15,7 +15,6 @@ import {
   Bell,
   HelpCircle,
   Settings,
-  Search,
   Phone,
   LogOut,
   LogIn,
@@ -28,11 +27,9 @@ import {
   ShieldCheck,
   User,
   ArrowLeft,
-  Loader2,
   Radio,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { api, type BackendPost } from '@/lib/api-client';
 import { Button } from '@/components/ui/Button';
 import { PageShellSkeleton } from '@/components/ui/Skeleton';
 import { Logo } from '@/components/ui/Logo';
@@ -71,11 +68,6 @@ export function AppShell({ children }: AppShellProps) {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
-  const [searchSuggestions, setSearchSuggestions] = useState<BackendPost[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   // Single posts are shareable, so /posts/<id> is readable without signing in
@@ -83,72 +75,11 @@ export function AppShell({ children }: AppShellProps) {
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isPostPage;
   const isAuthPage = pathname === '/login' || pathname === '/signup';
 
-  // Close menus and search dropdown on route change
+  // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setProfileMenuOpen(false);
-    setIsSearchDropdownOpen(false);
   }, [pathname]);
-
-  // Click outside to dismiss search dropdown
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
-        setIsSearchDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Fetch live search preview from database
-  useEffect(() => {
-    const term = searchQuery.trim();
-    if (term.length < 2) {
-      setSearchSuggestions([]);
-      setIsSearching(false);
-      return;
-    }
-
-    setIsSearching(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await api.searchPosts(term, { limit: 4 });
-        if (res.ok && res.data) {
-          setSearchSuggestions(res.data);
-        } else {
-          setSearchSuggestions([]);
-        }
-      } catch {
-        setSearchSuggestions([]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 250);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Global keyboard shortcut '/' to focus search (Only when authenticated)
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === '/' &&
-        document.activeElement?.tagName !== 'INPUT' &&
-        document.activeElement?.tagName !== 'TEXTAREA'
-      ) {
-        e.preventDefault();
-        document.getElementById('global-search-input')?.focus();
-        setIsSearchDropdownOpen(true);
-      }
-      if (e.key === 'Escape') {
-        setIsSearchDropdownOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAuthenticated]);
 
   // Automatic redirect if unauthenticated user tries to visit private dashboard routes
   useEffect(() => {
@@ -156,13 +87,6 @@ export function AppShell({ children }: AppShellProps) {
       router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
     }
   }, [isLoading, isAuthenticated, isPublicRoute, pathname, router]);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    setIsSearchDropdownOpen(false);
-    router.push(`/feed?q=${encodeURIComponent(searchQuery.trim())}`);
-  };
 
   const navItems: Array<{
     href: string;
@@ -174,7 +98,7 @@ export function AppShell({ children }: AppShellProps) {
   }> = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/feed', label: 'Community feed', icon: Radio },
-    { href: '/map', label: 'Safety map', icon: MapPin },
+    // { href: '/map', label: 'Safety map', icon: MapPin },
     { href: '/report', label: 'Report an incident', icon: AlertCircle, isAction: true },
     { href: '/myposts', label: 'My reports', icon: FileText },
     { href: '/contacts', label: 'Trusted contacts', icon: Users },
@@ -384,92 +308,7 @@ export function AppShell({ children }: AppShellProps) {
               <p className="font-display text-lg font-bold text-ink truncate">{activeItem?.label || 'Dashboard'}</p>
             </div>
 
-            {/* Global search */}
-            <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-lg ml-auto relative">
-              <form onSubmit={handleSearchSubmit} className="w-full relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  id="global-search-input"
-                  type="search"
-                  placeholder="Search reports, guides, places…"
-                  value={searchQuery}
-                  onFocus={() => setIsSearchDropdownOpen(true)}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setIsSearchDropdownOpen(true);
-                  }}
-                  className="w-full h-11 rounded-full border border-slate-200 bg-white pl-11 pr-12 text-sm text-ink placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition"
-                />
-                <kbd className="absolute right-4 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-mist px-1.5 text-[11px] font-semibold text-slate-400">/</kbd>
-              </form>
-
-              {isSearchDropdownOpen && searchQuery.trim().length >= 2 && (
-                <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-slate-200 shadow-[0_20px_50px_-20px_rgba(11,22,48,0.35)] overflow-hidden z-50">
-                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                    <span className="font-semibold text-ink">Search in</span>
-                    {isSearching ? (
-                      <span className="text-brand flex items-center gap-1">
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        Searching…
-                      </span>
-                    ) : (
-                      <span>Press Enter to see all</span>
-                    )}
-                  </div>
-
-                  <div className="p-2 space-y-0.5">
-                    {[
-                      { icon: Radio, label: 'Safety reports', to: `/feed?q=`, tint: 'bg-brand-tint text-brand' },
-                      { icon: BookOpen, label: 'Guides & legal rights', to: `/resources?q=`, tint: 'bg-coral-tint text-coral' },
-                      { icon: MapPin, label: 'Places on the safety map', to: `/map?search=`, tint: 'bg-emerald-50 text-emerald-600' },
-                    ].map((opt) => (
-                      <button
-                        key={opt.label}
-                        type="button"
-                        onClick={() => {
-                          setIsSearchDropdownOpen(false);
-                          router.push(`${opt.to}${encodeURIComponent(searchQuery.trim())}`);
-                        }}
-                        className="w-full text-left p-2 rounded-xl hover:bg-mist text-sm flex items-center gap-3 transition-colors"
-                      >
-                        <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${opt.tint}`}>
-                          <opt.icon className="h-4 w-4" />
-                        </span>
-                        <span className="text-slate-700 truncate">
-                          {opt.label} for &ldquo;<strong className="text-ink">{searchQuery}</strong>&rdquo;
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {searchSuggestions.length > 0 && (
-                    <div className="border-t border-slate-100 p-2 space-y-1 bg-mist/60">
-                      <p className="px-2 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                        Matching reports ({searchSuggestions.length})
-                      </p>
-                      {searchSuggestions.map((post) => (
-                        <button
-                          key={post.id}
-                          type="button"
-                          onClick={() => {
-                            setIsSearchDropdownOpen(false);
-                            router.push(`/feed?q=${encodeURIComponent(searchQuery.trim())}`);
-                          }}
-                          className="w-full text-left px-3 py-2 rounded-xl hover:bg-white text-xs transition-colors space-y-0.5"
-                        >
-                          <span className="block font-semibold text-ink truncate">
-                            {post.location || post.categoryName || 'Incident report'}
-                          </span>
-                          <span className="block text-[11px] text-slate-500 line-clamp-1">{post.content}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 ml-auto md:ml-0">
+            <div className="flex items-center gap-2 ml-auto">
               <Link
                 href="/notifications"
                 className={`relative h-11 w-11 rounded-full flex items-center justify-center border transition-colors ${

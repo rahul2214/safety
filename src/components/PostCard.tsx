@@ -14,12 +14,13 @@ import {
   Share2,
   MapPin,
 } from'lucide-react';
-import { api, hashtagText, type PostHashtag } from'@/lib/api-client';
+import { api } from '@/lib/api-client';
 import { useAuth } from'@/lib/auth-context';
 import { useToast } from'@/components/Toast';
 
 export interface PostItem {
   id: number;
+  uuid?: string;
   authorName?: string;
   isAnonymous?: boolean;
   category?: string;
@@ -42,7 +43,6 @@ export interface PostItem {
   solutionsCount?: number;
   hasSupported?: boolean;
   hasFacedThis?: boolean;
-  hashtags?: PostHashtag[];
   riskScore?: number;
   safetyAdvice?: string;
 }
@@ -92,7 +92,9 @@ export function PostCard({ post }: { post: PostItem }) {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
-  const openPost = () => router.push(`/posts/${post.id}`);
+  const openPost = () => {
+    if (post.uuid) router.push(`/posts/${post.uuid}`);
+  };
 
   const isAnon = post.isAnonymous ?? false;
   const displayName = getAuthorName(post);
@@ -109,43 +111,74 @@ export function PostCard({ post }: { post: PostItem }) {
   const [supportCount, setSupportCount] = useState<number>(initialSupport);
   const [facedThis, setFacedThis] = useState<boolean>(post.hasFacedThis || (post as any).hasFacedThisToo || false);
   const [similarCount, setSimilarCount] = useState<number>(initialSimilar);
+  const [isTogglingSupport, setIsTogglingSupport] = useState<boolean>(false);
+  const [isTogglingFacedThis, setIsTogglingFacedThis] = useState<boolean>(false);
 
   const toggleSupport = async (e: React.MouseEvent) => {
-  e.stopPropagation();
-  if (!isAuthenticated) {
-  showToast('Please sign in to support community incident reports.', 'info');
-  return;
-  }
-  const nextVal = !supported;
-  setSupported(nextVal);
-  setSupportCount((c: number) => Math.max(0, nextVal ? c + 1 : c - 1));
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      showToast('Please sign in to support community incident reports.', 'info');
+      return;
+    }
+    if (isTogglingSupport || !post.uuid) return;
+    setIsTogglingSupport(true);
 
-  try {
-  await api.supportPost(post.id);
-  } catch (err) {
-  console.warn('Failed to persist support to DB:', err);
-  setSupported(!nextVal);
-  setSupportCount((c: number) => Math.max(0, !nextVal ? c + 1 : c - 1));
-  }
+    const nextVal = !supported;
+    setSupported(nextVal);
+    setSupportCount((c: number) => Math.max(0, nextVal ? c + 1 : c - 1));
+
+    try {
+      const res = await api.supportPost(post.uuid);
+      if (!res.ok) {
+        showToast(res.error || 'Could not update support.', 'error');
+        setSupported(!nextVal);
+        setSupportCount((c: number) => Math.max(0, !nextVal ? c + 1 : c - 1));
+      } else if (res && res.data) {
+        const d = res.data as any;
+        if (typeof d.supported === 'boolean') setSupported(d.supported);
+        if (typeof d.supportCount === 'number') setSupportCount(d.supportCount);
+        else if (typeof d.count === 'number') setSupportCount(d.count);
+      }
+    } catch (err) {
+      console.warn('Failed to persist support to DB:', err);
+      setSupported(!nextVal);
+      setSupportCount((c: number) => Math.max(0, !nextVal ? c + 1 : c - 1));
+    } finally {
+      setIsTogglingSupport(false);
+    }
   };
 
   const toggleFacedThis = async (e: React.MouseEvent) => {
-  e.stopPropagation();
-  if (!isAuthenticated) {
-  showToast('Please sign in to react to community incidents.', 'info');
-  return;
-  }
-  const nextVal = !facedThis;
-  setFacedThis(nextVal);
-  setSimilarCount((c: number) => Math.max(0, nextVal ? c + 1 : c - 1));
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      showToast('Please sign in to react to community incidents.', 'info');
+      return;
+    }
+    if (isTogglingFacedThis || !post.uuid) return;
+    setIsTogglingFacedThis(true);
 
-  try {
-  await api.facedThisPost(post.id);
-  } catch (err) {
-  console.warn('Failed to persist faced-this to DB:', err);
-  setFacedThis(!nextVal);
-  setSimilarCount((c: number) => Math.max(0, !nextVal ? c + 1 : c - 1));
-  }
+    const nextVal = !facedThis;
+    setFacedThis(nextVal);
+    setSimilarCount((c: number) => Math.max(0, nextVal ? c + 1 : c - 1));
+
+    try {
+      const res = await api.facedThisPost(post.uuid);
+      if (!res.ok) {
+        showToast(res.error || 'Could not update reaction.', 'error');
+        setFacedThis(!nextVal);
+        setSimilarCount((c: number) => Math.max(0, !nextVal ? c + 1 : c - 1));
+      } else if (res && res.data) {
+        const d = res.data as any;
+        if (typeof d.faced === 'boolean') setFacedThis(d.faced);
+        if (typeof d.count === 'number') setSimilarCount(d.count);
+      }
+    } catch (err) {
+      console.warn('Failed to persist faced-this to DB:', err);
+      setFacedThis(!nextVal);
+      setSimilarCount((c: number) => Math.max(0, !nextVal ? c + 1 : c - 1));
+    } finally {
+      setIsTogglingFacedThis(false);
+    }
   };
 
   const isResolved = post.severity === 'RESOLVED';
@@ -230,7 +263,7 @@ export function PostCard({ post }: { post: PostItem }) {
   {post.content}
   </p>
 
-  {/* 3. Chip row (Category, Solved/Open status, hashtags) */}
+  {/* 3. Chip row (Category, Solved/Open status) */}
   <div className="flex flex-wrap items-center gap-2 pt-0.5">
   <span className="text-[12px] font-bold text-brand bg-brand-tint px-3 py-1 rounded-full">
   {categoryName}
@@ -265,18 +298,6 @@ export function PostCard({ post }: { post: PostItem }) {
   </span>
   )}
 
-  {post.hashtags && post.hashtags.length > 0 && (
-  <span className="text-[11.5px] text-slate-400">
-  {post.hashtags
-  .map((t) => {
-  const tagStr = hashtagText(t);
-  return tagStr ? `#${tagStr}` : '';
-  })
-  .filter(Boolean)
-  .join(' ')}
-  </span>
-  )}
-
   {post.safetyAdvice && (
   <div className="w-full mt-1 p-2.5 rounded-[12px] bg-blue-50 border border-blue-200 flex items-start gap-1.5 text-xs text-blue-700">
   <Sparkles className="h-3.5 w-3.5 shrink-0 mt-0.5" />
@@ -292,8 +313,10 @@ export function PostCard({ post }: { post: PostItem }) {
   <div className="flex items-center gap-4">
   {/* Heart / Support */}
   <button
+  type="button"
+  disabled={isTogglingSupport}
   onClick={toggleSupport}
-  className={`flex items-center gap-1.5 transition-colors ${
+  className={`flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60 ${
   supported ? 'text-coral font-bold' : 'hover:text-ink'
   }`}
   >
@@ -305,8 +328,10 @@ export function PostCard({ post }: { post: PostItem }) {
 
   {/* Faced This Too */}
   <button
+  type="button"
+  disabled={isTogglingFacedThis}
   onClick={toggleFacedThis}
-  className={`flex items-center gap-1.5 transition-colors ${
+  className={`flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60 ${
   facedThis ? 'text-brand font-bold' : 'hover:text-ink'
   }`}
   >

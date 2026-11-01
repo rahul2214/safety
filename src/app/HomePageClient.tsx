@@ -202,7 +202,7 @@ export function HomePageClient() {
     { label: 'Report an incident', hint: 'Anonymous if you prefer', icon: AlertCircle, href: '/report', tint: 'bg-brand-tint text-brand' },
     { label: 'Share my location', hint: 'Send a live GPS link', icon: Share2, onClick: handleShareLiveLocation, tint: 'bg-emerald-50 text-emerald-600', loading: shareLocationLoading },
     { label: 'Trusted contacts', hint: contacts === null ? 'Loading…' : `${contactCount} in your circle`, icon: Users, href: '/contacts', tint: 'bg-coral-tint text-coral' },
-    { label: 'Safety map', hint: 'Alerts near you', icon: MapPin, href: '/map', tint: 'bg-amber-50 text-amber-600' },
+    // { label: 'Safety map', hint: 'Alerts near you', icon: MapPin, href: '/map', tint: 'bg-amber-50 text-amber-600' },
   ];
 
   return (

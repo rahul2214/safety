@@ -327,7 +327,6 @@ export default function ReportProblemPage() {
   visibility: backendVis,
   postVisibilityId,
   audienceGenderId: postVisibilityId === 2 ? 1 : postVisibilityId === 3 ? 2 : postVisibilityId === 4 ? 3 : null,
-  hashtags: [category.toLowerCase().replace(/[^a-z0-9]/g, '')],
   incidentDateTime: incidentIso,
   location: locationName,
   });
@@ -344,11 +343,15 @@ export default function ReportProblemPage() {
   try {
   const rawIds = localStorage.getItem('safecircle_my_post_ids');
   const ids: number[] = rawIds ? JSON.parse(rawIds) : [];
+  const newUuid = (postRes.data as any).uuid;
   const newId = (postRes.data as any).id;
-  if (newId && !ids.includes(newId)) {
-  ids.unshift(newId);
-  localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.slice(0, 100)));
+  if (newUuid && !ids.includes(newUuid)) {
+    ids.unshift(newUuid);
   }
+  if (newId && !ids.includes(newId)) {
+    ids.unshift(newId);
+  }
+  localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.slice(0, 100)));
   const rawPosts = localStorage.getItem('safecircle_my_posted_posts');
   const postList: any[] = rawPosts ? JSON.parse(rawPosts) : [];
   postList.unshift(postRes.data);

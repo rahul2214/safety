@@ -41,8 +41,8 @@ class ApiCache {
       return 60 * 60 * 1000;
     }
 
-    // Hashtags and topics (5 minutes)
-    if (url.includes('/hashtags') || url.includes('/topics')) {
+    // Topics (5 minutes)
+    if (url.includes('/topics')) {
       return 5 * 60 * 1000;
     }
 

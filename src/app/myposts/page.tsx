@@ -23,7 +23,6 @@ import {
   ThumbsUp,
   Heart,
   RefreshCw,
-  Tag,
   Radio,
   Trash2,
   AlertTriangle,
@@ -32,7 +31,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Modal } from '@/components/ui/Modal';
-import { api, BackendPost, hashtagText } from '@/lib/api-client';
+import { api, BackendPost } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { PostCardSkeleton, Skeleton } from '@/components/ui/Skeleton';
@@ -50,22 +49,22 @@ export default function MyPostsPage() {
   const router = useRouter();
 
   const handleDeletePost = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !deleteTarget.uuid) return;
     setIsDeleting(true);
-    const res = await api.deletePost(deleteTarget.id);
+    const res = await api.deletePost(deleteTarget.uuid);
     setIsDeleting(false);
     if (!res.ok) {
       showToast(res.error || 'Could not delete this post. Please try again.', 'error');
       return;
     }
-    const removedId = deleteTarget.id;
-    setPosts((prev) => prev.filter((p) => p.id !== removedId));
+    const removedUuid = deleteTarget.uuid;
+    setPosts((prev) => prev.filter((p) => p.uuid !== removedUuid));
     // The report form also keeps a local copy of the user's posts
     try {
-      const ids: number[] = JSON.parse(localStorage.getItem('safecircle_my_post_ids') || '[]');
-      localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.filter((id) => id !== removedId)));
+      const ids: any[] = JSON.parse(localStorage.getItem('safecircle_my_post_ids') || '[]');
+      localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.filter((id) => id !== removedUuid && id !== deleteTarget.id)));
       const cached: any[] = JSON.parse(localStorage.getItem('safecircle_my_posted_posts') || '[]');
-      localStorage.setItem('safecircle_my_posted_posts', JSON.stringify(cached.filter((p) => p?.id !== removedId)));
+      localStorage.setItem('safecircle_my_posted_posts', JSON.stringify(cached.filter((p) => p?.uuid !== removedUuid && p?.id !== deleteTarget.id)));
     } catch {
       // Local cache is best-effort
     }
@@ -82,8 +81,9 @@ export default function MyPostsPage() {
 
       let backendPosts: BackendPost[] = [];
       if (res.ok && res.data && Array.isArray(res.data)) {
-        backendPosts = res.data.map((item: any) => ({
+        backendPosts = res.data.map((item: any, idx: number) => ({
           ...item,
+          uuid: item.uuid || item.Uuid || '',
           categoryName: item.categoryName || item.category?.name || 'Safety Alert',
           solutionsCount: item.solutionsCount ?? item.solutionCount ?? 0,
           supportCount: item.supportCount ?? 0,
@@ -136,8 +136,7 @@ export default function MyPostsPage() {
       post.id.toString().includes(query) ||
       post.content.toLowerCase().includes(query) ||
       (post.categoryName && post.categoryName.toLowerCase().includes(query)) ||
-      (post.location && post.location.toLowerCase().includes(query)) ||
-      (post.hashtags && post.hashtags.some((t) => hashtagText(t).toLowerCase().includes(query)))
+      (post.location && post.location.toLowerCase().includes(query))
     );
   });
 
@@ -319,19 +318,18 @@ export default function MyPostsPage() {
         </Card>
       ) : filteredPosts.length > 0 ? (
         <div className="space-y-3">
-          {filteredPosts.map((post) => (
+          {filteredPosts.map((post, index) => (
             <Card
-              key={post.id}
+              key={post.uuid || (post as any).id || `mypost-${index}`}
               className="p-4 sm:p-5 hover:border-blue-300 transition-colors cursor-pointer group"
-              onClick={() => router.push(`/posts/${post.id}`)}
+              onClick={() => {
+                if (post.uuid) router.push(`/posts/${post.uuid}`);
+              }}
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                {/* Left: ID, Badges, Content & Metadata */}
+                {/* Left: Badges, Content & Metadata */}
                 <div className="space-y-2 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-slate-900">
-                      #POST-{post.id}
-                    </span>
                     {post.categoryName && (
                       <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700">
                         {post.categoryName}
@@ -349,21 +347,6 @@ export default function MyPostsPage() {
                   <p className="text-xs text-slate-800 line-clamp-3 leading-relaxed whitespace-pre-wrap">
                     {post.content}
                   </p>
-
-                  {/* Hashtags */}
-                  {post.hashtags && post.hashtags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
-                      {post.hashtags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-0.5 text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded"
-                        >
-                          <Tag className="h-2.5 w-2.5" />
-                          <span>#{hashtagText(tag)}</span>
-                        </span>
-                      ))}
-                    </div>
-                  )}
 
                   {/* Metadata bar */}
                   <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-400 pt-1 border-t border-slate-100">
@@ -399,7 +382,7 @@ export default function MyPostsPage() {
                       setDeleteTarget(post);
                     }}
                     className="h-9 w-9 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                    aria-label={`Delete post #${post.id}`}
+                    aria-label="Delete post"
                     title="Delete post"
                   >
                     <Trash2 className="h-4 w-4" />

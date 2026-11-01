@@ -66,10 +66,7 @@ function SafetyResourcesContent() {
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 animate-in fade-in-50 duration-200">
       {/* Header */}
       <div className="space-y-3 max-w-3xl">
-        <span className="eyebrow">
-          <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
-          Safety &amp; Legal Knowledge Base
-        </span>
+       
         <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
           Know your rights, safety protocols &amp; legal remedies
         </h1>

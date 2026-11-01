@@ -41,9 +41,6 @@ function getProxyCacheTtl(cleanSubpath: string): number {
   ) {
     return 5 * 60 * 1000; // 5 minutes
   }
-  if (p.includes('api/hashtags')) {
-    return 2 * 60 * 1000; // 2 minutes
-  }
   return 0; // Not cached in BFF
 }
 

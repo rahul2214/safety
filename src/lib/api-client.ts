@@ -23,17 +23,9 @@ export interface ApiResponse<T> {
   };
 }
 
-/** The API returns hashtags as `{ id, name }` objects; older/local data uses plain strings. */
-export type PostHashtag = string | { id?: number; name?: string };
-
-/** Hashtag text without a leading '#', whichever shape it arrived in. */
-export function hashtagText(tag: PostHashtag | null | undefined): string {
-  const raw = typeof tag === 'string' ? tag : tag?.name ?? '';
-  return raw.replace(/^#/, '');
-}
-
 export interface BackendPost {
   id: number;
+  uuid?: string;
   content: string;
   severity: string;
   status: string;
@@ -51,7 +43,6 @@ export interface BackendPost {
   hasSupported?: boolean;
   hasFacedThis?: boolean;
   hasSaved?: boolean;
-  hashtags?: PostHashtag[];
   safetyAdvice?: string;
   riskScore?: number;
   postSeverityId?: number;
@@ -383,7 +374,6 @@ export const api = {
     visibility?: string;
     postVisibilityId?: number;
     audienceGenderId?: number | null;
-    hashtags?: string[];
     incidentDateTime?: string;
     location?: string;
   }) {
@@ -411,7 +401,6 @@ export const api = {
         visibility: payload.visibility || 'PUBLIC',
         postVisibilityId: payload.postVisibilityId || 1,
         audienceGenderId: payload.audienceGenderId !== undefined ? payload.audienceGenderId : -1,
-        hashtags: payload.hashtags || [],
         incidentDateTime: payload.incidentDateTime,
         location: payload.location,
       }),
@@ -435,30 +424,30 @@ export const api = {
     return { ok: false, error: res.error, status: res.status, data: [] };
   },
 
-  /** One post by id. Authors can read their own posts in any moderation state. */
-  async getPost(postId: number, forceRefresh = false) {
+  /** One post by uuid. Authors can read their own posts in any moderation state. */
+  async getPost(uuid: string, forceRefresh = false) {
     return request<BackendPost & { similarExperienceCount?: number; hasFacedThisToo?: boolean; solutionCount?: number; author?: { displayName?: string }; category?: { name?: string } }>(
-      `/api/posts/${postId}`,
+      `/api/posts/${encodeURIComponent(uuid)}`,
       {},
       1,
       { forceRefresh }
     );
   },
 
-  async supportPost(postId: number) {
-    return request<{ success: boolean; supportCount: number }>(`/api/posts/${postId}/support`, {
+  async supportPost(uuid: string) {
+    return request<{ success: boolean; supportCount: number }>(`/api/posts/${encodeURIComponent(uuid)}/support`, {
       method: 'POST',
     });
   },
 
-  async facedThisPost(postId: number) {
-    return request<{ success: boolean; count?: number }>(`/api/posts/${postId}/similar-experience`, {
+  async facedThisPost(uuid: string) {
+    return request<{ success: boolean; count?: number }>(`/api/posts/${encodeURIComponent(uuid)}/similar-experience`, {
       method: 'POST',
     });
   },
 
-  async savePost(postId: number) {
-    return request<{ saved: boolean }>(`/api/posts/${postId}/save`, {
+  async savePost(uuid: string) {
+    return request<{ saved: boolean }>(`/api/posts/${encodeURIComponent(uuid)}/save`, {
       method: 'POST',
     });
   },
@@ -521,14 +510,14 @@ export const api = {
     });
   },
 
-  /** Permanently deletes one of the signed-in user's own posts. */
-  async deletePost(postId: number) {
-    return request(`/api/posts/${postId}`, { method: 'DELETE' });
+  /** Permanently deletes one of the signed-in user's own posts by uuid. */
+  async deletePost(uuid: string) {
+    return request(`/api/posts/${encodeURIComponent(uuid)}`, { method: 'DELETE' });
   },
 
-  /** Sets the status of one of the signed-in user's own posts (e.g. 'RESOLVED'). */
-  async updatePostStatus(postId: number, status: string) {
-    return request<{ status: string; postStatusId: number }>(`/api/posts/${postId}/status`, {
+  /** Sets the status of one of the signed-in user's own posts by uuid (e.g. 'RESOLVED'). */
+  async updatePostStatus(uuid: string, status: string) {
+    return request<{ status: string; postStatusId: number }>(`/api/posts/${encodeURIComponent(uuid)}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
@@ -703,7 +692,7 @@ export const api = {
   },
 
   // Solutions & Community Advice
-  async getSolutions(postId: number, forceRefresh = false) {
+  async getSolutions(uuid: string, forceRefresh = false) {
     return request<Array<{
       id: number;
       postId: number;
@@ -717,11 +706,11 @@ export const api = {
         displayName: string;
         isVerifiedExpert?: boolean;
       };
-    }>>(`/api/posts/${postId}/solutions`, {}, 1, { forceRefresh });
+    }>>(`/api/posts/${encodeURIComponent(uuid)}/solutions`, {}, 1, { forceRefresh });
   },
 
-  async createSolution(postId: number, content: string) {
-    return request(`/api/posts/${postId}/solutions`, {
+  async createSolution(uuid: string, content: string) {
+    return request(`/api/posts/${encodeURIComponent(uuid)}/solutions`, {
       method: 'POST',
       body: JSON.stringify({ content: content.trim() }),
     });
@@ -742,7 +731,6 @@ export const api = {
         severity: 'IMMEDIATE_DANGER',
         isAnonymous: false,
         visibility: 'PUBLIC',
-        hashtags: ['emergency', 'sos'],
       }),
     });
   },

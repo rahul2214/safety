@@ -321,8 +321,8 @@ export function PublicLanding({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {filteredPosts.slice(0, 4).map((post) => (
-                  <PostCard key={post.id} post={post} />
+                {filteredPosts.slice(0, 4).map((post, index) => (
+                  <PostCard key={post.uuid || (post as any).id || `landing-post-${index}`} post={post} />
                 ))}
               </div>
             )}
