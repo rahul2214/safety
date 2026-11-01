@@ -22,8 +22,11 @@ import {
   Globe,
   ShieldCheck,
   FileQuestion,
+  ChevronDown,
+  ChevronUp,
+  CornerDownRight,
 } from 'lucide-react';
-import { api, type BackendPost } from '@/lib/api-client';
+import { api, type BackendPost, type Solution, type SolutionReply } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { buildWhatsAppLink } from '@/lib/location';
@@ -58,7 +61,7 @@ export function PostDetailClient() {
   const params = useParams<{ id: string }>();
   const postIdentifier = params?.id ? String(params.id).trim() : '';
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { showToast } = useToast();
 
   const [post, setPost] = useState<any | null>(null);
@@ -66,10 +69,21 @@ export function PostDetailClient() {
   const [notFound, setNotFound] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
 
-  const [solutions, setSolutions] = useState<any[]>([]);
+  const [solutions, setSolutions] = useState<Solution[]>([]);
   const [loadingSolutions, setLoadingSolutions] = useState(true);
   const [newSolution, setNewSolution] = useState('');
   const [submittingSolution, setSubmittingSolution] = useState(false);
+
+  // Interactive advice actions: Support, Replies, Delete
+  const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const [replyTexts, setReplyTexts] = useState<Record<number, string>>({});
+  const [submittingReplyId, setSubmittingReplyId] = useState<number | null>(null);
+  const [expandedReplies, setExpandedReplies] = useState<Set<number>>(new Set());
+
+  const [solutionToDelete, setSolutionToDelete] = useState<Solution | null>(null);
+  const [isDeletingSolution, setIsDeletingSolution] = useState(false);
+  const [replyToDelete, setReplyToDelete] = useState<{ solutionId: number; replyId: number } | null>(null);
+  const [isDeletingReply, setIsDeletingReply] = useState(false);
 
   const [supported, setSupported] = useState(false);
   const [supportCount, setSupportCount] = useState(0);
@@ -191,6 +205,122 @@ export function PostDetailClient() {
     showToast('Your advice has been added.', 'success');
     const refreshed = await api.getSolutions(targetPostUuid, true);
     if (refreshed.ok && Array.isArray(refreshed.data)) setSolutions(refreshed.data);
+  };
+
+  const handleSupportSolution = async (sol: Solution) => {
+    if (requireSignIn('Please sign in to support this advice.')) return;
+
+    const currentSupported = !!sol.hasSupported;
+    const currentCount = sol.helpfulCount || 0;
+    const nextSupported = !currentSupported;
+    const nextCount = Math.max(0, currentCount + (nextSupported ? 1 : -1));
+
+    // Optimistic UI update
+    setSolutions((prev) =>
+      prev.map((s) =>
+        s.id === sol.id ? { ...s, hasSupported: nextSupported, helpfulCount: nextCount } : s
+      )
+    );
+
+    const res = await api.supportSolution(targetPostUuid, sol.id);
+    if (!res.ok) {
+      showToast(res.error || 'Could not update support.', 'error');
+      // Revert on error
+      setSolutions((prev) =>
+        prev.map((s) =>
+          s.id === sol.id ? { ...s, hasSupported: currentSupported, helpfulCount: currentCount } : s
+        )
+      );
+    } else if (res.data) {
+      setSolutions((prev) =>
+        prev.map((s) =>
+          s.id === sol.id
+            ? { ...s, hasSupported: res.data!.supported, helpfulCount: res.data!.helpfulCount }
+            : s
+        )
+      );
+    }
+  };
+
+  const handleSendReply = async (solutionId: number) => {
+    const text = (replyTexts[solutionId] || '').trim();
+    if (!text) return;
+    if (requireSignIn('Please sign in to reply to advice.')) return;
+
+    setSubmittingReplyId(solutionId);
+    const res = await api.createSolutionReply(targetPostUuid, solutionId, text);
+    setSubmittingReplyId(null);
+
+    if (!res.ok || !res.data) {
+      showToast(res.error || 'Could not post your reply.', 'error');
+      return;
+    }
+
+    const createdReply = res.data;
+    setReplyTexts((prev) => ({ ...prev, [solutionId]: '' }));
+    setReplyingToId(null);
+    setExpandedReplies((prev) => new Set(prev).add(solutionId));
+
+    setSolutions((prev) =>
+      prev.map((s) => {
+        if (s.id !== solutionId) return s;
+        return {
+          ...s,
+          replies: [...(s.replies || []), createdReply],
+        };
+      })
+    );
+    showToast('Your reply has been added.', 'success');
+  };
+
+  const handleDeleteSolution = async () => {
+    if (!solutionToDelete) return;
+    setIsDeletingSolution(true);
+    const res = await api.deleteSolution(targetPostUuid, solutionToDelete.id);
+    setIsDeletingSolution(false);
+
+    if (!res.ok) {
+      showToast(res.error || 'Could not delete advice.', 'error');
+      return;
+    }
+
+    setSolutions((prev) => prev.filter((s) => s.id !== solutionToDelete.id));
+    setSolutionToDelete(null);
+    showToast('Advice deleted successfully.', 'success');
+  };
+
+  const handleDeleteReply = async () => {
+    if (!replyToDelete) return;
+    setIsDeletingReply(true);
+    const { solutionId, replyId } = replyToDelete;
+    const res = await api.deleteSolutionReply(targetPostUuid, solutionId, replyId);
+    setIsDeletingReply(false);
+
+    if (!res.ok) {
+      showToast(res.error || 'Could not delete reply.', 'error');
+      return;
+    }
+
+    setSolutions((prev) =>
+      prev.map((s) => {
+        if (s.id !== solutionId) return s;
+        return {
+          ...s,
+          replies: (s.replies || []).filter((r) => r.id !== replyId),
+        };
+      })
+    );
+    setReplyToDelete(null);
+    showToast('Reply deleted.', 'success');
+  };
+
+  const toggleRepliesExpanded = (solutionId: number) => {
+    setExpandedReplies((prev) => {
+      const next = new Set(prev);
+      if (next.has(solutionId)) next.delete(solutionId);
+      else next.add(solutionId);
+      return next;
+    });
   };
 
   const handleShare = () => {
@@ -390,57 +520,306 @@ export function PostDetailClient() {
             </div>
           </article>
 
-          {/* Solutions */}
-          <section className="rounded-3xl bg-white border border-slate-200/80 p-6 sm:p-8 space-y-5">
-            <h2 className="flex items-center gap-2 font-display text-xl font-bold text-ink">
-              <MessageSquare className="h-5 w-5 text-brand" /> Community advice
-              <span className="rounded-full bg-mist px-2.5 py-0.5 text-sm font-semibold text-slate-500">{solutions.length}</span>
-            </h2>
+          {/* Solutions & Community Advice */}
+          <section className="rounded-3xl bg-white border border-slate-200/80 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-5">
+            <div className="flex items-center justify-between">
+              <h2 className="flex items-center gap-2 font-display text-lg sm:text-xl font-bold text-ink">
+                <MessageSquare className="h-5 w-5 text-brand" /> Community advice
+                <span className="rounded-full bg-mist px-2.5 py-0.5 text-xs sm:text-sm font-semibold text-slate-500">
+                  {solutions.length}
+                </span>
+              </h2>
+              <span className="text-xs text-slate-400 hidden sm:inline">
+                Guidance & support
+              </span>
+            </div>
 
-            <form onSubmit={handleSendSolution} className="flex flex-col sm:flex-row gap-2">
-              <label htmlFor="new-solution" className="sr-only">Your advice</label>
-              <input
-                id="new-solution"
-                type="text"
-                value={newSolution}
-                onChange={(e) => setNewSolution(e.target.value)}
-                disabled={submittingSolution}
-                placeholder={isAuthenticated ? 'Share practical advice or a safer alternative…' : 'Sign in to share advice…'}
-                className="flex-1 h-12 rounded-full border border-slate-200 bg-mist px-5 text-sm text-ink placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10"
-              />
-              <Button type="submit" disabled={submittingSolution || !newSolution.trim()} loading={submittingSolution} leftIcon={<Send className="h-4 w-4" />}>
-                Post advice
-              </Button>
+            {/* Advice Composer */}
+            <form onSubmit={handleSendSolution} className="space-y-3">
+              <div className="relative rounded-2xl border border-slate-200 bg-mist/50 focus-within:bg-white focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10 transition-all p-3 sm:p-4">
+                <label htmlFor="new-solution" className="sr-only">Your advice</label>
+                <textarea
+                  id="new-solution"
+                  rows={3}
+                  value={newSolution}
+                  onChange={(e) => setNewSolution(e.target.value)}
+                  disabled={submittingSolution}
+                  placeholder={
+                    isAuthenticated
+                      ? 'Share practical advice, precautions, or safety guidance for the community…'
+                      : 'Sign in to share advice…'
+                  }
+                  className="w-full bg-transparent text-sm sm:text-base text-ink placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+                />
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-200/60">
+                  <span className="text-[11px] sm:text-xs text-slate-400 flex items-center gap-1">
+                    <Sparkles className="h-3.5 w-3.5 text-brand" /> Practical advice helps most
+                  </span>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={submittingSolution || !newSolution.trim()}
+                    loading={submittingSolution}
+                    leftIcon={<Send className="h-3.5 w-3.5" />}
+                    className="rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold ml-auto"
+                  >
+                    Post advice
+                  </Button>
+                </div>
+              </div>
             </form>
 
+            {/* Advice Cards List */}
             {loadingSolutions ? (
               <div className="space-y-3">
                 <SolutionSkeleton />
                 <SolutionSkeleton />
               </div>
             ) : solutions.length > 0 ? (
-              <ul className="space-y-3">
-                {solutions.map((sol) => (
-                  <li key={sol.id} className="rounded-2xl bg-mist p-4 space-y-1.5">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="flex items-center gap-2 text-sm font-semibold text-ink">
-                        {sol.author?.displayName || 'Community member'}
-                        {sol.isAccepted && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
-                            <CheckCircle2 className="h-3 w-3" /> Verified
+              <ul className="space-y-3 sm:space-y-4">
+                {solutions.map((sol) => {
+                  const canDeleteSol =
+                    !!user?.id && (String(sol.authorId) === String(user.id) || isOwner);
+                  const replies = sol.replies || [];
+                  const isReplying = replyingToId === sol.id;
+                  const areRepliesExpanded = expandedReplies.has(sol.id);
+
+                  return (
+                    <li
+                      key={sol.id}
+                      className="rounded-2xl bg-white border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-4 sm:p-5 space-y-3 transition hover:border-slate-300"
+                    >
+                      {/* Header: Author + Badges + Delete */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                          <span className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-brand/15 to-brand/5 text-brand flex items-center justify-center font-bold text-sm ring-1 ring-brand/20">
+                            {(sol.author?.displayName || 'C').charAt(0).toUpperCase()}
                           </span>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                              <span className="font-semibold text-sm text-ink truncate">
+                                {sol.author?.displayName || 'Community member'}
+                              </span>
+                              {sol.isAccepted && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-emerald-700">
+                                  <CheckCircle2 className="h-3 w-3" /> Verified
+                                </span>
+                              )}
+                              {sol.author?.isVerifiedExpert && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-indigo-700">
+                                  <ShieldCheck className="h-3 w-3" /> Expert
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] sm:text-xs text-slate-400">
+                              {timeAgo(sol.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+
+                        {canDeleteSol && (
+                          <button
+                            type="button"
+                            onClick={() => setSolutionToDelete(sol)}
+                            className="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
+                            title="Delete this advice"
+                            aria-label="Delete this advice"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         )}
-                      </span>
-                      <span className="text-xs text-slate-400">{timeAgo(sol.createdAt)}</span>
-                    </div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{sol.content}</p>
-                  </li>
-                ))}
+                      </div>
+
+                      {/* Content */}
+                      <p className="text-sm sm:text-base text-slate-800 leading-relaxed whitespace-pre-wrap break-words">
+                        {sol.content}
+                      </p>
+
+                      {/* Actions Bar: Support, Reply, View/Hide replies */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                        <div className="flex items-center gap-2">
+                          {/* Support Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleSupportSolution(sol)}
+                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs sm:text-sm font-semibold transition cursor-pointer ${
+                              sol.hasSupported
+                                ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                                : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                            }`}
+                            aria-pressed={!!sol.hasSupported}
+                          >
+                            <Heart
+                              className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${
+                                sol.hasSupported ? 'fill-rose-600 text-rose-600' : 'text-slate-500'
+                              }`}
+                            />
+                            <span>{sol.hasSupported ? 'Supported' : 'Support'}</span>
+                            {(sol.helpfulCount || 0) > 0 && (
+                              <span className="ml-0.5 rounded-full bg-black/5 px-1.5 py-0.2 text-xs font-bold">
+                                {sol.helpfulCount}
+                              </span>
+                            )}
+                          </button>
+
+                          {/* Reply Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReplyingToId((cur) => (cur === sol.id ? null : sol.id));
+                              setExpandedReplies((prev) => new Set(prev).add(sol.id));
+                            }}
+                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs sm:text-sm font-semibold transition cursor-pointer ${
+                              isReplying
+                                ? 'bg-brand-tint text-brand border border-brand/30'
+                                : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                            }`}
+                          >
+                            <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-500" />
+                            <span>Reply</span>
+                            {replies.length > 0 && (
+                              <span className="ml-0.5 rounded-full bg-black/5 px-1.5 py-0.2 text-xs font-bold">
+                                {replies.length}
+                              </span>
+                            )}
+                          </button>
+                        </div>
+
+                        {replies.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => toggleRepliesExpanded(sol.id)}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline cursor-pointer"
+                          >
+                            {areRepliesExpanded ? (
+                              <>
+                                <span>Hide {replies.length === 1 ? 'reply' : 'replies'}</span>
+                                <ChevronUp className="h-3.5 w-3.5" />
+                              </>
+                            ) : (
+                              <>
+                                <span>
+                                  View {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+                                </span>
+                                <ChevronDown className="h-3.5 w-3.5" />
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Replies List */}
+                      {areRepliesExpanded && replies.length > 0 && (
+                        <div className="space-y-2.5 pl-3 sm:pl-4 border-l-2 border-brand/20 mt-3 pt-1">
+                          {replies.map((reply) => {
+                            const canDeleteReply =
+                              !!user?.id && (String(reply.authorId) === String(user.id) || isOwner);
+                            return (
+                              <div
+                                key={reply.id}
+                                className="group relative rounded-xl bg-slate-50 border border-slate-100 p-3 space-y-1"
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <span className="h-6 w-6 shrink-0 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xs">
+                                      {(reply.author?.displayName || 'C').charAt(0).toUpperCase()}
+                                    </span>
+                                    <span className="text-xs font-semibold text-ink truncate">
+                                      {reply.author?.displayName || 'Community member'}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 shrink-0">
+                                      {timeAgo(reply.createdAt)}
+                                    </span>
+                                  </div>
+                                  {canDeleteReply && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setReplyToDelete({ solutionId: sol.id, replyId: reply.id })
+                                      }
+                                      className="shrink-0 text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition cursor-pointer"
+                                      title="Delete reply"
+                                      aria-label="Delete reply"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                  )}
+                                </div>
+                                <p className="text-xs sm:text-sm text-slate-700 pl-8 leading-relaxed whitespace-pre-wrap break-words">
+                                  {reply.content}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Inline Reply Composer */}
+                      {isReplying && (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSendReply(sol.id);
+                          }}
+                          className="pt-2 pl-3 sm:pl-4 border-l-2 border-brand/40 space-y-2"
+                        >
+                          <div className="relative rounded-xl border border-slate-200 bg-white focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10 p-2.5">
+                            <textarea
+                              rows={2}
+                              value={replyTexts[sol.id] || ''}
+                              onChange={(e) =>
+                                setReplyTexts((prev) => ({ ...prev, [sol.id]: e.target.value }))
+                              }
+                              placeholder={
+                                isAuthenticated
+                                  ? 'Write a reply to this advice…'
+                                  : 'Sign in to reply…'
+                              }
+                              className="w-full bg-transparent text-xs sm:text-sm text-ink placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  handleSendReply(sol.id);
+                                }
+                              }}
+                            />
+                            <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                              <span className="text-[10px] text-slate-400">Press Enter to send</span>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setReplyingToId(null)}
+                                  className="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                                >
+                                  Cancel
+                                </button>
+                                <Button
+                                  type="submit"
+                                  size="sm"
+                                  disabled={
+                                    submittingReplyId === sol.id || !(replyTexts[sol.id] || '').trim()
+                                  }
+                                  loading={submittingReplyId === sol.id}
+                                  leftIcon={<Send className="h-3 w-3" />}
+                                  className="rounded-xl px-3 py-1 text-xs font-semibold"
+                                >
+                                  Reply
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
-              <div className="rounded-2xl border-2 border-dashed border-slate-200 p-8 text-center">
+              <div className="rounded-2xl border-2 border-dashed border-slate-200 p-6 sm:p-8 text-center space-y-1">
                 <p className="font-semibold text-ink">No advice yet</p>
-                <p className="text-sm text-slate-500">Be the first to share something that could help.</p>
+                <p className="text-sm text-slate-500">
+                  Be the first to share practical tips or precautions that could help.
+                </p>
               </div>
             )}
           </section>
@@ -492,17 +871,6 @@ export function PostDetailClient() {
             </div>
           )}
 
-          <div className="rounded-3xl bg-ink text-white p-6 space-y-3">
-            <p className="flex items-center gap-2 font-semibold">
-              <AlertTriangle className="h-5 w-5 text-coral" /> Nearby and in danger?
-            </p>
-            <p className="text-sm text-white/65">Don&rsquo;t wait for replies here — call for help now.</p>
-            <div className="grid grid-cols-2 gap-2">
-              <a href="tel:112" className="rounded-xl bg-red-600 hover:bg-red-700 py-2.5 text-center text-sm font-bold transition">Call 112</a>
-              <a href="tel:1091" className="rounded-xl bg-white/10 hover:bg-white/15 py-2.5 text-center text-sm font-bold transition">Call 1091</a>
-            </div>
-          </div>
-
           {!isAuthenticated && (
             <div className="rounded-3xl bg-white border border-slate-200/80 p-6 space-y-3">
               <p className="font-semibold text-ink">Join the conversation</p>
@@ -529,6 +897,71 @@ export function PostDetailClient() {
             </Button>
             <Button variant="emergency" onClick={handleDelete} loading={isDeleting} leftIcon={<Trash2 className="h-4 w-4" />}>
               Delete permanently
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Advice Modal */}
+      <Modal
+        isOpen={!!solutionToDelete}
+        onClose={() => !isDeletingSolution && setSolutionToDelete(null)}
+        title="Delete this advice?"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 rounded-2xl bg-red-50 border border-red-200 p-4">
+            <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-900 leading-relaxed">
+              This will permanently delete this piece of advice and all of its replies. It cannot be undone.
+            </p>
+          </div>
+          <div className="flex items-center justify-end gap-2.5">
+            <Button
+              variant="outline"
+              onClick={() => setSolutionToDelete(null)}
+              disabled={isDeletingSolution}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="emergency"
+              onClick={handleDeleteSolution}
+              loading={isDeletingSolution}
+              leftIcon={<Trash2 className="h-4 w-4" />}
+            >
+              Delete advice
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Reply Modal */}
+      <Modal
+        isOpen={!!replyToDelete}
+        onClose={() => !isDeletingReply && setReplyToDelete(null)}
+        title="Delete this reply?"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Are you sure you want to delete this reply? This cannot be undone.
+          </p>
+          <div className="flex items-center justify-end gap-2.5">
+            <Button
+              variant="outline"
+              onClick={() => setReplyToDelete(null)}
+              disabled={isDeletingReply}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="emergency"
+              onClick={handleDeleteReply}
+              loading={isDeletingReply}
+              leftIcon={<Trash2 className="h-4 w-4" />}
+            >
+              Delete reply
             </Button>
           </div>
         </div>

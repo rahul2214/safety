@@ -119,6 +119,38 @@ export interface SupportTicket {
   updatedAt: string;
 }
 
+export interface SolutionReply {
+  id: number;
+  solutionId: number;
+  authorId: number;
+  content: string;
+  createdAt: string;
+  author?: {
+    id: number;
+    displayName: string;
+    isVerifiedExpert?: boolean;
+    avatarUrl?: string;
+  };
+}
+
+export interface Solution {
+  id: number;
+  postId: number;
+  authorId: number;
+  content: string;
+  isAccepted: boolean;
+  helpfulCount: number;
+  hasSupported?: boolean;
+  replies?: SolutionReply[];
+  createdAt: string;
+  author?: {
+    id: number;
+    displayName: string;
+    isVerifiedExpert?: boolean;
+    avatarUrl?: string;
+  };
+}
+
 export interface CreateSupportTicketPayload {
   subject: string;
   category: string;
@@ -693,27 +725,45 @@ export const api = {
 
   // Solutions & Community Advice
   async getSolutions(uuid: string, forceRefresh = false) {
-    return request<Array<{
-      id: number;
-      postId: number;
-      authorId: number;
-      content: string;
-      isAccepted: boolean;
-      helpfulCount: number;
-      createdAt: string;
-      author?: {
-        id: number;
-        displayName: string;
-        isVerifiedExpert?: boolean;
-      };
-    }>>(`/api/posts/${encodeURIComponent(uuid)}/solutions`, {}, 1, { forceRefresh });
+    return request<Solution[]>(`/api/posts/${encodeURIComponent(uuid)}/solutions`, {}, 1, { forceRefresh });
   },
 
   async createSolution(uuid: string, content: string) {
-    return request(`/api/posts/${encodeURIComponent(uuid)}/solutions`, {
+    return request<Solution>(`/api/posts/${encodeURIComponent(uuid)}/solutions`, {
       method: 'POST',
       body: JSON.stringify({ content: content.trim() }),
     });
+  },
+
+  async supportSolution(uuid: string, solutionId: number) {
+    return request<{ success: boolean; supported: boolean; helpfulCount: number }>(
+      `/api/posts/${encodeURIComponent(uuid)}/solutions/${solutionId}/support`,
+      { method: 'POST' }
+    );
+  },
+
+  async deleteSolution(uuid: string, solutionId: number) {
+    return request<{ success: boolean; message?: string }>(
+      `/api/posts/${encodeURIComponent(uuid)}/solutions/${solutionId}`,
+      { method: 'DELETE' }
+    );
+  },
+
+  async createSolutionReply(uuid: string, solutionId: number, content: string) {
+    return request<SolutionReply>(
+      `/api/posts/${encodeURIComponent(uuid)}/solutions/${solutionId}/replies`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ content: content.trim() }),
+      }
+    );
+  },
+
+  async deleteSolutionReply(uuid: string, solutionId: number, replyId: number) {
+    return request<{ success: boolean; message?: string }>(
+      `/api/posts/${encodeURIComponent(uuid)}/solutions/${solutionId}/replies/${replyId}`,
+      { method: 'DELETE' }
+    );
   },
 
   // Live Emergency SOS Broadcast
