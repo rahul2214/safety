@@ -30,6 +30,7 @@ import { SosModal } from '@/components/SosModal';
 import { FakeCallModal } from '@/components/FakeCallModal';
 import { api, type Category, type EmergencyContact, type NotificationItem } from '@/lib/api-client';
 import { getCurrentCoordinates, buildEmergencySosText, buildWhatsAppLink } from '@/lib/location';
+import { PostCard, type PostItem } from '@/components/PostCard';
 import { PostCardSkeleton } from '@/components/ui/Skeleton';
 
 function greeting() {
@@ -305,39 +306,31 @@ export function HomePageClient() {
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {loadingData ? (
-              <>
+              <div className="space-y-4">
                 <PostCardSkeleton />
                 <PostCardSkeleton />
-              </>
+              </div>
             ) : recentReports.length > 0 ? (
-              recentReports.map((report) => (
-                <Link
-                  key={report.id}
-                  href="/feed"
-                  className="block rounded-2xl border border-slate-100 bg-mist/60 p-4 hover:bg-white hover:border-slate-200 transition"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="rounded-full bg-white border border-slate-200 px-2.5 py-0.5 text-xs font-semibold text-ink truncate">
-                        {report.category?.name || report.categoryName || 'General safety'}
-                      </span>
-                      {report.location && (
-                        <span className="hidden sm:flex items-center gap-1 text-xs text-slate-500 truncate">
-                          <MapPin className="h-3 w-3" /> {report.location}
-                        </span>
-                      )}
-                    </div>
-                    <StatusBadge status={report.status || 'Under Review'} />
-                  </div>
-                  <p className="mt-2.5 text-sm text-slate-700 leading-relaxed line-clamp-2">{report.content}</p>
-                  <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
-                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{timeAgo(report.createdAt)}</span>
-                    <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5" />{report.supportCount || 0}</span>
-                    <span className="flex items-center gap-1"><MessageCircle className="h-3.5 w-3.5" />{report.solutionsCount || 0} solutions</span>
-                  </div>
-                </Link>
+              recentReports.map((report, idx) => (
+                <PostCard
+                  key={report.uuid || report.id || `home-post-${idx}`}
+                  post={{
+                    ...report,
+                    uuid: report.uuid,
+                    categoryName: report.category?.name || report.categoryName,
+                    similarCount:
+                      report.similarExperienceCount ??
+                      report.similarCount ??
+                      report.facedThisCount ??
+                      0,
+                    solutionCount:
+                      report.solutionCount ??
+                      report.solutionsCount ??
+                      0,
+                  }}
+                />
               ))
             ) : (
               <div className="rounded-2xl border-2 border-dashed border-slate-200 p-10 text-center">

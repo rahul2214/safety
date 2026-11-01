@@ -70,21 +70,51 @@ export function getAuthorName(post: any): string {
   return'Community Member';
 }
 
-function formatTimeAgo(dateStr?: string): string {
-  if (!dateStr) return'Recently';
+export function parseUtcDate(dateStr?: string): Date | null {
+  if (!dateStr) return null;
+  const s = String(dateStr).trim();
+  const hasTz = s.endsWith('Z') || s.endsWith('z') || /[+-]\d{2}:?\d{2}$/.test(s);
+  const normalized = hasTz ? s : `${s}Z`;
+  const parsed = new Date(normalized);
+  if (!isNaN(parsed.getTime())) return parsed;
+  const fallback = new Date(s);
+  return isNaN(fallback.getTime()) ? null : fallback;
+}
+
+export function formatTimeAgo(dateStr?: string): string {
+  if (!dateStr) return 'Recently';
   try {
-  const time = new Date(dateStr).getTime();
-  if (isNaN(time)) return'Recently';
-  const diffMs = Date.now() - time;
-  const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return'Just now';
-  if (diffMins < 60) return`${diffMins}m ago`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return`${diffHours}h ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  return`${diffDays}d ago`;
+    const d = parseUtcDate(dateStr);
+    if (!d || isNaN(d.getTime())) return 'Recently';
+    const diffMs = Date.now() - d.getTime();
+    if (diffMs < 0) return 'Just now';
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
   } catch {
-  return'Recently';
+    return 'Recently';
+  }
+}
+
+export function formatIncidentDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  try {
+    const d = parseUtcDate(dateStr);
+    if (!d || isNaN(d.getTime())) return '';
+    return d.toLocaleString('en-IN', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  } catch {
+    return '';
   }
 }
 
@@ -285,16 +315,12 @@ export function PostCard({ post }: { post: PostItem }) {
   )}
 
   {post.incidentDateTime && (
-  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full">
+  <span
+    className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full"
+    title={`Incident date: ${formatIncidentDate(post.incidentDateTime)}`}
+  >
   <Clock className="h-3 w-3 text-indigo-500 shrink-0" />
-  <span>
-  {new Date(post.incidentDateTime).toLocaleDateString(undefined, {
-  month: 'short',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  })}
-  </span>
+  <span>Incident: {formatIncidentDate(post.incidentDateTime)}</span>
   </span>
   )}
 
@@ -310,12 +336,14 @@ export function PostCard({ post }: { post: PostItem }) {
 
   {/* 4. Hairline divider & Interactions Footer */}
   <div className="pt-2.5 border-t border-slate-200 flex items-center justify-between text-[13px] text-slate-600">
-  <div className="flex items-center gap-4">
+  <div className="flex flex-wrap items-center gap-3 sm:gap-4">
   {/* Heart / Support */}
   <button
   type="button"
   disabled={isTogglingSupport}
   onClick={toggleSupport}
+  title="Support this report"
+  aria-label={`Support this report: ${supportCount} supports`}
   className={`flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60 ${
   supported ? 'text-coral font-bold' : 'hover:text-ink'
   }`}
@@ -331,13 +359,14 @@ export function PostCard({ post }: { post: PostItem }) {
   type="button"
   disabled={isTogglingFacedThis}
   onClick={toggleFacedThis}
-  className={`flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60 ${
-  facedThis ? 'text-brand font-bold' : 'hover:text-ink'
+  title="I faced this incident too"
+  aria-label={`I faced this too: ${similarCount} people faced this`}
+  className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors cursor-pointer disabled:opacity-60 ${
+  facedThis ? 'bg-brand-tint text-brand font-bold border border-brand/30' : 'hover:text-ink hover:bg-slate-100'
   }`}
   >
-  <Users className={`h-4 w-4 ${facedThis ? 'text-brand' : ''}`} />
-  <span className="hidden sm:inline">{similarCount} faced this</span>
-  <span className="sm:hidden">{similarCount}</span>
+  <Users className={`h-3.5 w-3.5 ${facedThis ? 'text-brand' : ''}`} />
+  <span>{similarCount} faced this</span>
   </button>
   </div>
 
