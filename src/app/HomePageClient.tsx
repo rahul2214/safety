@@ -226,9 +226,6 @@ export function HomePageClient() {
         <div aria-hidden className="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-coral/25 blur-3xl" />
         <div className="relative grid lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-5">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" /> You&rsquo;re protected
-            </span>
             <h1 className="font-display text-3xl sm:text-[2.75rem] leading-[1.1] font-extrabold tracking-[-0.02em]">
               {greeting()}, {firstName}.
             </h1>
