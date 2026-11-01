@@ -207,25 +207,7 @@ export default function MyPostsPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
-        <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">My Posts</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            View, track, and manage safety incidents, advisories, and community posts you shared.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2">
-          
-          <Link href="/report">
-            <Button variant="primary" size="sm">
-              <Plus className="h-4 w-4 mr-1.5" />
-              <span>Create New Post</span>
-            </Button>
-          </Link>
-        </div>
-      </div>
 
       {/* Metrics Summary Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
