@@ -9,12 +9,8 @@ const nextConfig: NextConfig = {
   compress: true,
   images: {
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
+    // next/image is not used with remote sources; no remotePatterns so the
+    // image optimizer cannot be abused as an open proxy (SEC-03).
   },
   async redirects() {
     return [

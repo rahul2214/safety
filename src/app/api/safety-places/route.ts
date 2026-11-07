@@ -26,6 +26,58 @@ interface CacheEntry {
 }
 const cache = new Map<string, CacheEntry>();
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+const CACHE_MAX_ENTRIES = 500;
+
+function cacheGet(key: string): CacheEntry | undefined {
+  const entry = cache.get(key);
+  if (!entry) return undefined;
+  if (Date.now() - entry.timestamp >= CACHE_TTL_MS) {
+    cache.delete(key);
+    return undefined;
+  }
+  // Refresh recency (Map keeps insertion order -> bounded LRU)
+  cache.delete(key);
+  cache.set(key, entry);
+  return entry;
+}
+
+function cacheSet(key: string, entry: CacheEntry) {
+  cache.delete(key);
+  cache.set(key, entry);
+  while (cache.size > CACHE_MAX_ENTRIES) {
+    const oldest = cache.keys().next().value;
+    if (oldest === undefined) break;
+    cache.delete(oldest);
+  }
+}
+
+// Per-IP sliding-window rate limit (in-memory, bounded)
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX = 30;
+const RATE_LIMIT_MAX_KEYS = 5000;
+const rateLimitHits = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  const hits = (rateLimitHits.get(ip) || []).filter((t) => t > windowStart);
+  const limited = hits.length >= RATE_LIMIT_MAX;
+  if (!limited) hits.push(now);
+  rateLimitHits.delete(ip);
+  rateLimitHits.set(ip, hits);
+  while (rateLimitHits.size > RATE_LIMIT_MAX_KEYS) {
+    const oldest = rateLimitHits.keys().next().value;
+    if (oldest === undefined) break;
+    rateLimitHits.delete(oldest);
+  }
+  return limited;
+}
+
+function getClientIp(req: NextRequest): string {
+  const xff = req.headers.get('x-forwarded-for');
+  const first = xff?.split(',')[0]?.trim();
+  return first || req.headers.get('x-real-ip')?.trim() || 'unknown';
+}
 
 // Curated pan-India verified emergency infrastructure fallback across major states & metros
 const NATIONWIDE_HUBS: SafetyPlaceItem[] = [
@@ -287,14 +339,31 @@ export async function GET(req: NextRequest) {
   const lngStr = searchParams.get('lng');
   const q = searchParams.get('q');
 
+  if (isRateLimited(getClientIp(req))) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again shortly.' },
+      { status: 429, headers: { 'Retry-After': '60' } }
+    );
+  }
+
   const lat = latStr ? parseFloat(latStr) : null;
   const lng = lngStr ? parseFloat(lngStr) : null;
+
+  if (
+    (lat !== null && (!Number.isFinite(lat) || lat < -90 || lat > 90)) ||
+    (lng !== null && (!Number.isFinite(lng) || lng < -180 || lng > 180))
+  ) {
+    return NextResponse.json({ error: 'Invalid coordinates.' }, { status: 400 });
+  }
+  if (q !== null && q.length > 100) {
+    return NextResponse.json({ error: 'Query too long.' }, { status: 400 });
+  }
 
   // Cache key based on rounded coordinates (~1km grid) or search query
   const cacheKey = lat && lng ? `${lat.toFixed(2)},${lng.toFixed(2)}` : q ? `q:${q.toLowerCase()}` : 'default';
 
-  const cached = cache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+  const cached = cacheGet(cacheKey);
+  if (cached) {
     return NextResponse.json(cached.data, {
       headers: {
         'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
@@ -309,7 +378,8 @@ export async function GET(req: NextRequest) {
   const discoveredPlaces: SafetyPlaceItem[] = [];
 
   const headers = {
-    'User-Agent': 'SabhijudeApp/2.0 (Women Safety Platform India; contact: admin@veltria.in)',
+    // Nominatim usage policy requires an identifying User-Agent.
+    'User-Agent': 'SabhijudeSafetyWeb/2.0 (community safety platform; nearby emergency services lookup)',
     'Accept-Language': 'en-IN,en;q=0.9',
   };
 
@@ -346,16 +416,15 @@ export async function GET(req: NextRequest) {
     const viewbox = `${lng - delta},${lat + delta},${lng + delta},${lat - delta}`;
 
     try {
-      const [policeRes, hospitalRes] = await Promise.all([
-        fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&amenity=police&viewbox=${viewbox}&bounded=1&limit=6&addressdetails=1`,
-          { headers, next: { revalidate: 3600 } }
-        ),
-        fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&amenity=hospital&viewbox=${viewbox}&bounded=1&limit=6&addressdetails=1`,
-          { headers, next: { revalidate: 3600 } }
-        ),
-      ]);
+      // Sequential (not parallel) to respect Nominatim's ~1 req/s usage policy.
+      const policeRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&amenity=police&viewbox=${viewbox}&bounded=1&limit=6&addressdetails=1`,
+        { headers, next: { revalidate: 3600 } }
+      );
+      const hospitalRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&amenity=hospital&viewbox=${viewbox}&bounded=1&limit=6&addressdetails=1`,
+        { headers, next: { revalidate: 3600 } }
+      );
 
       if (policeRes.ok) {
         const policeData: any[] = await policeRes.json();
@@ -436,7 +505,7 @@ export async function GET(req: NextRequest) {
     places: finalPlaces,
   };
 
-  cache.set(cacheKey, { data: resultData, timestamp: Date.now() });
+  cacheSet(cacheKey, { data: resultData, timestamp: Date.now() });
 
   return NextResponse.json(resultData, {
     headers: {

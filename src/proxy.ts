@@ -38,16 +38,34 @@ export function proxy(request: NextRequest) {
   const defaultApiOrigin = isDev
     ? 'http://localhost:5000'
     : 'https://safecircle-api-752721321209.asia-south1.run.app';
-  const apiOrigin = process.env.NEXT_PUBLIC_API_URL || defaultApiOrigin;
+  // API origin comes from env (NEXT_PUBLIC_API_URL); hardcoded value is only a fallback.
+  let apiOrigin = defaultApiOrigin;
+  try {
+    apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL || defaultApiOrigin).origin;
+  } catch {
+    apiOrigin = defaultApiOrigin;
+  }
   const apiSocketOrigin = apiOrigin.replace(/^http/, 'ws');
+
+  // Production: no 'unsafe-eval' and no blanket https: script source (SEC-16).
+  // 'unsafe-inline' is still required for Next's inline bootstrap scripts (no nonce in use)
+  // and the inline gtag snippet. Dev additionally needs 'unsafe-eval' for React refresh.
+  const scriptSrc = [
+    "'self'",
+    "'unsafe-inline'",
+    isDev ? "'unsafe-eval'" : '',
+    'https://www.googletagmanager.com',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const csp = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob:;
+    script-src ${scriptSrc};
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https:;
     font-src 'self' data: https://fonts.gstatic.com;
-    connect-src 'self' ${apiOrigin} ${apiSocketOrigin} https://safecircle-api-752721321209.asia-south1.run.app wss://safecircle-api-752721321209.asia-south1.run.app https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;
+    connect-src 'self' ${apiOrigin} ${apiSocketOrigin} https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
@@ -68,6 +86,9 @@ export function proxy(request: NextRequest) {
   response.headers.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=()');
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
+  if (!isDev) {
+    response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains');
+  }
 
   return response;
 }

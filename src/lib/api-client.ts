@@ -311,6 +311,7 @@ async function request<T>(
       localStorage.removeItem('safecircle_token');
       localStorage.removeItem(REFRESH_TOKEN_KEY);
       localStorage.removeItem('safecircle_user');
+      apiCache.clear();
       window.dispatchEvent(new Event('safecircle_auth_expired'));
     }
 
@@ -335,8 +336,8 @@ async function request<T>(
       return { ok: true, data: responseData, status };
     }
 
-    // Attempt 1 retry for 502/503/504 cold starts
-    if (retries > 0 && (status === 502 || status === 503 || status === 504)) {
+    // Attempt 1 retry for 502/503/504 cold starts (idempotent GET/HEAD only — SEC-27)
+    if (isGet && retries > 0 && (status === 502 || status === 503 || status === 504)) {
       await new Promise((r) => setTimeout(r, 1000));
       return request<T>(endpoint, options, retries - 1, cacheOptions);
     }
@@ -344,7 +345,7 @@ async function request<T>(
     const errorMsg = json?.error?.message || json?.message || `Request failed with status ${status}`;
     return { ok: false, error: errorMsg, status };
   } catch (err: any) {
-    if (retries > 0) {
+    if (isGet && retries > 0) {
       await new Promise((r) => setTimeout(r, 1000));
       return request<T>(endpoint, options, retries - 1, cacheOptions);
     }
@@ -790,9 +791,9 @@ export const api = {
     return request<SupportConfig>('/api/support/config', {}, 1, { forceRefresh });
   },
 
-  async getSupportTickets(email?: string, forceRefresh = false) {
-    const q = email ? `?email=${encodeURIComponent(email)}` : '';
-    return request<SupportTicket[]>(`/api/support/tickets/mine${q}`, {}, 1, { forceRefresh });
+  // Requires authentication; the backend identifies the user from the JWT only.
+  async getSupportTickets(forceRefresh = false) {
+    return request<SupportTicket[]>('/api/support/tickets/mine', {}, 1, { forceRefresh });
   },
 
   async createSupportTicket(payload: CreateSupportTicketPayload) {

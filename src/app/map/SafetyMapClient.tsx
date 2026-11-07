@@ -172,6 +172,21 @@ const LOCALITY_COORDS: Record<string, { lat: number; lng: number }> = {
   'guwahati': { lat: 26.1445, lng: 91.7362 },
 };
 
+/** HTML-escape a value before interpolating it into an HTML string. */
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Only allow hex colors in inline styles; fall back to a neutral color. */
+function safeCssColor(value: unknown): string {
+  return typeof value === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(value) ? value : '#64748b';
+}
+
 function resolveLocationCoords(
   locationName?: string,
   postId?: number,
@@ -450,7 +465,7 @@ export function SafetyMapClient() {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background-color: ${res.statusColor};
+  background-color: ${safeCssColor(res.statusColor)};
   color: #ffffff;
   border-radius: 50%;
   border: 2.5px solid #ffffff;
@@ -466,13 +481,13 @@ export function SafetyMapClient() {
   position: absolute;
   inset: -5px;
   border-radius: 50%;
-  background-color: ${res.statusColor};
+  background-color: ${safeCssColor(res.statusColor)};
   opacity: 0.35;
   animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
   "></span>`
   : ''
   }
-  <span style="position: relative; z-index: 10;">${res.iconLabel}</span>
+  <span style="position: relative; z-index: 10;">${escapeHtml(res.iconLabel)}</span>
   </div>
   `;
 
@@ -486,19 +501,33 @@ export function SafetyMapClient() {
 
   const marker = L.marker([res.lat, res.lng], { icon: customIcon });
 
-  // Popup Content
+  // Popup Content (built with DOM APIs + textContent to prevent stored XSS)
   const popupContent = document.createElement('div');
   popupContent.className = 'p-1 space-y-1 text-slate-900';
-  popupContent.innerHTML = `
-  <div style="font-weight: bold; font-size: 13px; color: #1e1b4b;">${res.name}</div>
-  <div style="font-size: 11px; color: #64748b;">${res.address}</div>
-  <div style="font-size: 11px; color: #334155; margin-top: 4px; max-height: 80px; overflow-y: auto;">${res.details}</div>
-  ${
-  res.phone
-  ? `<a href="tel:${res.phone}"style="display: inline-block; margin-top: 6px; padding: 4px 10px; background-color: #6d4aff; color: white; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none;">Call ${res.phone}</a>`
-  : ''
+
+  const nameEl = document.createElement('div');
+  nameEl.style.cssText = 'font-weight: bold; font-size: 13px; color: #1e1b4b;';
+  nameEl.textContent = res.name ?? '';
+  popupContent.appendChild(nameEl);
+
+  const addressEl = document.createElement('div');
+  addressEl.style.cssText = 'font-size: 11px; color: #64748b;';
+  addressEl.textContent = res.address ?? '';
+  popupContent.appendChild(addressEl);
+
+  const detailsEl = document.createElement('div');
+  detailsEl.style.cssText = 'font-size: 11px; color: #334155; margin-top: 4px; max-height: 80px; overflow-y: auto;';
+  detailsEl.textContent = res.details ?? '';
+  popupContent.appendChild(detailsEl);
+
+  const telNumber = res.phone ? String(res.phone).replace(/[^+0-9]/g, '') : '';
+  if (telNumber) {
+  const callEl = document.createElement('a');
+  callEl.href = `tel:${telNumber}`;
+  callEl.style.cssText = 'display: inline-block; margin-top: 6px; padding: 4px 10px; background-color: #6d4aff; color: white; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none;';
+  callEl.textContent = `Call ${res.phone}`;
+  popupContent.appendChild(callEl);
   }
-  `;
 
   marker.bindPopup(popupContent);
 

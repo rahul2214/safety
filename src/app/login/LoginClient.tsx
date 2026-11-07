@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { safeRedirect } from '@/lib/safe-redirect';
 import { useToast } from '@/components/Toast';
 import { Logo } from '@/components/ui/Logo';
 import { AuthLayout } from '@/components/public/AuthLayout';
@@ -28,7 +29,7 @@ import { AuthLayout } from '@/components/public/AuthLayout';
 function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || '/';
+  const redirectPath = safeRedirect(searchParams.get('redirect'));
 
   const { login, isAuthenticated, isLoading } = useAuth();
   const { showToast } = useToast();

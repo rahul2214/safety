@@ -1,4 +1,4 @@
-import { clearSession, getToken, isTokenExpired, touchSession } from './session';
+import { clearSession, getToken, isTokenExpired, onSessionChange, touchSession } from './session';
 
 const DEFAULT_PROD_API = 'https://safecircle-api-752721321209.asia-south1.run.app';
 
@@ -21,6 +21,8 @@ interface OrgCacheEntry {
   timestamp: number;
 }
 const orgCache = new Map<string, OrgCacheEntry>();
+// Never serve one session's cached data to another (logout, expiry, or a new login).
+onSessionChange(() => orgCache.clear());
 const ORG_CACHE_TTL = 30 * 1000; // 30 seconds
 
 export async function adminFetch<T = any>(

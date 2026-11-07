@@ -44,6 +44,7 @@ export function SupportClient() {
 
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
+  const [ticketsNeedLogin, setTicketsNeedLogin] = useState(false);
   const [supportConfig, setSupportConfig] = useState<SupportConfig>({
     helplinePhone: '+91 6303563546',
     supportEmail: 'admin@veltria.in',
@@ -74,14 +75,14 @@ export function SupportClient() {
         setSupportConfig(cfgRes.data);
       }
 
-      // 2. Fetch user's tickets from database
-      let userEmail = '';
+      // 2. Fetch user's tickets from database (requires a signed-in session)
+      let hasSession = false;
       if (typeof window !== 'undefined') {
         try {
+          hasSession = !!localStorage.getItem('safecircle_token');
           const stored = localStorage.getItem('safecircle_user');
           if (stored) {
             const u = JSON.parse(stored);
-            if (u.email) userEmail = u.email;
             if (u.displayName || u.username) setContactName(u.displayName || u.username);
             if (u.email) setContactEmail(u.email);
           }
@@ -90,9 +91,18 @@ export function SupportClient() {
         }
       }
 
-      const ticketsRes = await api.getSupportTickets(userEmail);
-      if (ticketsRes.ok && ticketsRes.data) {
-        setTickets(ticketsRes.data);
+      if (!hasSession) {
+        setTickets([]);
+        setTicketsNeedLogin(true);
+      } else {
+        const ticketsRes = await api.getSupportTickets();
+        if (ticketsRes.ok && ticketsRes.data) {
+          setTickets(ticketsRes.data);
+          setTicketsNeedLogin(false);
+        } else if (ticketsRes.status === 401 || ticketsRes.status === 403) {
+          setTickets([]);
+          setTicketsNeedLogin(true);
+        }
       }
     } catch (err) {
       console.warn('Failed to load support data from DB:', err);
@@ -258,6 +268,17 @@ export function SupportClient() {
               <SupportTicketSkeleton key={i} />
             ))}
           </div>
+        ) : ticketsNeedLogin && tickets.length === 0 ? (
+          <Card className="p-8 text-center text-xs text-slate-500">
+            <LifeBuoy className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+            <p className="font-bold text-slate-900">Sign in to view your tickets</p>
+            <p>
+              <Link href="/login?redirect=/support" className="text-brand font-semibold">
+                Log in
+              </Link>{' '}
+              to track the status of support tickets you have raised.
+            </p>
+          </Card>
         ) : tickets.length > 0 ? (
           <div className="space-y-2.5">
             {tickets.map((t) => (

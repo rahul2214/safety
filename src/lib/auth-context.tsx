@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { REFRESH_TOKEN_KEY } from '@/lib/api-client';
+import { apiCache } from '@/lib/api-cache';
 
 export interface AuthUser {
   id: string;
@@ -64,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const onRefreshed = () => setToken(localStorage.getItem('safecircle_token'));
     const onExpired = () => {
+      apiCache.clear();
       setToken(null);
       setUser(null);
     };
@@ -112,6 +114,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           isAnonymous: false,
         };
 
+        // Drop any cached responses from a previous (possibly different) user.
+        apiCache.clear();
         setToken(accessToken);
         setUser(userData);
         localStorage.setItem('safecircle_token', accessToken);
@@ -175,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           isAnonymous: false,
         };
 
+        apiCache.clear();
         if (accessToken) {
           setToken(accessToken);
           localStorage.setItem('safecircle_token', accessToken);
@@ -198,6 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    apiCache.clear();
     setToken(null);
     setUser(null);
     localStorage.removeItem('safecircle_token');

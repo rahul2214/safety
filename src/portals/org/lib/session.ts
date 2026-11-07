@@ -61,7 +61,25 @@ export function getStoredUser<T>(): T | null {
   }
 }
 
+// Listeners notified whenever the session starts or ends (used to drop cached API data).
+const sessionChangeListeners = new Set<() => void>();
+
+export function onSessionChange(listener: () => void) {
+  sessionChangeListeners.add(listener);
+}
+
+function notifySessionChange() {
+  sessionChangeListeners.forEach((listener) => {
+    try {
+      listener();
+    } catch {
+      // ignore listener failures
+    }
+  });
+}
+
 export function saveSession(token: string, user: unknown) {
+  notifySessionChange();
   const s = store();
   if (!s) return;
 
@@ -80,6 +98,7 @@ export function saveUser(user: unknown) {
 }
 
 export function clearSession() {
+  notifySessionChange();
   const s = store();
   if (!s) return;
 

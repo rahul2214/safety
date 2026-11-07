@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '@/components/ClientProviders';
+import { GoogleAnalytics } from '@/components/seo/GoogleAnalytics';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -52,9 +52,6 @@ export const metadata: Metadata = {
     email: false,
     address: false,
     telephone: false,
-  },
-  alternates: {
-    canonical: '/',
   },
   robots: {
     index: true,
@@ -105,8 +102,6 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-SABHIJUDE01';
-
 export default function RootLayout({
   children,
 }: {
@@ -115,20 +110,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable}`}>
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_ID}', {
-              page_path: window.location.pathname,
-            });
-          `}
-        </Script>
+        <GoogleAnalytics />
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

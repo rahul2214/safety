@@ -16,6 +16,8 @@ export default function robots(): MetadataRoute.Robots {
           '/safety-measures',
           '/resources',
           '/organization-request',
+          // '/org' disallow is a prefix match; keep public org pages crawlable explicitly.
+          '/organizations',
           '/feed',
           '/privacy',
           '/support',
@@ -24,8 +26,8 @@ export default function robots(): MetadataRoute.Robots {
           '/posts/',
         ],
         disallow: [
-          '/admin/',
-          '/org/',
+          '/admin',
+          '/org',
           '/api/',
           '/profile',
           '/settings',
