@@ -1,7 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  // Standalone mode is only needed for self-hosted container / Docker deployments.
+  // On Vercel, Vercel natively handles serverless function packaging and onBuildComplete
+  // fails with ENOENT for next-server.js.nft.json when standalone is forced.
+  output: process.env.VERCEL ? undefined : 'standalone',
   poweredByHeader: false,
   compress: true,
   images: {
