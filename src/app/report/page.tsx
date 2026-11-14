@@ -16,6 +16,7 @@ import {
   Home,
   Shield,
   HelpCircle,
+  Map as MapIcon,
   Clock,
   Calendar,
   Compass,
@@ -46,12 +47,18 @@ import {
 } from'@/lib/reports-store';
 import { api, PostVisibility } from'@/lib/api-client';
 import { useAuth } from'@/lib/auth-context';
+import { MapPinPicker } from '@/components/MapPinPicker';
+import type { RequestPin } from '@/lib/requests';
 
 // Client-side mirrors of the backend's SafetyContentModerator text checks, so problems surface on the Details step
 const LINK_PATTERN = /(?:bit\.ly|tinyurl\.com|t\.me|wa\.me|chat\.whatsapp\.com|shorturl\.at|ow\.ly|is\.gd|buff\.ly)/i;
 const CHAR_REPEAT_PATTERN = /(.)\1{5,}/;
 const WORD_LOOP_PATTERN = /\b([a-z]{2,15})\b(?:\s+\1\b){3,}/i;
 const CONSONANT_RUN_PATTERN = /\b[bcdfghjklmnpqrstvwxyz]{9,}\b/i;
+
+// UGC's national anti-ragging helpline, shown as soon as the Ragging category is chosen.
+const ANTI_RAGGING_HELPLINE = '1800-180-5522';
+const ANTI_RAGGING_EMAIL = 'helpline@antiragging.in';
 
 export default function ReportProblemPage() {
   const router = useRouter();
@@ -79,6 +86,8 @@ export default function ReportProblemPage() {
   const [locationType, setLocationType] = useState<ReportLocationType>('CURRENT_GPS');
   const [manualLocation, setManualLocation] = useState<string>('');
   const [gpsCoordinates, setGpsCoordinates] = useState<{ latitude: number; longitude: number; accuracy: number } | null>(null);
+  // A place chosen on the map instead of the reporter's own position.
+  const [mapPin, setMapPin] = useState<RequestPin | null>(null);
   const [locLoading, setLocLoading] = useState(false);
   const [locError, setLocError] = useState<string | null>(null);
 
@@ -90,6 +99,12 @@ export default function ReportProblemPage() {
 
   // Dynamic PostVisibility lookup from database
   const [visibilities, setVisibilities] = useState<PostVisibility[]>([]);
+
+  // A shortcut can open this form with the category already chosen.
+  useEffect(() => {
+  const wanted = new URLSearchParams(window.location.search).get('category')?.toLowerCase();
+  if (wanted === 'ragging') setCategory('Ragging');
+  }, []);
 
   useEffect(() => {
   async function loadVisibilities() {
@@ -119,8 +134,18 @@ export default function ReportProblemPage() {
   { id: 'College/University Issue', title: 'College/University Issue', subtitle: 'Campus safety, dorms, academic setting', icon: GraduationCap },
   { id: 'Domestic/Social Issue', title: 'Domestic/Social Issue', subtitle: 'Family, household, or partner safety concern', icon: Home },
   { id: 'Emergency', title: 'Immediate Danger / Emergency', subtitle: 'Active crisis requiring urgent escalation', icon: AlertCircle },
+  { id: 'Ragging', title: 'Ragging', subtitle: 'Ragging, bullying or hazing in a college, hostel or school', icon: Users },
   { id: 'Other', title: 'Other Safety Concern', subtitle: 'General safety problem or non-listed incident', icon: HelpCircle },
   ];
+
+  // A ragging report can be pinned to a place and is then shown to people near it.
+  const isRagging = category === 'Ragging';
+  const pinnedCoordinates =
+  locationType === 'CURRENT_GPS' && gpsCoordinates
+  ? { latitude: gpsCoordinates.latitude, longitude: gpsCoordinates.longitude }
+  : locationType === 'MAP_PIN' && mapPin
+  ? { latitude: mapPin.latitude, longitude: mapPin.longitude }
+  : null;
 
   // Severities config
   const severityList: {
@@ -214,6 +239,10 @@ export default function ReportProblemPage() {
   setStepError('Please enter a location name, landmark, or area description.');
   return;
   }
+  if (locationType === 'MAP_PIN' && !mapPin) {
+  setStepError('Click the map to pin the place, or choose another option.');
+  return;
+  }
   if (locationType === 'CURRENT_GPS' && !gpsCoordinates) {
   // Trigger auto-fetch if not yet acquired
   handleAcquireGps();
@@ -264,6 +293,8 @@ export default function ReportProblemPage() {
   : 'Current GPS Coordinates'
   : locationType === 'MANUAL'
   ? manualLocation
+  : locationType === 'MAP_PIN' && mapPin
+  ? mapPin.label
   : 'Location not shared (Privacy protected)';
 
   const incidentIso = incidentDateTime
@@ -283,8 +314,8 @@ export default function ReportProblemPage() {
   customDate: incidentDateTime,
   locationType,
   locationName,
-  latitude: gpsCoordinates?.latitude,
-  longitude: gpsCoordinates?.longitude,
+  latitude: pinnedCoordinates?.latitude,
+  longitude: pinnedCoordinates?.longitude,
   description,
   hasEvidence: false,
   evidenceNames: [],
@@ -307,6 +338,7 @@ export default function ReportProblemPage() {
   'Domestic/Social Issue': 8,
   'Emergency': 9,
   'Other': 10,
+  'Ragging': 11,
   };
 
   const severityIdMap: Record<ReportSeverity, number> = {
@@ -329,6 +361,8 @@ export default function ReportProblemPage() {
   audienceGenderId: postVisibilityId === 2 ? 1 : postVisibilityId === 3 ? 2 : postVisibilityId === 4 ? 3 : null,
   incidentDateTime: incidentIso,
   location: locationName,
+  // Only sent for a ragging report; the API drops a pin on anything else.
+  ...(isRagging && pinnedCoordinates ? pinnedCoordinates : {}),
   });
 
   if (visibility !== 'ONLY_ME' && !postRes.ok) {
@@ -341,7 +375,7 @@ export default function ReportProblemPage() {
 
   if (postRes.ok && postRes.data) {
   try {
-  const rawIds = localStorage.getItem('safecircle_my_post_ids');
+  const rawIds = localStorage.getItem('sabhijude_my_post_ids');
   const ids: number[] = rawIds ? JSON.parse(rawIds) : [];
   const newUuid = (postRes.data as any).uuid;
   const newId = (postRes.data as any).id;
@@ -351,11 +385,11 @@ export default function ReportProblemPage() {
   if (newId && !ids.includes(newId)) {
     ids.unshift(newId);
   }
-  localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.slice(0, 100)));
-  const rawPosts = localStorage.getItem('safecircle_my_posted_posts');
+  localStorage.setItem('sabhijude_my_post_ids', JSON.stringify(ids.slice(0, 100)));
+  const rawPosts = localStorage.getItem('sabhijude_my_posted_posts');
   const postList: any[] = rawPosts ? JSON.parse(rawPosts) : [];
   postList.unshift(postRes.data);
-  localStorage.setItem('safecircle_my_posted_posts', JSON.stringify(postList.slice(0, 100)));
+  localStorage.setItem('sabhijude_my_posted_posts', JSON.stringify(postList.slice(0, 100)));
   } catch (storageErr) {
   console.warn('Could not cache user post locally:', storageErr);
   }
@@ -408,6 +442,8 @@ export default function ReportProblemPage() {
       ? gpsCoordinates
         ? `Current location (±${Math.round(gpsCoordinates.accuracy)} m)`
         : 'Current location'
+      : locationType === 'MAP_PIN'
+      ? mapPin?.label || 'Not pinned yet'
       : locationType === 'MANUAL'
       ? manualLocation || 'Not entered yet'
       : 'Not shared';
@@ -567,6 +603,31 @@ export default function ReportProblemPage() {
                         );
                       })}
                     </div>
+
+                    {isRagging && (
+                      <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3">
+                        <span className="h-11 w-11 shrink-0 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                          <Phone className="h-5 w-5" />
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-ink">National Anti-Ragging Helpline</p>
+                          <p className="text-sm text-slate-600">
+                            <strong className="text-ink">{ANTI_RAGGING_HELPLINE}</strong> · toll-free, 24×7 (UGC) ·{' '}
+                            <a href={`mailto:${ANTI_RAGGING_EMAIL}`} className="underline">{ANTI_RAGGING_EMAIL}</a>
+                          </p>
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            Ragging is a punishable offence. You can call now and still file this report.
+                          </p>
+                        </div>
+                        <a
+                          href={`tel:${ANTI_RAGGING_HELPLINE.replace(/\D/g, '')}`}
+                          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-700"
+                        >
+                          <Phone className="h-4 w-4" /> Call helpline
+                        </a>
+                      </div>
+                    )}
+
                   </>
                 )}
 
@@ -671,7 +732,9 @@ export default function ReportProblemPage() {
                 {/* STEP 4 — where */}
                 {currentStep === 4 && (
                   <>
-                    {stepHeading('Where did it happen?', 'Helps others avoid unsafe spots. Exact coordinates are never shown publicly.')}
+                    {isRagging
+                      ? stepHeading('Where did it happen?', 'Share your location or pin the campus and people nearby will be alerted on their home screen. Only an approximate area is used.')
+                      : stepHeading('Where did it happen?', 'Helps others avoid unsafe spots. Exact coordinates are never shown publicly.')}
                     <div className="space-y-3">
                       {/* Current location */}
                       <div className={`${optionClass(locationType === 'CURRENT_GPS')} p-4 sm:p-5`}>
@@ -704,6 +767,32 @@ export default function ReportProblemPage() {
                               <Button variant="outline" size="sm" onClick={handleAcquireGps}>Get my location</Button>
                             )}
                             {locError && <span className="text-red-600 text-xs">{locError}</span>}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Pick on the map */}
+                      <div className={`${optionClass(locationType === 'MAP_PIN')} p-4 sm:p-5`}>
+                        <button type="button" onClick={() => setLocationType('MAP_PIN')} className="w-full flex items-center gap-4 text-left">
+                          <span className="h-11 w-11 shrink-0 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><MapIcon className="h-5 w-5" /></span>
+                          <span className="pr-8">
+                            <span className="block font-semibold text-ink">Pick a place on the map</span>
+                            <span className="block text-sm text-slate-500">
+                              Pin the spot if you are no longer there
+                            </span>
+                          </span>
+                        </button>
+                        {locationType === 'MAP_PIN' && selectedTick()}
+                        {locationType === 'MAP_PIN' && (
+                          <div className="mt-4">
+                            <MapPinPicker
+                              value={mapPin}
+                              onChange={(pin) => {
+                                setMapPin(pin);
+                                setStepError(null);
+                              }}
+                              initialCenter={gpsCoordinates}
+                            />
                           </div>
                         )}
                       </div>

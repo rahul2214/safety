@@ -1,5 +1,6 @@
 'use client';
 
+import { NearbyRequests } from '@/components/NearbyRequests';
 import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -67,6 +68,13 @@ function FeedPageContent() {
 
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get('q') || searchParams.get('search') || '';
+
+  // /feed?category=<id> opens the feed filtered to one topic (linked from Discover).
+  const urlCategory = searchParams.get('category');
+  useEffect(() => {
+    const id = Number(urlCategory);
+    if (Number.isInteger(id) && id > 0) setSelectedCategoryIds([id]);
+  }, [urlCategory]);
 
   // Single-Value Filters & Sorting
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>('ALL');
@@ -486,6 +494,9 @@ function FeedPageContent() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-16">
+      {/* Blood requests and ragging alerts pinned close to the reader */}
+      <NearbyRequests />
+
       {/* ============================================================ */}
       {/* 1. HERO HEADER: Public Safety Feed Banner */}
       {/* ============================================================ */}

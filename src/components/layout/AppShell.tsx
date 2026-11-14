@@ -7,6 +7,7 @@ import {
   Shield,
   Home,
   AlertCircle,
+  Droplet,
   FileText,
   MapPin,
   Users,
@@ -35,6 +36,7 @@ import { PageShellSkeleton } from '@/components/ui/Skeleton';
 import { Logo } from '@/components/ui/Logo';
 import { PublicHeader } from '@/components/public/PublicHeader';
 import { PublicFooter } from '@/components/public/PublicFooter';
+import { SuspendedScreen, useAccountStanding } from '@/components/SuspendedScreen';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -42,7 +44,7 @@ interface AppShellProps {
 
 const NAV_GROUPS = [
   { label: 'Overview', hrefs: ['/', '/feed', '/map'] },
-  { label: 'Take action', hrefs: ['/report', '/myposts', '/contacts', '/emergency'] },
+  { label: 'Take action', hrefs: ['/report', '/blood', '/myposts', '/contacts', '/emergency'] },
   { label: 'Learn & get help', hrefs: ['/resources', '/support'] },
   { label: 'Account', hrefs: ['/profile', '/settings'] },
 ];
@@ -75,6 +77,8 @@ export function AppShell({ children }: AppShellProps) {
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isPostPage;
   const isAuthPage = pathname === '/login' || pathname === '/signup';
 
+  const standing = useAccountStanding(isAuthenticated && !isAuthPage);
+
   // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -100,6 +104,7 @@ export function AppShell({ children }: AppShellProps) {
     { href: '/feed', label: 'Community feed', icon: Radio },
     // { href: '/map', label: 'Safety map', icon: MapPin },
     { href: '/report', label: 'Report an incident', icon: AlertCircle, isAction: true },
+    { href: '/blood', label: 'Request blood', icon: Droplet },
     { href: '/myposts', label: 'My reports', icon: FileText },
     { href: '/contacts', label: 'Trusted contacts', icon: Users },
     { href: '/emergency', label: 'Emergency', icon: AlertTriangle, isEmergency: true },
@@ -191,6 +196,18 @@ export function AppShell({ children }: AppShellProps) {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // A suspended member sees the suspension screen instead of the app — except Emergency.
+  // SOS must keep working whatever an account's standing.
+  if (standing.status?.suspended && pathname !== '/emergency') {
+    return (
+      <SuspendedScreen
+        status={standing.status}
+        onAppealSent={() => void standing.refresh()}
+        onSignOut={() => logout()}
+      />
     );
   }
 

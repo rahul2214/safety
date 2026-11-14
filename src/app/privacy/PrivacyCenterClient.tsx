@@ -92,15 +92,15 @@ export function PrivacyCenterClient() {
 
     // Load saved local preferences
     try {
-      const savedAnon = localStorage.getItem('safecircle_pref_anonymize_default');
+      const savedAnon = localStorage.getItem('sabhijude_pref_anonymize_default');
       if (savedAnon !== null) {
         setAnonymizeReportsDefault(savedAnon === 'true');
       }
-      const savedVis = localStorage.getItem('safecircle_pref_default_visibility_id');
+      const savedVis = localStorage.getItem('sabhijude_pref_default_visibility_id');
       if (savedVis !== null) {
         setDefaultVisibilityId(Number(savedVis));
       }
-      const savedLoc = localStorage.getItem('safecircle_pref_location_sharing');
+      const savedLoc = localStorage.getItem('sabhijude_pref_location_sharing');
       if (savedLoc !== null) {
         setLocationSharingEnabled(savedLoc === 'true');
       }
@@ -132,7 +132,7 @@ export function PrivacyCenterClient() {
   const handleToggleAnonymity = () => {
     const nextVal = !anonymizeReportsDefault;
     setAnonymizeReportsDefault(nextVal);
-    localStorage.setItem('safecircle_pref_anonymize_default', String(nextVal));
+    localStorage.setItem('sabhijude_pref_anonymize_default', String(nextVal));
     showToast(
       nextVal
         ? 'Default reporting set to Anonymous'
@@ -143,7 +143,7 @@ export function PrivacyCenterClient() {
 
   const handleChangeVisibility = (visId: number) => {
     setDefaultVisibilityId(visId);
-    localStorage.setItem('safecircle_pref_default_visibility_id', String(visId));
+    localStorage.setItem('sabhijude_pref_default_visibility_id', String(visId));
     const selected = visibilities.find((v) => v.id === visId)?.name || 'Everyone';
     showToast(`Default audience set to "${selected}"`, 'success');
   };
@@ -151,7 +151,7 @@ export function PrivacyCenterClient() {
   const handleToggleLocation = () => {
     const nextVal = !locationSharingEnabled;
     setLocationSharingEnabled(nextVal);
-    localStorage.setItem('safecircle_pref_location_sharing', String(nextVal));
+    localStorage.setItem('sabhijude_pref_location_sharing', String(nextVal));
     showToast(
       nextVal
         ? 'High-accuracy GPS enabled for emergency dispatches'

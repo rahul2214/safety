@@ -48,6 +48,7 @@ import {
 import { AuthGuard } from '@/components/AuthGuard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Modal } from '@/components/ui/Modal';
+import { BLOOD_GROUPS } from '@/lib/requests';
 
 interface UserProfileData {
   id?: number;
@@ -63,6 +64,7 @@ interface UserProfileData {
   dob?: string | null;
   phoneNumber?: string | null;
   occupationStatusId?: number | null;
+  bloodGroup?: string | null;
   pushNotifications?: boolean;
   role?: string;
   createdAt?: string;
@@ -120,6 +122,7 @@ export default function ProfilePage() {
     dob: '',
     genderId: '',
     occupationStatusId: '',
+    bloodGroup: '',
   });
   const [editSaving, setEditSaving] = useState<boolean>(false);
   const [editError, setEditError] = useState<string | null>(null);
@@ -172,6 +175,7 @@ export default function ProfilePage() {
           dob: u.dob || '',
           genderId: u.genderId ? u.genderId.toString() : '',
           occupationStatusId: u.occupationStatusId ? u.occupationStatusId.toString() : '',
+          bloodGroup: u.bloodGroup || '',
         });
       }
 
@@ -291,6 +295,8 @@ export default function ProfilePage() {
         dob: editForm.dob.trim() || undefined,
         genderId: editForm.genderId ? Number(editForm.genderId) : undefined,
         occupationStatusId: editForm.occupationStatusId ? Number(editForm.occupationStatusId) : undefined,
+        // An empty string clears a blood group that was removed.
+        bloodGroup: editForm.bloodGroup,
       });
 
       if (res.ok) {
@@ -586,6 +592,13 @@ export default function ProfilePage() {
             </div>
 
             <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
+              <p className="text-[11.5px] font-medium text-slate-600">Blood Group</p>
+              <p className={`text-[14px] font-bold mt-0.5 ${profile?.bloodGroup ? 'text-red-600' : 'text-ink'}`}>
+                {profile?.bloodGroup || 'Not specified'}
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-[16px] bg-mist border border-slate-200">
               <p className="text-[11.5px] font-medium text-slate-600">Emergency Phone</p>
               <p className="text-[14px] font-bold text-ink mt-0.5">
                 {profile?.phoneNumber || authUser?.phoneNumber || 'None linked'}
@@ -797,6 +810,25 @@ export default function ProfilePage() {
                 {occupations.map((o) => (
                   <option key={o.id} value={o.id.toString()}>
                     {o.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="profile-blood-group" className="block text-xs font-bold text-slate-700 mb-1">
+                Blood Group <span className="font-normal text-slate-400">(optional, only you can see it)</span>
+              </label>
+              <select
+                id="profile-blood-group"
+                value={editForm.bloodGroup}
+                onChange={(e) => setEditForm({ ...editForm, bloodGroup: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand bg-white"
+              >
+                <option value="">Not specified</option>
+                {BLOOD_GROUPS.map((group) => (
+                  <option key={group} value={group}>
+                    {group}
                   </option>
                 ))}
               </select>

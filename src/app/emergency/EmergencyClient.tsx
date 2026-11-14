@@ -1,5 +1,6 @@
 'use client';
 
+import { formatPhone, withCountryCode } from '@/lib/phone';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -39,6 +40,7 @@ export function EmergencyClient() {
   const [contactsLoading, setContactsLoading] = useState<boolean>(true);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [sosState, setSosState] = useState<'locating' | 'sending' | 'sent' | 'failed'>('locating');
 
   // Load Contacts
   useEffect(() => {
@@ -83,24 +85,42 @@ export function EmergencyClient() {
   const handleTriggerSos = async () => {
     setConfirmSosOpen(false);
     setIsActive(true);
-    setStatusMessage('Acquiring high-precision GPS coordinates...');
+    setSosState('locating');
+    setGpsData(null);
+    setStatusMessage(null);
 
+    // The alert goes out whether or not a GPS fix arrives: a late SOS without a location is
+    // still far better than none.
+    let coords: GeoLocationResult | null = null;
     try {
-      const coords = await getCurrentCoordinates();
+      coords = await getCurrentCoordinates();
       setGpsData(coords);
-      setStatusMessage('Broadcasting emergency alert to safety registry and guardians...');
+    } catch (err) {
+      console.warn('SOS location unavailable:', err);
+    }
 
-      await api.triggerSosBroadcast({
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        accuracy: coords.accuracy,
-        message: `EMERGENCY ALERT from ${user?.displayName || 'Sabhijude Member'}. Immediate assistance required.`,
-      });
+    setSosState('sending');
+    const res = await api.triggerSos({
+      latitude: coords?.latitude ?? null,
+      longitude: coords?.longitude ?? null,
+      accuracy: coords?.accuracy ?? null,
+    });
 
-      setStatusMessage('Emergency broadcast active. Guardians alerted.');
-    } catch (err: any) {
-      console.warn('SOS activation notice:', err);
-      setStatusMessage('SOS active. Could not acquire high-accuracy GPS.');
+    setSosState(res.ok ? 'sent' : 'failed');
+    if (res.ok) {
+      const who =
+        typeof res.contactsCount === 'number' && res.contactsCount > 0
+          ? `${res.contactsCount} emergency contact${res.contactsCount === 1 ? '' : 's'}`
+          : 'your emergency contacts';
+      setStatusMessage(
+        coords
+          ? `SOS sent to ${who} with your location.`
+          : `SOS sent to ${who}, but your location could not be found. Share it from below if you can.`
+      );
+    } else {
+      setStatusMessage(
+        `The SOS could not be sent (${res.error}). Call 112 now, or use the call and WhatsApp buttons below.`
+      );
     }
   };
 
@@ -161,26 +181,32 @@ export function EmergencyClient() {
             </div>
           </div>
 
-          {/* Telemetry info */}
+          {/* What has actually happened — never claim contacts were alerted before the API says so. */}
           <div className="p-3 rounded bg-red-700/80 text-xs space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-red-100">SOS Status</span>
-              <span className="font-bold text-white">Broadcast Engaged</span>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-red-100">SOS status</span>
+              <span className="font-bold text-white text-right">
+                {sosState === 'locating' && 'Finding your location...'}
+                {sosState === 'sending' && 'Sending...'}
+                {sosState === 'sent' && 'Sent'}
+                {sosState === 'failed' && 'NOT SENT'}
+              </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-red-100">Location Telemetry</span>
-              <span className="font-mono font-medium text-white">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-red-100">Location</span>
+              <span className="font-mono font-medium text-white text-right">
                 {gpsData
                   ? `${gpsData.latitude.toFixed(4)}, ${gpsData.longitude.toFixed(4)} (±${Math.round(gpsData.accuracy)}m)`
-                  : 'Acquiring GPS fix...'}
+                  : sosState === 'locating'
+                    ? 'Acquiring GPS fix...'
+                    : 'Unavailable'}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-red-100">Guardians Notified</span>
-              <span className="font-bold text-white">
-                {contacts.length > 0 ? `${contacts.length} Contacts Dispatched` : 'National Helpline Standby'}
-              </span>
-            </div>
+            {statusMessage && (
+              <p role="status" aria-live="assertive" className="pt-1.5 border-t border-red-500/60 font-semibold text-white leading-relaxed">
+                {statusMessage}
+              </p>
+            )}
           </div>
 
           {/* Quick Actions in Active Mode */}
@@ -311,7 +337,7 @@ export function EmergencyClient() {
             {/* Action 4: Contact Trusted Person */}
             {primaryContact ? (
               <a
-                href={`tel:${primaryContact.phoneNumber}`}
+                href={`tel:${withCountryCode(primaryContact.phoneNumber)}`}
                 className="p-4 rounded-lg border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center gap-3">
@@ -322,7 +348,7 @@ export function EmergencyClient() {
                     <p className="text-xs font-bold text-slate-900">
                       Call {primaryContact.name} ({primaryContact.relationship})
                     </p>
-                    <p className="text-[11px] text-slate-500">{primaryContact.phoneNumber}</p>
+                    <p className="text-[11px] text-slate-500">{formatPhone(primaryContact.phoneNumber)}</p>
                   </div>
                 </div>
                 <span className="text-xs font-semibold text-slate-700">Dial &rarr;</span>

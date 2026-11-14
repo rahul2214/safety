@@ -1,5 +1,5 @@
 /**
- * SafeCircle design tokens matching the Stitch design and mobile app 1:1.
+ * Sabhijude design tokens matching the Stitch design and mobile app 1:1.
  */
 export const PALETTE = {
   canvas: '#09090f',

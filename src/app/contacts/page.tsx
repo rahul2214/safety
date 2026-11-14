@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from'react';
 import Link from'next/link';
+import { COUNTRY_CODE, formatPhone, isValidIndianMobile, nationalDigits, withCountryCode } from '@/lib/phone';
 import {
   Users,
   UserPlus,
@@ -81,11 +82,17 @@ export default function TrustedContactsPage() {
   e.preventDefault();
   if (!name.trim() || !phone.trim()) return;
 
+  if (!isValidIndianMobile(phone)) {
+  showToast('Enter a valid 10-digit mobile number. The +91 country code is added for you.', 'error');
+  return;
+  }
+
   setSubmitting(true);
   try {
   const res = await api.createEmergencyContact({
   name: name.trim(),
-  phoneNumber: phone.trim(),
+  // Saved with the country code, so the SOS text and WhatsApp message can be delivered.
+  phoneNumber: `${COUNTRY_CODE}${phone}`,
   relationship,
   isPrimary: isPrimary || contacts.length === 0,
   });
@@ -277,7 +284,7 @@ export default function TrustedContactsPage() {
   </div>
 
   <p className="text-xs text-slate-500">
-  {contact.relationship} • {contact.phoneNumber}
+  {contact.relationship} • {formatPhone(contact.phoneNumber)}
   </p>
   </div>
   </div>
@@ -285,7 +292,7 @@ export default function TrustedContactsPage() {
   {/* Actions */}
   <div className="flex items-center gap-2 self-end sm:self-center">
   <a
-  href={`tel:${contact.phoneNumber}`}
+  href={`tel:${withCountryCode(contact.phoneNumber)}`}
   className="p-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
   title="Call Contact"
   >
@@ -449,16 +456,25 @@ export default function TrustedContactsPage() {
   <label className="block text-xs font-semibold text-slate-700 mb-1">
   Phone Number <span className="text-red-500">*</span>
   </label>
+  <div className="flex h-10 rounded-lg border border-slate-200 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-600">
+  <span className="flex items-center px-3 bg-slate-50 border-r border-slate-200 text-xs font-bold text-slate-700 select-none">
+  {COUNTRY_CODE}
+  </span>
   <input
   type="tel"
-  placeholder="+91 98765 43210"
+  inputMode="numeric"
+  autoComplete="tel-national"
+  placeholder="98765 43210"
+  aria-label="Mobile number, without the country code"
   value={phone}
-  onChange={(e) => setPhone(e.target.value)}
+  // nationalDigits also strips a pasted "+91" or leading 0, so the code is never doubled.
+  onChange={(e) => setPhone(nationalDigits(e.target.value))}
   required
-  className="w-full h-10 px-3 rounded-lg border border-slate-200 text-xs text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+  className="flex-1 min-w-0 h-full px-3 text-xs text-slate-900 bg-white focus:outline-none"
   />
+  </div>
   <p className="text-[11px] text-slate-400 mt-1">
-  Include country code for reliable SMS dispatch.
+  +91 is added automatically so SOS texts and WhatsApp alerts reach this number.
   </p>
   </div>
 

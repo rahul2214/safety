@@ -48,8 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Initialize auth state from localStorage
   useEffect(() => {
     try {
-      const storedToken = localStorage.getItem('safecircle_token');
-      const storedUser = localStorage.getItem('safecircle_user');
+      const storedToken = localStorage.getItem('sabhijude_token');
+      const storedUser = localStorage.getItem('sabhijude_user');
       if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
@@ -63,17 +63,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // api-client renews expired tokens and ends dead sessions; keep React state in step with it
   useEffect(() => {
-    const onRefreshed = () => setToken(localStorage.getItem('safecircle_token'));
+    const onRefreshed = () => setToken(localStorage.getItem('sabhijude_token'));
     const onExpired = () => {
       apiCache.clear();
       setToken(null);
       setUser(null);
     };
-    window.addEventListener('safecircle_token_refreshed', onRefreshed);
-    window.addEventListener('safecircle_auth_expired', onExpired);
+    window.addEventListener('sabhijude_token_refreshed', onRefreshed);
+    window.addEventListener('sabhijude_auth_expired', onExpired);
     return () => {
-      window.removeEventListener('safecircle_token_refreshed', onRefreshed);
-      window.removeEventListener('safecircle_auth_expired', onExpired);
+      window.removeEventListener('sabhijude_token_refreshed', onRefreshed);
+      window.removeEventListener('sabhijude_auth_expired', onExpired);
     };
   }, []);
 
@@ -118,9 +118,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         apiCache.clear();
         setToken(accessToken);
         setUser(userData);
-        localStorage.setItem('safecircle_token', accessToken);
+        localStorage.setItem('sabhijude_token', accessToken);
         storeRefreshToken(data);
-        localStorage.setItem('safecircle_user', JSON.stringify(userData));
+        localStorage.setItem('sabhijude_user', JSON.stringify(userData));
         return { success: true };
       } else {
         const errorMsg =
@@ -182,11 +182,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         apiCache.clear();
         if (accessToken) {
           setToken(accessToken);
-          localStorage.setItem('safecircle_token', accessToken);
+          localStorage.setItem('sabhijude_token', accessToken);
           storeRefreshToken(data);
         }
         setUser(userData);
-        localStorage.setItem('safecircle_user', JSON.stringify(userData));
+        localStorage.setItem('sabhijude_user', JSON.stringify(userData));
         return { success: true };
       } else {
         const errorMsg =
@@ -206,16 +206,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     apiCache.clear();
     setToken(null);
     setUser(null);
-    localStorage.removeItem('safecircle_token');
+    localStorage.removeItem('sabhijude_token');
     localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem('safecircle_user');
+    localStorage.removeItem('sabhijude_user');
   };
 
   const setAnonymousMode = (anon: boolean) => {
     if (user) {
       const updated = { ...user, isAnonymous: anon };
       setUser(updated);
-      localStorage.setItem('safecircle_user', JSON.stringify(updated));
+      localStorage.setItem('sabhijude_user', JSON.stringify(updated));
     }
   };
 

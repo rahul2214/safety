@@ -492,7 +492,7 @@ export function SafetyMapClient() {
   `;
 
   const customIcon = L.divIcon({
-  className: 'safecircle-map-pin',
+  className: 'sabhijude-map-pin',
   html: iconHtml,
   iconSize: [32, 32],
   iconAnchor: [16, 16],

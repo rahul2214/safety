@@ -12,15 +12,20 @@ import {
   ShieldAlert,
   Radio,
 } from 'lucide-react';
+import Link from 'next/link';
 import { getCurrentCoordinates, buildEmergencySosText, buildWhatsAppLink, type GeoLocationResult } from '@/lib/location';
+import { api, type EmergencyContact } from '@/lib/api-client';
+import { withCountryCode } from '@/lib/phone';
 
 interface SosModalProps {
   isOpen: boolean;
   onClose: () => void;
-  primaryContactPhone?: string;
 }
 
-export function SosModal({ isOpen, onClose, primaryContactPhone = '919876543210' }: SosModalProps) {
+export function SosModal({ isOpen, onClose }: SosModalProps) {
+  // The signed-in user's own emergency contacts. The alert goes to them and nobody else:
+  // this used to default to a placeholder number, so an SOS reached a stranger.
+  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [stage, setStage] = useState<'COUNTDOWN' | 'ACTIVE'>('COUNTDOWN');
   const [countdown, setCountdown] = useState(3);
   const [location, setLocation] = useState<GeoLocationResult | null>(null);
@@ -48,6 +53,25 @@ export function SosModal({ isOpen, onClose, primaryContactPhone = '919876543210'
         });
       }, 1000);
 
+      // Load the people to alert. Only attempted for a signed-in user; a guest has none.
+      // A failure leaves the list empty, and the buttons then let the user pick a recipient.
+      let hasSession = false;
+      try {
+        hasSession = !!localStorage.getItem('sabhijude_token');
+      } catch {
+        hasSession = false;
+      }
+      if (hasSession) {
+        api
+          .getEmergencyContacts()
+          .then((res) => {
+            if (res.ok && Array.isArray(res.data)) setContacts(res.data);
+          })
+          .catch(() => {});
+      } else {
+        setContacts([]);
+      }
+
       // Fetch Geolocation
       getCurrentCoordinates()
         .then((loc) => {
@@ -74,8 +98,19 @@ export function SosModal({ isOpen, onClose, primaryContactPhone = '919876543210'
   };
 
   const sosText = buildEmergencySosText(location || undefined);
-  const whatsAppLink = buildWhatsAppLink(primaryContactPhone, sosText);
-  const smsLink = `sms:${primaryContactPhone}?body=${encodeURIComponent(sosText)}`;
+
+  const reachable = contacts.filter((c) => withCountryCode(c.phoneNumber));
+  const primaryContact = reachable.find((c) => c.isPrimary) ?? reachable[0] ?? null;
+
+  // WhatsApp can address one person, so it goes to the primary contact. With no saved
+  // contact the link carries no number and WhatsApp asks who to send it to.
+  const whatsAppLink = primaryContact
+    ? buildWhatsAppLink(primaryContact.phoneNumber, sosText)
+    : `https://wa.me/?text=${encodeURIComponent(sosText)}`;
+
+  // SMS goes to every saved contact, each with its +91 country code.
+  const smsRecipients = reachable.map((c) => withCountryCode(c.phoneNumber)).join(',');
+  const smsLink = `sms:${smsRecipients}?body=${encodeURIComponent(sosText)}`;
 
   const copySosMessage = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -193,7 +228,21 @@ export function SosModal({ isOpen, onClose, primaryContactPhone = '919876543210'
               </a>
             </div>
 
-
+            {/* Who the alert goes to */}
+            {primaryContact ? (
+              <p className="text-[11px] text-[#a6a6be] leading-relaxed">
+                WhatsApp opens a chat with <strong className="text-white">{primaryContact.name}</strong>. SMS is
+                addressed to {reachable.length === 1 ? 'them' : `all ${reachable.length} of your emergency contacts`}.
+              </p>
+            ) : (
+              <p className="text-[11px] text-amber-300 leading-relaxed">
+                You have no emergency contacts saved, so you will be asked who to send the alert to.{' '}
+                <Link href="/contacts" onClick={handleAbort} className="font-semibold underline">
+                  Add contacts
+                </Link>{' '}
+                once you are safe.
+              </p>
+            )}
 
             {/* Direct Helplines */}
             <div className="space-y-1.5 pt-1">

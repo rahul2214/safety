@@ -61,10 +61,10 @@ export default function MyPostsPage() {
     setPosts((prev) => prev.filter((p) => p.uuid !== removedUuid));
     // The report form also keeps a local copy of the user's posts
     try {
-      const ids: any[] = JSON.parse(localStorage.getItem('safecircle_my_post_ids') || '[]');
-      localStorage.setItem('safecircle_my_post_ids', JSON.stringify(ids.filter((id) => id !== removedUuid && id !== deleteTarget.id)));
-      const cached: any[] = JSON.parse(localStorage.getItem('safecircle_my_posted_posts') || '[]');
-      localStorage.setItem('safecircle_my_posted_posts', JSON.stringify(cached.filter((p) => p?.uuid !== removedUuid && p?.id !== deleteTarget.id)));
+      const ids: any[] = JSON.parse(localStorage.getItem('sabhijude_my_post_ids') || '[]');
+      localStorage.setItem('sabhijude_my_post_ids', JSON.stringify(ids.filter((id) => id !== removedUuid && id !== deleteTarget.id)));
+      const cached: any[] = JSON.parse(localStorage.getItem('sabhijude_my_posted_posts') || '[]');
+      localStorage.setItem('sabhijude_my_posted_posts', JSON.stringify(cached.filter((p) => p?.uuid !== removedUuid && p?.id !== deleteTarget.id)));
     } catch {
       // Local cache is best-effort
     }

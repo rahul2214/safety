@@ -25,6 +25,8 @@ import {
   ChevronDown,
   ChevronUp,
   CornerDownRight,
+  Flag,
+  UserX,
 } from 'lucide-react';
 import { api, type BackendPost, type Solution, type SolutionReply } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
@@ -33,6 +35,7 @@ import { buildWhatsAppLink } from '@/lib/location';
 import { getCategoryName, getAuthorName } from '@/components/PostCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { ReportDialog, type ReportTarget } from '@/components/ReportDialog';
 import { Skeleton, SolutionSkeleton } from '@/components/ui/Skeleton';
 
 const SEVERITY: Record<string, { label: string; chip: string; dot: string }> = {
@@ -90,6 +93,8 @@ export function PostDetailClient() {
   const [facedThis, setFacedThis] = useState(false);
   const [facedCount, setFacedCount] = useState(0);
 
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  const [reported, setReported] = useState<Set<ReportTarget>>(new Set());
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
@@ -350,14 +355,14 @@ export function PostDetailClient() {
     }
     // The report form also keeps a local copy of the user's posts
     try {
-      const ids: any[] = JSON.parse(localStorage.getItem('safecircle_my_post_ids') || '[]');
+      const ids: any[] = JSON.parse(localStorage.getItem('sabhijude_my_post_ids') || '[]');
       localStorage.setItem(
-        'safecircle_my_post_ids',
+        'sabhijude_my_post_ids',
         JSON.stringify(ids.filter((id) => id !== post?.id && id !== post?.uuid && String(id) !== postIdentifier))
       );
-      const cached: any[] = JSON.parse(localStorage.getItem('safecircle_my_posted_posts') || '[]');
+      const cached: any[] = JSON.parse(localStorage.getItem('sabhijude_my_posted_posts') || '[]');
       localStorage.setItem(
-        'safecircle_my_posted_posts',
+        'sabhijude_my_posted_posts',
         JSON.stringify(cached.filter((p) => p?.id !== post?.id && p?.uuid !== post?.uuid && String(p?.id) !== postIdentifier))
       );
     } catch {
@@ -871,6 +876,35 @@ export function PostDetailClient() {
             </div>
           )}
 
+          {isAuthenticated && !isOwner && post?.uuid && (
+            <div className="rounded-3xl bg-white border border-slate-200/80 p-6 space-y-3">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Something wrong?</p>
+              <p className="text-sm text-slate-500">
+                Reports go to moderators. Nobody is told who sent them.
+              </p>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={reported.has('post')}
+                  onClick={() => setReportTarget('post')}
+                  leftIcon={<Flag className="h-4 w-4" />}
+                >
+                  {reported.has('post') ? 'Post reported' : 'Report this post'}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                  disabled={reported.has('author')}
+                  onClick={() => setReportTarget('author')}
+                  leftIcon={<UserX className="h-4 w-4" />}
+                >
+                  {reported.has('author') ? 'Author reported' : `Report ${isAnon ? 'the author' : author}`}
+                </Button>
+              </div>
+            </div>
+          )}
+
           {!isAuthenticated && (
             <div className="rounded-3xl bg-white border border-slate-200/80 p-6 space-y-3">
               <p className="font-semibold text-ink">Join the conversation</p>
@@ -882,6 +916,19 @@ export function PostDetailClient() {
           )}
         </aside>
       </div>
+
+      {post?.uuid && (
+        <ReportDialog
+          isOpen={reportTarget !== null}
+          target={reportTarget ?? 'post'}
+          postUuid={post.uuid}
+          onClose={() => setReportTarget(null)}
+          onReported={(target) => {
+            setReported((prev) => new Set(prev).add(target));
+            showToast('Thanks. Moderators will review your report.', 'success');
+          }}
+        />
+      )}
 
       <Modal isOpen={confirmDelete} onClose={() => !isDeleting && setConfirmDelete(false)} title="Delete this post?" size="sm">
         <div className="space-y-5">

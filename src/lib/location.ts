@@ -1,3 +1,5 @@
+import { withCountryCode } from './phone';
+
 /**
  * Geolocation and emergency messaging service.
  */
@@ -142,13 +144,15 @@ export function buildEmergencySosText(loc?: GeoLocationResult): string {
 }
 
 export function buildWhatsAppLink(phoneNumber: string, message: string): string {
-  const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+  // wa.me needs the full international number as digits; a bare 10-digit number is rejected.
+  const cleanNumber = withCountryCode(phoneNumber).replace(/[^0-9]/g, '');
   const encoded = encodeURIComponent(message);
   return `https://wa.me/${cleanNumber}?text=${encoded}`;
 }
 
 export function buildSmsLink(phoneNumber: string, message: string): string {
-  const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+  // Keeps the "+91": an SMS to a number without its country code is not reliably routed.
+  const cleanNumber = withCountryCode(phoneNumber);
   const encoded = encodeURIComponent(message);
   return `sms:${cleanNumber}?body=${encoded}`;
 }

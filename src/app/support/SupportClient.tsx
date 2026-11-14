@@ -79,8 +79,8 @@ export function SupportClient() {
       let hasSession = false;
       if (typeof window !== 'undefined') {
         try {
-          hasSession = !!localStorage.getItem('safecircle_token');
-          const stored = localStorage.getItem('safecircle_user');
+          hasSession = !!localStorage.getItem('sabhijude_token');
+          const stored = localStorage.getItem('sabhijude_user');
           if (stored) {
             const u = JSON.parse(stored);
             if (u.displayName || u.username) setContactName(u.displayName || u.username);

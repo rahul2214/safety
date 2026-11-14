@@ -1,5 +1,5 @@
 # ==========================================
-# Multi-stage Dockerfile for SafeCircle User Web Portal (Next.js)
+# Multi-stage Dockerfile for Sabhijude User Web Portal (Next.js)
 # ==========================================
 
 FROM node:22-alpine AS base

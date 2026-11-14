@@ -19,6 +19,7 @@ import {
   BookOpen,
   MessageCircle,
   Heart,
+  Droplet,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
@@ -27,6 +28,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Modal } from '@/components/ui/Modal';
 import { PublicLanding } from '@/components/PublicLanding';
 import { SosModal } from '@/components/SosModal';
+import { NearbyRequests } from '@/components/NearbyRequests';
 import { FakeCallModal } from '@/components/FakeCallModal';
 import { api, type Category, type EmergencyContact, type NotificationItem } from '@/lib/api-client';
 import { getCurrentCoordinates, buildEmergencySosText, buildWhatsAppLink } from '@/lib/location';
@@ -203,6 +205,7 @@ export function HomePageClient() {
     { label: 'Report an incident', hint: 'Anonymous if you prefer', icon: AlertCircle, href: '/report', tint: 'bg-brand-tint text-brand' },
     { label: 'Share my location', hint: 'Send a live GPS link', icon: Share2, onClick: handleShareLiveLocation, tint: 'bg-emerald-50 text-emerald-600', loading: shareLocationLoading },
     { label: 'Trusted contacts', hint: contacts === null ? 'Loading…' : `${contactCount} in your circle`, icon: Users, href: '/contacts', tint: 'bg-coral-tint text-coral' },
+    { label: 'Request blood', hint: 'Alert donors near you', icon: Droplet, href: '/blood', tint: 'bg-red-50 text-red-600' },
     // { label: 'Safety map', hint: 'Alerts near you', icon: MapPin, href: '/map', tint: 'bg-amber-50 text-amber-600' },
   ];
 
@@ -267,6 +270,9 @@ export function HomePageClient() {
           </div>
         </div>
       </section>
+
+      {/* Blood requests and ragging alerts pinned close to the reader */}
+      <NearbyRequests />
 
       {/* ── Quick actions ──────────────────────────────────── */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

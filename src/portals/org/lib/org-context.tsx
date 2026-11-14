@@ -4,7 +4,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { organizationsApi, type Organization } from './api';
 import { useAdminAuth } from './auth-context';
 
-const SELECTED_ORG_KEY = 'safecircle_selected_org';
+const SELECTED_ORG_KEY = 'sabhijude_selected_org';
 
 interface OrgContextValue {
   /** The organization every dashboard screen is currently scoped to. */

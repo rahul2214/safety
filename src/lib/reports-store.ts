@@ -13,7 +13,8 @@ export type ReportCategory =
   | 'College/University Issue'
   | 'Domestic/Social Issue'
   | 'Emergency'
-  | 'Other';
+  | 'Other'
+  | 'Ragging';
 
 export type ReportTimeframe =
   | 'Just now'
@@ -25,6 +26,7 @@ export type ReportTimeframe =
 export type ReportLocationType =
   | 'CURRENT_GPS'
   | 'MANUAL'
+  | 'MAP_PIN'
   | 'NONE';
 
 export type ReportVisibility =
@@ -84,7 +86,7 @@ export interface SafetyReport {
   notes?: string[];
 }
 
-const STORAGE_KEY = 'safecircle_user_reports_v2';
+const STORAGE_KEY = 'sabhijude_user_reports_v2';
 
 export const ReportsStore = {
   getReports(): SafetyReport[] {

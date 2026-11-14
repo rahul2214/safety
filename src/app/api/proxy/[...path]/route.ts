@@ -172,6 +172,12 @@ async function handleProxy(
   const accept = request.headers.get('accept');
   if (accept) headers.set('accept', accept);
 
+  // SOS retries reuse one key so the API never records the same emergency twice.
+  const idempotencyKey = request.headers.get('idempotency-key');
+  if (idempotencyKey && /^[A-Za-z0-9-]{8,64}$/.test(idempotencyKey)) {
+    headers.set('idempotency-key', idempotencyKey);
+  }
+
   // Forward the client IP so backend rate limiting applies per end user.
   const clientIp = getClientIp(request);
   const incomingXff = request.headers.get('x-forwarded-for');

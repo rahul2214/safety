@@ -23,6 +23,38 @@ export interface ApiResponse<T> {
   };
 }
 
+/** The signed-in member's standing, and where any appeal stands. Mirrors AccountStatusDto. */
+export interface AccountStatus {
+  suspended: boolean;
+  /** AUTOMATIC_REPORTS or MODERATOR. Null when in good standing. */
+  kind: 'AUTOMATIC_REPORTS' | 'MODERATOR' | null;
+  since: string | null;
+  appealPending: boolean;
+  appealSubmittedAt: string | null;
+  appealOutcome: 'UPHELD' | 'REVERSED' | null;
+}
+
+export interface DiscoverTopic {
+  categoryId: number;
+  name: string;
+  description?: string | null;
+  postCount: number;
+}
+
+export interface DiscoverHashtag {
+  id: number;
+  name: string;
+  usageCount: number;
+}
+
+/** GET /api/discover. Posts are in the same shape as the feed's. */
+export interface DiscoverFeed {
+  trending: BackendPost[];
+  topics: DiscoverTopic[];
+  successStories: BackendPost[];
+  trendingHashtags: DiscoverHashtag[];
+}
+
 export interface BackendPost {
   id: number;
   uuid?: string;
@@ -36,6 +68,8 @@ export interface BackendPost {
   createdAt: string;
   incidentDateTime?: string;
   location?: string;
+  /** Distance from the reader in km. Only present on results from the nearby endpoint. */
+  distanceKm?: number | null;
   supportCount: number;
   similarCount?: number;
   facedThisCount?: number;
@@ -77,6 +111,37 @@ export interface PostSeverityOption {
 export interface PostStatusOption {
   id: number;
   name: string;
+}
+
+/** A request for blood donors. Separate from posts. */
+export interface BloodRequest {
+  uuid: string;
+  bloodGroup: string;
+  unitsNeeded: number;
+  /** Name of the hospital or place. */
+  location: string;
+  latitude: number;
+  longitude: number;
+  /** The number donors should call, with country code. */
+  contactPhone: string;
+  note?: string | null;
+  status: 'OPEN' | 'FULFILLED' | 'CANCELLED';
+  requesterName: string;
+  /** Whether the signed-in user raised it, and so may close it. */
+  isMine: boolean;
+  /** Distance from the reader in km. Only present on nearby results. */
+  distanceKm?: number | null;
+  createdAt: string;
+}
+
+export interface CreateBloodRequestPayload {
+  bloodGroup: string;
+  unitsNeeded: number;
+  location: string;
+  latitude: number;
+  longitude: number;
+  contactPhone: string;
+  note?: string;
 }
 
 export interface EmergencyContact {
@@ -217,7 +282,7 @@ export interface DpdpExportResult {
 function getAuthHeader(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   const headers: Record<string, string> = {};
-  const token = localStorage.getItem('safecircle_token');
+  const token = localStorage.getItem('sabhijude_token');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -230,7 +295,7 @@ export interface RequestCacheOptions {
   ttlMs?: number;
 }
 
-export const REFRESH_TOKEN_KEY = 'safecircle_refresh_token';
+export const REFRESH_TOKEN_KEY = 'sabhijude_refresh_token';
 
 // Concurrent 401s share one refresh call, since Supabase rotates the refresh token on use
 let refreshInFlight: Promise<boolean> | null = null;
@@ -256,9 +321,9 @@ async function refreshSession(): Promise<boolean> {
         const accessToken: string | undefined = json?.data?.accessToken;
         if (!res.ok || !accessToken) return false;
 
-        localStorage.setItem('safecircle_token', accessToken);
+        localStorage.setItem('sabhijude_token', accessToken);
         if (json.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, json.data.refreshToken);
-        window.dispatchEvent(new Event('safecircle_token_refreshed'));
+        window.dispatchEvent(new Event('sabhijude_token_refreshed'));
         return true;
       } catch {
         return false;
@@ -303,16 +368,16 @@ async function request<T>(
 
     const status = res.status;
 
-    if (status === 401 && typeof window !== 'undefined' && localStorage.getItem('safecircle_token')) {
+    if (status === 401 && typeof window !== 'undefined' && localStorage.getItem('sabhijude_token')) {
       // Access token expired: renew it once and replay the request before giving up
       if (!isRetryAfterRefresh && !endpoint.startsWith('/api/auth/') && (await refreshSession())) {
         return request<T>(endpoint, options, retries, cacheOptions, true);
       }
-      localStorage.removeItem('safecircle_token');
+      localStorage.removeItem('sabhijude_token');
       localStorage.removeItem(REFRESH_TOKEN_KEY);
-      localStorage.removeItem('safecircle_user');
+      localStorage.removeItem('sabhijude_user');
       apiCache.clear();
-      window.dispatchEvent(new Event('safecircle_auth_expired'));
+      window.dispatchEvent(new Event('sabhijude_auth_expired'));
     }
 
     let json: any = null;
@@ -340,6 +405,12 @@ async function request<T>(
     if (isGet && retries > 0 && (status === 502 || status === 503 || status === 504)) {
       await new Promise((r) => setTimeout(r, 1000));
       return request<T>(endpoint, options, retries - 1, cacheOptions);
+    }
+
+    // An account can be suspended mid-session. The first refusal tells the app shell to
+    // re-check standing and show the suspension screen.
+    if (status === 403 && json?.error?.code === 'ACCOUNT_SUSPENDED' && typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('sabhijude_account_suspended'));
     }
 
     const errorMsg = json?.error?.message || json?.message || `Request failed with status ${status}`;
@@ -409,6 +480,9 @@ export const api = {
     audienceGenderId?: number | null;
     incidentDateTime?: string;
     location?: string;
+    /** The pinned place. Optional, and only kept for a Ragging report. */
+    latitude?: number;
+    longitude?: number;
   }) {
     const derivedSeverityId =
       payload.postSeverityId ||
@@ -436,8 +510,24 @@ export const api = {
         audienceGenderId: payload.audienceGenderId !== undefined ? payload.audienceGenderId : -1,
         incidentDateTime: payload.incidentDateTime,
         location: payload.location,
+        latitude: payload.latitude,
+        longitude: payload.longitude,
       }),
     });
+  },
+
+  /**
+   * Open ragging reports pinned near a position, nearest first.
+   * Pass a coarse position (see `coarse` in lib/requests.ts); the API does not store it.
+   * Never served from the client cache: it has to reflect a request posted a moment ago.
+   */
+  async getNearbyRequests(params: { lat: number; lng: number; radiusKm?: number; limit?: number }) {
+    const q = new URLSearchParams();
+    q.set('lat', String(params.lat));
+    q.set('lng', String(params.lng));
+    if (params.radiusKm) q.set('radiusKm', String(params.radiusKm));
+    if (params.limit) q.set('limit', String(params.limit));
+    return request<BackendPost[]>(`/api/posts/nearby?${q.toString()}`, {}, 1, { skipCache: true });
   },
 
   /** The signed-in user's own posts. The server identifies the user from the session token. */
@@ -485,6 +575,41 @@ export const api = {
     });
   },
 
+  /** Trending posts, topics with live counts, resolved stories and trending hashtags. */
+  async getDiscover() {
+    return request<DiscoverFeed>('/api/discover', {}, 1, { skipCache: true });
+  },
+
+  async getAccountStatus() {
+    return request<AccountStatus>('/api/account/status', {}, 1, { skipCache: true });
+  },
+
+  async submitAppeal(message: string) {
+    return request<AccountStatus>('/api/account/appeal', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+  },
+
+  /** Reports the post itself to moderators. */
+  async reportPost(uuid: string, reason: string, details?: string) {
+    return request<{ reported: boolean }>(`/api/posts/${encodeURIComponent(uuid)}/report`, {
+      method: 'POST',
+      body: JSON.stringify({ reason, details }),
+    });
+  },
+
+  /**
+   * Reports whoever wrote the post. Addressed to the post, not a user id, so the author of an
+   * anonymous post is never revealed to the reporter.
+   */
+  async reportPostAuthor(uuid: string, reason: string, details?: string) {
+    return request<{ reported: boolean }>(`/api/posts/${encodeURIComponent(uuid)}/report-author`, {
+      method: 'POST',
+      body: JSON.stringify({ reason, details }),
+    });
+  },
+
   async getSavedPosts(limit = 50) {
     return request<BackendPost[]>(`/api/posts/saved?limit=${limit}`);
   },
@@ -507,6 +632,31 @@ export const api = {
   // Categories
   async getCategories(forceRefresh = false) {
     return request<Category[]>('/api/categories', {}, 1, { forceRefresh });
+  },
+
+  // Blood requests — separate from posts: own table, own page, never in the report flow.
+  async createBloodRequest(payload: CreateBloodRequestPayload) {
+    return request<BloodRequest>('/api/bloodrequests', { method: 'POST', body: JSON.stringify(payload) });
+  },
+
+  /** Pass a coarse position (see `coarse` in lib/requests.ts); the API does not store it. */
+  async getNearbyBloodRequests(params: { lat: number; lng: number; radiusKm?: number }) {
+    const q = new URLSearchParams();
+    q.set('lat', String(params.lat));
+    q.set('lng', String(params.lng));
+    if (params.radiusKm) q.set('radiusKm', String(params.radiusKm));
+    return request<BloodRequest[]>(`/api/bloodrequests/nearby?${q.toString()}`, {}, 1, { skipCache: true });
+  },
+
+  async getMyBloodRequests() {
+    return request<BloodRequest[]>('/api/bloodrequests/mine', {}, 1, { skipCache: true });
+  },
+
+  async setBloodRequestStatus(uuid: string, status: 'FULFILLED' | 'CANCELLED') {
+    return request<BloodRequest>(`/api/bloodrequests/${encodeURIComponent(uuid)}/status`, {
+      method: 'POST',
+      body: JSON.stringify({ status }),
+    });
   },
 
   // Emergency Contacts
@@ -593,12 +743,23 @@ export const api = {
           isRead: Boolean(n.isRead),
           referenceType: n.referenceType,
           referenceId: n.referenceId,
-          link: n.referenceType === 'CONTACTS' ? '/contacts' : n.referenceId ? `/feed` : undefined,
+          // Post routes accept only the public uuid, so an alert opens the post it is about
+          // when the API supplies one, and is not a link otherwise.
+          link:
+            n.referenceType === 'CONTACTS'
+              ? '/contacts'
+              : String(n.referenceType || '').toUpperCase() === 'POST' && n.referenceUuid
+              ? `/posts/${n.referenceUuid}`
+              : undefined,
         };
       });
       return { ...res, data: normalized };
     }
     return res as { ok: boolean; data?: NotificationItem[]; error?: string; status: number };
+  },
+
+  async markNotificationRead(id: string | number) {
+    return request(`/api/notifications/${encodeURIComponent(String(id))}/read`, { method: 'POST' });
   },
 
   async markAllNotificationsRead() {
@@ -617,6 +778,8 @@ export const api = {
     dob?: string;
     occupationStatusId?: number;
     occupationStatus?: string;
+    /** Empty string clears it. */
+    bloodGroup?: string;
     displayName?: string;
     bio?: string;
   }) {
@@ -767,23 +930,58 @@ export const api = {
     );
   },
 
-  // Live Emergency SOS Broadcast
-  async triggerSosBroadcast(payload: {
-    latitude?: number;
-    longitude?: number;
-    accuracy?: number;
-    message?: string;
-  }) {
-    return request('/api/posts', {
-      method: 'POST',
-      body: JSON.stringify({
-        content: payload.message || 'EMERGENCY SOS: User has activated panic button.',
-        categoryId: 1, // Harassment / Emergency
-        severity: 'IMMEDIATE_DANGER',
-        isAnonymous: false,
-        visibility: 'PUBLIC',
-      }),
-    });
+  /**
+   * Records an SOS and alerts the member's emergency contacts — the same endpoint the
+   * mobile app uses. This used to publish a PUBLIC feed post instead, which told strangers
+   * and nobody who could help, and carried no location.
+   *
+   * Null coordinates mean "location unavailable"; never send 0,0. Retries reuse one
+   * Idempotency-Key, so a retry can never create a second incident.
+   */
+  async triggerSos(payload: {
+    latitude: number | null;
+    longitude: number | null;
+    accuracy?: number | null;
+    note?: string | null;
+  }): Promise<{ ok: boolean; message?: string; contactsCount?: number; error?: string }> {
+    const idempotencyKey =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+
+    const delays = [0, 2000, 5000];
+    let lastError = 'Could not reach the server.';
+
+    for (const delay of delays) {
+      if (delay) await new Promise((r) => setTimeout(r, delay));
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10_000);
+      const res = await request<{ message?: string; contactsCount?: number }>(
+        '/api/emergencycontacts/sos',
+        {
+          method: 'POST',
+          headers: { 'Idempotency-Key': idempotencyKey },
+          body: JSON.stringify({
+            latitude: payload.latitude,
+            longitude: payload.longitude,
+            accuracy: payload.accuracy == null ? null : Math.round(payload.accuracy),
+            note: payload.note ?? null,
+          }),
+          signal: controller.signal,
+        },
+        0
+      ).finally(() => clearTimeout(timer));
+
+      if (res.ok) {
+        return { ok: true, message: res.data?.message, contactsCount: res.data?.contactsCount };
+      }
+      lastError = res.error || lastError;
+      // Only a network failure or a server error is worth repeating.
+      if (res.status !== 0 && res.status < 500) break;
+    }
+
+    return { ok: false, error: lastError };
   },
 
   // Support & Help Desk Tickets

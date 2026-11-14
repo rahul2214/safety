@@ -80,6 +80,18 @@ export function AuthLayout({ title, subtitle, badge, children }: AuthLayoutProps
           </div>
         </main>
 
+        <p className="text-center text-xs text-slate-400 tracking-wide pt-2">
+          A product of{' '}
+          <a
+            href="https://veltria.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-extrabold tracking-[0.06em] text-slate-600 hover:text-brand hover:underline underline-offset-2 transition-colors"
+          >
+            Veltria
+          </a>
+        </p>
+
         <footer className="px-5 sm:px-10 py-5 text-xs text-slate-400 flex flex-wrap justify-between gap-2">
           <span>&copy; {new Date().getFullYear()} Sabhijude</span>
           <span className="flex gap-4">
