@@ -10,7 +10,7 @@ import { getCurrentCoordinates, reverseGeocodeCoords } from '@/lib/location';
 import { BLOOD_GROUPS, type RequestPin } from '@/lib/requests';
 import { COUNTRY_CODE, isCallableIndianNumber, nationalDigits } from '@/lib/phone';
 import { MapPinPicker } from '@/components/MapPinPicker';
-import { NearbyRequests, relativeTime } from '@/components/NearbyRequests';
+import { NearbyRequests, ShareBloodRequestButton, relativeTime } from '@/components/NearbyRequests';
 
 const MAX_NOTE = 500;
 const MAX_UNITS = 20;
@@ -477,6 +477,8 @@ export default function BloodRequestPage() {
                         {editingUuid === req.uuid ? 'Editing…' : 'Edit'}
                       </button>
                     )}
+                    {/* Only an open request is worth passing on. */}
+                    {isOpen && <ShareBloodRequestButton request={req} className="flex-1 py-1.5" />}
                     <button
                       type="button"
                       onClick={() => deleteRequest(req)}

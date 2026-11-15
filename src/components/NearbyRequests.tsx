@@ -2,9 +2,9 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Droplet, GraduationCap, MapPin, Navigation, Phone } from 'lucide-react';
+import { Check, Droplet, GraduationCap, MapPin, Navigation, Phone, Share2 } from 'lucide-react';
 import { api, type BackendPost, type BloodRequest } from '@/lib/api-client';
-import { coarse, formatDistance } from '@/lib/requests';
+import { bloodRequestShareText, coarse, formatDistance } from '@/lib/requests';
 import { withCountryCode } from '@/lib/phone';
 
 type Stage = 'checking' | 'ask' | 'locating' | 'ready' | 'unavailable';
@@ -23,7 +23,55 @@ export function relativeTime(iso: string): string {
 export const directionsUrl = (latitude: number, longitude: number) =>
   `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 
-/** One open blood request, with the two things a donor needs: call and directions. */
+/**
+ * Passes a blood request on: the device's share sheet where there is one (phones, most
+ * modern browsers), otherwise the message is copied for pasting into WhatsApp or SMS.
+ */
+export async function shareBloodRequest(request: BloodRequest): Promise<'shared' | 'copied' | 'cancelled' | 'failed'> {
+  const text = bloodRequestShareText(request);
+  if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    try {
+      await navigator.share({ title: `${request.bloodGroup} blood needed`, text });
+      return 'shared';
+    } catch (err: any) {
+      // Closing the share sheet is not an error worth reporting.
+      if (err?.name === 'AbortError') return 'cancelled';
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    return 'copied';
+  } catch {
+    return 'failed';
+  }
+}
+
+/** A Share button that says "Copied" for a moment when the message went to the clipboard. */
+export function ShareBloodRequestButton({ request, className = '' }: { request: BloodRequest; className?: string }) {
+  const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
+
+  const onClick = async () => {
+    const result = await shareBloodRequest(request);
+    if (result === 'copied' || result === 'failed') {
+      setState(result);
+      setTimeout(() => setState('idle'), 2500);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Share the ${request.bloodGroup} blood request`}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-ink transition hover:border-slate-300 ${className}`}
+    >
+      {state === 'copied' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Share2 className="h-3.5 w-3.5" />}
+      <span aria-live="polite">{state === 'copied' ? 'Copied' : state === 'failed' ? 'Could not share' : 'Share'}</span>
+    </button>
+  );
+}
+
+/** One open blood request, with what a donor needs: call, directions, and passing it on. */
 export function BloodRequestCard({ request }: { request: BloodRequest }) {
   const distance = formatDistance(request.distanceKm);
   return (
@@ -66,6 +114,7 @@ export function BloodRequestCard({ request }: { request: BloodRequest }) {
         >
           <Navigation className="h-3.5 w-3.5" /> Directions
         </a>
+        <ShareBloodRequestButton request={request} className="flex-1" />
       </div>
     </div>
   );

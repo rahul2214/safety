@@ -415,10 +415,11 @@ export function SafetyMapClient() {
   zoomControl: true,
   });
 
-  // CartoDB Voyager clean tile layer
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-  attribution:
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+  // The standard OpenStreetMap map: free and needs no API key. Its usage policy asks for
+  // the attribution below and for modest traffic; a busy deployment should move to a
+  // self-hosted or paid tile server.
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   maxZoom: 19,
   }).addTo(map);
 
