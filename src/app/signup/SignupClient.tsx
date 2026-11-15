@@ -23,10 +23,12 @@ import {
   MapPin,
   Users,
   Check,
+  Droplet,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { safeRedirect } from '@/lib/safe-redirect';
 import { api } from '@/lib/api-client';
+import { BLOOD_GROUPS } from '@/lib/requests';
 import { Logo } from '@/components/ui/Logo';
 import { AuthLayout } from '@/components/public/AuthLayout';
 
@@ -48,6 +50,8 @@ function SignupFormContent() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
+  // Optional. Empty string means "not chosen".
+  const [bloodGroup, setBloodGroup] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -138,7 +142,7 @@ function SignupFormContent() {
     }
 
     if (!isAgeConfirmed) {
-      setErrorMsg('You must confirm you are 18 years of age or older to join Sabhijude.');
+      setErrorMsg('You must confirm you are 10 years of age or older to join Sabhijude.');
       return;
     }
 
@@ -146,6 +150,17 @@ function SignupFormContent() {
 
     const standardPhone = cleanDigits.length === 10 ? '+91' + cleanDigits : '+' + cleanDigits;
     const result = await register(cleanName, cleanEmail, standardPhone, password);
+
+    // Registration itself does not take a blood group, so it is saved on the new profile
+    // straight away, before step 2, so that skipping step 2 does not lose it. A failure here
+    // must not block sign-up: it can still be set from the profile page.
+    if (result.success && bloodGroup) {
+      try {
+        await api.updateProfile({ bloodGroup });
+      } catch {
+        // Ignored on purpose; see above.
+      }
+    }
 
     setIsSubmitting(false);
 
@@ -301,6 +316,34 @@ function SignupFormContent() {
                     </p>
                   </div>
 
+                  {/* Blood Group (optional) */}
+                  <div className="space-y-1.5 text-left">
+                    <label htmlFor="bloodGroup" className="block text-xs font-semibold text-slate-700">
+                      Blood Group <span className="font-normal text-slate-500">(optional)</span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3.5 pointer-events-none text-red-500">
+                        <Droplet className="h-4 w-4" />
+                      </div>
+                      <select
+                        id="bloodGroup"
+                        value={bloodGroup}
+                        onChange={(e) => setBloodGroup(e.target.value)}
+                        className="w-full h-12 bg-white border border-slate-300 rounded-xl pl-10 pr-3.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors"
+                      >
+                        <option value="">Select blood group</option>
+                        {BLOOD_GROUPS.map((group) => (
+                          <option key={group} value={group}>
+                            {group}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-[11px] text-slate-500 pl-0.5">
+                      Only you can see this. You can change it later from your profile.
+                    </p>
+                  </div>
+
                   {/* Password Input */}
                   <div className="space-y-1.5 text-left">
                     <label htmlFor="password" className="block text-xs font-semibold text-slate-700">
@@ -410,7 +453,7 @@ function SignupFormContent() {
                       className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
                     <label htmlFor="ageCheck" className="text-xs text-slate-600 leading-snug cursor-pointer">
-                      I confirm I am <strong className="text-slate-900">18 years of age or older</strong> and
+                      I confirm I am <strong className="text-slate-900">10 years of age or older</strong> and
                       agree to the Sabhijude Community Guidelines and Emergency Response Protocols.
                     </label>
                   </div>
@@ -483,7 +526,7 @@ function SignupFormContent() {
                       />
                     </div>
                     <p className="text-[11px] text-slate-500 pl-0.5">
-                      Must be 18 years or older. Used strictly for demographic safety auditing and support
+                      Must be 10 years or older. Used strictly for demographic safety auditing and support
                       triage.
                     </p>
                   </div>
