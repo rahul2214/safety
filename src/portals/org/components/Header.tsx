@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useAdminAuth } from '@/portals/org/lib/auth-context';
 import { useOrg } from '@/portals/org/lib/org-context';
-import { Shield, Circle, Building2 } from 'lucide-react';
+import { Shield, Circle, Building2, Menu } from 'lucide-react';
 
 const TITLE_MAP: Record<string, { title: string; subtitle: string }> = {
   '/org/dashboard': {
@@ -32,7 +32,7 @@ const TITLE_MAP: Record<string, { title: string; subtitle: string }> = {
   },
 };
 
-export default function Header() {
+export default function Header({ onMenu }: { onMenu?: () => void }) {
   const pathname = usePathname();
   const { admin } = useAdminAuth();
   const { organization, organizations, selectOrganization } = useOrg();
@@ -43,23 +43,33 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 border-b border-[#e8e8f0] bg-white/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20 select-none">
-      <div>
-        <h1 className="text-sm font-bold text-[#16161d]">{meta.title}</h1>
-        <p className="text-[11.5px] text-[#5b5b6e]">{meta.subtitle}</p>
+    <header className="min-h-16 py-2 border-b border-[#e8e8f0] bg-white/80 backdrop-blur-md px-4 md:px-8 flex items-center justify-between gap-3 sticky top-0 z-20 select-none">
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          type="button"
+          onClick={onMenu}
+          aria-label="Open menu"
+          className="md:hidden -ml-1 h-10 w-10 shrink-0 rounded-[10px] flex items-center justify-center text-[#16161d] hover:bg-[#f1f1f6]"
+        >
+          <Menu size={20} />
+        </button>
+        <div className="min-w-0">
+          <h1 className="text-sm font-bold text-[#16161d] truncate">{meta.title}</h1>
+          <p className="hidden sm:block text-[11.5px] text-[#5b5b6e] truncate">{meta.subtitle}</p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4 shrink-0">
         {/* Active organization switcher */}
         {organization && (
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#f1edff] border border-[#6d4aff]/20 text-[11px] text-[#6d4aff]">
-            <Building2 size={13} />
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#f1edff] border border-[#6d4aff]/20 text-[11px] text-[#6d4aff] max-w-[140px] sm:max-w-[240px]">
+            <Building2 size={13} className="shrink-0" />
             {organizations.length > 1 ? (
               <select
                 value={organization.id}
                 onChange={(e) => selectOrganization(Number(e.target.value))}
                 aria-label="Active organization"
-                className="bg-transparent text-[#6d4aff] font-bold outline-none cursor-pointer"
+                className="min-w-0 truncate bg-transparent text-[#6d4aff] font-bold outline-none cursor-pointer"
               >
                 {organizations.map((o) => (
                   <option key={o.id} value={o.id} className="bg-white text-[#16161d]">
@@ -68,19 +78,19 @@ export default function Header() {
                 ))}
               </select>
             ) : (
-              <span className="font-bold">{organization.name}</span>
+              <span className="font-bold truncate">{organization.name}</span>
             )}
           </div>
         )}
 
         {/* Live status badge */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ecfdf5] border border-[#059669]/20 text-[#059669] text-[11px] font-semibold">
+        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ecfdf5] border border-[#059669]/20 text-[#059669] text-[11px] font-semibold">
           <Circle size={6} className="fill-[#059669] animate-pulse" />
           <span>API Connected</span>
         </div>
 
         {/* User preview */}
-        <div className="flex items-center gap-2 pl-3 border-l border-[#e8e8f0]">
+        <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#e8e8f0]">
           <div className="h-8 w-8 rounded-[10px] bg-[#f1edff] text-[#6d4aff] flex items-center justify-center font-bold text-xs">
             <Shield size={16} />
           </div>

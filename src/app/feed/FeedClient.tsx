@@ -602,9 +602,9 @@ function FeedPageContent() {
 
             {/* Search Query Chip */}
             {searchQuery.trim().length > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-white border border-slate-200 text-slate-800">
-                <span>Keyword: &quot;{searchQuery}&quot;</span>
-                <button type="button" onClick={() => handleSearchChange('')} className="hover:text-rose-500">
+              <span className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-white border border-slate-200 text-slate-800">
+                <span className="truncate max-w-[220px]">Keyword: &quot;{searchQuery}&quot;</span>
+                <button type="button" onClick={() => handleSearchChange('')} className="p-1.5 -m-1 rounded-full hover:text-rose-500">
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -617,13 +617,13 @@ function FeedPageContent() {
               return (
                 <span
                   key={catId}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-brand-tint text-brand border border-brand/30"
+                  className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-brand-tint text-brand border border-brand/30"
                 >
                   <span>Category: {label}</span>
                   <button
                     type="button"
                     onClick={() => toggleCategoryById(catId)}
-                    className="hover:text-rose-500"
+                    className="p-1.5 -m-1 rounded-full hover:text-rose-500"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -638,7 +638,7 @@ function FeedPageContent() {
               return (
                 <span
                   key={sevId}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200"
+                  className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200"
                 >
                   <span>Severity: {label}</span>
                   <button
@@ -659,7 +659,7 @@ function FeedPageContent() {
               return (
                 <span
                   key={stId}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"
                 >
                   <span>Status: {label}</span>
                   <button
@@ -675,7 +675,7 @@ function FeedPageContent() {
 
             {/* Timeframe Chip */}
             {selectedTimeframe !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+              <span className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
                 <span>Time: {selectedTimeframe}</span>
                 <button
                   type="button"
@@ -689,10 +689,10 @@ function FeedPageContent() {
 
             {/* Location Query Chip */}
             {locationQuery.trim().length > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-800">
+              <span className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-800">
                 <MapPin className="h-3 w-3 text-rose-500" />
                 <span>Loc: &quot;{locationQuery}&quot;</span>
-                <button type="button" onClick={() => setLocationQuery('')} className="hover:text-rose-500">
+                <button type="button" onClick={() => setLocationQuery('')} className="p-1.5 -m-1 rounded-full hover:text-rose-500">
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -700,9 +700,9 @@ function FeedPageContent() {
 
             {/* Has Location Only Chip */}
             {hasLocationOnly && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-800">
+              <span className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-800">
                 <span>With Location Tag</span>
-                <button type="button" onClick={() => setHasLocationOnly(false)} className="hover:text-rose-500">
+                <button type="button" onClick={() => setHasLocationOnly(false)} className="p-1.5 -m-1 rounded-full hover:text-rose-500">
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -712,7 +712,7 @@ function FeedPageContent() {
             {selectedAuthorTypes.map((auth) => (
               <span
                 key={auth}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200"
+                className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200"
               >
                 <span>Author: {auth === 'ANONYMOUS' ? 'Anonymous' : 'Verified'}</span>
                 <button type="button" onClick={() => toggleAuthorType(auth)} className="hover:text-purple-900">
@@ -723,9 +723,9 @@ function FeedPageContent() {
 
             {/* Sort Chip */}
             {sortBy !== 'NEWEST_INCIDENT' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-800">
+              <span className="inline-flex max-w-full items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-800">
                 <span>Sort: {sortBy.replace('_', ' ')}</span>
-                <button type="button" onClick={() => setSortBy('NEWEST_INCIDENT')} className="hover:text-rose-500">
+                <button type="button" onClick={() => setSortBy('NEWEST_INCIDENT')} className="p-1.5 -m-1 rounded-full hover:text-rose-500">
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -1187,7 +1187,7 @@ function FeedPageContent() {
       {/* ============================================================ */}
       <section className="space-y-3.5">
         {/* Results Count Header */}
-        <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 px-1">
           <span>
             Showing <strong>{filteredPosts.length}</strong> of <strong>{posts.length}</strong> reports
             {activeFilterCount > 0 ? ` (${activeFilterCount} filter criteria applied)` : ''}

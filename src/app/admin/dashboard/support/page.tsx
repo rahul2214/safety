@@ -241,11 +241,11 @@ export default function AdminSupportPage() {
           </form>
 
           {/* Priority & Category Selectors */}
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 gap-2 md:flex md:items-center">
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-3 py-2 rounded-[12px] bg-[#f7f7fa] border border-[#e8e8f0] text-xs font-semibold text-[#5b5b6e] focus:outline-none focus:border-[#6d4aff]"
+              className="w-full md:w-auto min-w-0 px-3 py-2 rounded-[12px] bg-[#f7f7fa] border border-[#e8e8f0] text-xs font-semibold text-[#5b5b6e] focus:outline-none focus:border-[#6d4aff]"
             >
               <option value="ALL">All Categories</option>
               <option value="Report Status">Report Status</option>
@@ -258,7 +258,7 @@ export default function AdminSupportPage() {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-3 py-2 rounded-[12px] bg-[#f7f7fa] border border-[#e8e8f0] text-xs font-semibold text-[#5b5b6e] focus:outline-none focus:border-[#6d4aff]"
+              className="w-full md:w-auto min-w-0 px-3 py-2 rounded-[12px] bg-[#f7f7fa] border border-[#e8e8f0] text-xs font-semibold text-[#5b5b6e] focus:outline-none focus:border-[#6d4aff]"
             >
               <option value="ALL">All Priorities</option>
               <option value="High">High</option>

@@ -434,7 +434,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="text-[13px] text-slate-600 flex flex-wrap items-center justify-center md:justify-start gap-4">
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 min-w-0 break-all">
                 <Mail className="h-3.5 w-3.5 text-slate-400" />
                 {profile?.email || authUser?.email || 'No email registered'}
               </span>
@@ -534,7 +534,7 @@ export default function ProfilePage() {
 
         {/* ─── 3. Demographic & Account Metadata ──────────────────────────── */}
         <section className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
             <div className="flex items-center gap-2">
               <UserCheck className="h-5 w-5 text-brand" />
               <h3 className="text-[16px] font-black text-ink">
@@ -609,7 +609,7 @@ export default function ProfilePage() {
 
         {/* ─── 4. Emergency Circle Guardians ─────────────────────────────── */}
         <section className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-brand" />
               <h3 className="text-[16px] font-black text-ink">
@@ -651,11 +651,11 @@ export default function ProfilePage() {
               {guardians.map((c) => (
                 <div
                   key={c.id}
-                  className="p-4 rounded-[16px] bg-mist border border-slate-200 flex items-center justify-between"
+                  className="p-4 rounded-[16px] bg-mist border border-slate-200 flex items-center justify-between gap-3"
                 >
-                  <div className="space-y-0.5">
+                  <div className="space-y-0.5 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-ink">
+                      <span className="text-sm font-bold text-ink truncate">
                         {c.name}
                       </span>
                       {c.isPrimary && (
@@ -672,7 +672,7 @@ export default function ProfilePage() {
                   </div>
                   <Link
                     href={`tel:${c.phoneNumber}`}
-                    className="p-2 rounded-[10px] bg-white text-[#059669] hover:bg-[#ecfdf5] transition border border-slate-200"
+                    className="h-10 w-10 shrink-0 flex items-center justify-center rounded-[10px] bg-white text-[#059669] hover:bg-[#ecfdf5] transition border border-slate-200"
                     title="Call contact"
                   >
                     <Phone className="h-4 w-4" />
@@ -693,7 +693,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="space-y-3">
-            <div className="p-4 rounded-[16px] bg-mist border border-slate-200 flex items-center justify-between">
+            <div className="p-4 rounded-[16px] bg-mist border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-[13.5px] font-bold text-ink">
                   High-Accuracy Geolocation Sensor
@@ -704,7 +704,7 @@ export default function ProfilePage() {
               </div>
               <button
                 onClick={handleTestLocation}
-                className="px-4 py-2 rounded-[12px] bg-white border border-slate-200 text-ink text-xs font-bold transition hover:border-brand shadow-xs"
+                className="shrink-0 self-start sm:self-auto px-4 py-2 rounded-[12px] bg-white border border-slate-200 text-ink text-xs font-bold transition hover:border-brand shadow-xs"
               >
                 Test Sensor
               </button>

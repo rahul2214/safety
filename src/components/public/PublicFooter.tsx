@@ -89,7 +89,7 @@ export function PublicFooter() {
         Sabhijude Footer
       </h2>
       <div className="public-container pt-16 pb-10">
-        <div className="grid gap-12 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4 space-y-5">
             <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Sabhijude Home">
               <span className="rounded-xl bg-white p-1">

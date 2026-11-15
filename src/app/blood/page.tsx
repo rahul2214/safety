@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { CheckCircle2, Compass, Droplet, Map as MapIcon, Minus, Plus } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { CheckCircle2, Compass, Droplet, Map as MapIcon, Minus, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/lib/auth-context';
@@ -42,6 +42,10 @@ export default function BloodRequestPage() {
   const [note, setNote] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  // Set while the form is editing one of the user's own requests instead of creating one.
+  const [editingUuid, setEditingUuid] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [mine, setMine] = useState<BloodRequest[]>([]);
   // Remounts the nearby list after a change, so a new request shows up straight away.
@@ -111,7 +115,7 @@ export default function BloodRequestPage() {
 
     setSubmitting(true);
     try {
-      const res = await api.createBloodRequest({
+      const payload = {
         bloodGroup,
         unitsNeeded: units,
         location: placeName.trim(),
@@ -119,26 +123,69 @@ export default function BloodRequestPage() {
         longitude: pin.longitude,
         contactPhone: `${COUNTRY_CODE}${phone}`,
         note: note.trim() || undefined,
-      });
+      };
+      const res = editingUuid
+        ? await api.updateBloodRequest(editingUuid, payload)
+        : await api.createBloodRequest(payload);
 
       if (!res.ok) {
-        showToast(res.error || 'Could not send the request. Please try again.', 'error');
+        showToast(
+          res.error || (editingUuid ? 'Could not save your changes.' : 'Could not send the request.') + ' Please try again.',
+          'error'
+        );
         return;
       }
 
-      showToast('Request sent. People near that place can now see it.', 'success');
-      setBloodGroup(null);
-      setUnits(1);
-      setPin(null);
-      setPlaceMode(null);
-      setPlaceName('');
-      setNote('');
-      setErrors({});
+      showToast(
+        editingUuid ? 'Changes saved.' : 'Request sent. People near that place can now see it.',
+        'success'
+      );
+      resetForm();
       void loadMine();
       setNearbyKey((k) => k + 1);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const resetForm = () => {
+    setEditingUuid(null);
+    setBloodGroup(null);
+    setUnits(1);
+    setPin(null);
+    setPlaceMode(null);
+    setPlaceName('');
+    setNote('');
+    setErrors({});
+  };
+
+  /** Loads one of the user's open requests into the form, to change and save. */
+  const startEdit = (req: BloodRequest) => {
+    setEditingUuid(req.uuid);
+    setBloodGroup(req.bloodGroup);
+    setUnits(req.unitsNeeded);
+    setPin({ latitude: req.latitude, longitude: req.longitude, label: req.location });
+    setPlaceName(req.location);
+    // Show the map with the saved pin, so the place can be moved as well as renamed.
+    setPlaceMode('map');
+    setPhone(nationalDigits(req.contactPhone));
+    setNote(req.note ?? '');
+    setErrors({});
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const deleteRequest = async (req: BloodRequest) => {
+    if (!window.confirm('Delete this request permanently? This cannot be undone.')) return;
+
+    const res = await api.deleteBloodRequest(req.uuid);
+    if (!res.ok) {
+      showToast(res.error || 'Could not delete the request.', 'error');
+      return;
+    }
+    if (editingUuid === req.uuid) resetForm();
+    setMine((prev) => prev.filter((r) => r.uuid !== req.uuid));
+    setNearbyKey((k) => k + 1);
+    showToast('Request deleted.', 'success');
   };
 
   const closeRequest = async (req: BloodRequest, status: 'FULFILLED' | 'CANCELLED') => {
@@ -153,6 +200,8 @@ export default function BloodRequestPage() {
       showToast(res.error || 'Could not update the request.', 'error');
       return;
     }
+    // A closed request cannot be edited, so leave edit mode if it was the one open.
+    if (editingUuid === req.uuid) resetForm();
     setMine((prev) => prev.map((r) => (r.uuid === req.uuid ? { ...r, status } : r)));
     setNearbyKey((k) => k + 1);
   };
@@ -172,16 +221,29 @@ export default function BloodRequestPage() {
   const visibleMine = [...mine.filter((r) => r.status === 'OPEN'), ...mine.filter((r) => r.status !== 'OPEN').slice(0, 5)];
 
   return (
-    <div className="max-w-5xl mx-auto grid gap-6 lg:grid-cols-5">
+    <div className="max-w-5xl mx-auto grid grid-cols-1 gap-6 lg:grid-cols-5">
       {/* Form */}
-      <form onSubmit={handleSubmit} noValidate className="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-5">
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        noValidate
+        className={`min-w-0 lg:col-span-3 rounded-2xl border bg-white p-4 sm:p-6 space-y-5 scroll-mt-20 ${
+          editingUuid ? 'border-brand ring-4 ring-brand/10' : 'border-slate-200'
+        }`}
+      >
         <div className="flex items-center gap-3">
           <span className="h-10 w-10 shrink-0 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
-            <Droplet className="h-5 w-5" />
+            {editingUuid ? <Pencil className="h-5 w-5" /> : <Droplet className="h-5 w-5" />}
           </span>
           <div>
-            <h1 className="font-display text-xl font-extrabold tracking-[-0.02em] text-ink">Request blood</h1>
-            <p className="text-sm text-slate-500">Shown to people near the place you choose. They can call the number you give.</p>
+            <h1 className="font-display text-xl font-extrabold tracking-[-0.02em] text-ink">
+              {editingUuid ? 'Edit your request' : 'Request blood'}
+            </h1>
+            <p className="text-sm text-slate-500">
+              {editingUuid
+                ? 'Change anything below and save. People nearby will see the updated request.'
+                : 'Shown to people near the place you choose. They can call the number you give.'}
+            </p>
           </div>
         </div>
 
@@ -253,7 +315,7 @@ export default function BloodRequestPage() {
           <span className={sectionLabel}>
             Where is it needed? <span className="text-red-600">*</span>
           </span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button type="button" onClick={useMyLocation} disabled={locating} className={placeOption(placeMode === 'gps')}>
               {locating ? (
                 <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
@@ -340,12 +402,22 @@ export default function BloodRequestPage() {
         </div>
 
         <Button type="submit" variant="primary" size="lg" loading={submitting} className="w-full">
-          Send request
+          {editingUuid ? 'Save changes' : 'Send request'}
         </Button>
+        {editingUuid && (
+          <button
+            type="button"
+            onClick={resetForm}
+            disabled={submitting}
+            className="w-full -mt-2 py-2 text-sm font-semibold text-slate-500 hover:text-ink transition"
+          >
+            Discard changes
+          </button>
+        )}
       </form>
 
       {/* My requests */}
-      <aside className="lg:col-span-2 space-y-3">
+      <aside className="min-w-0 lg:col-span-2 space-y-3">
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Your requests</h2>
         {visibleMine.length === 0 ? (
           <p className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
@@ -393,6 +465,27 @@ export default function BloodRequestPage() {
                       </button>
                     </div>
                   )}
+                  <div className="mt-2 flex gap-2">
+                    {isOpen && (
+                      <button
+                        type="button"
+                        onClick={() => startEdit(req)}
+                        disabled={editingUuid === req.uuid}
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-ink transition hover:border-slate-300 disabled:opacity-50"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        {editingUuid === req.uuid ? 'Editing…' : 'Edit'}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => deleteRequest(req)}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 transition hover:bg-red-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete
+                    </button>
+                  </div>
                 </li>
               );
             })}
@@ -401,7 +494,7 @@ export default function BloodRequestPage() {
       </aside>
 
       {/* Requests from other people nearby */}
-      <NearbyRequests key={nearbyKey} className="lg:col-span-5" />
+      <NearbyRequests key={nearbyKey} className="min-w-0 lg:col-span-5" />
     </div>
   );
 }

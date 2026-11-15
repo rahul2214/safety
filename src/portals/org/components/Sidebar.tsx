@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -10,13 +10,67 @@ import {
   BarChart3,
   Radio,
   Settings,
-  Shield,
   LogOut,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import { useAdminAuth } from '@/portals/org/lib/auth-context';
 
-export default function OrgSidebar() {
+/**
+ * The org portal's navigation.
+ *
+ * From the md breakpoint up it is a fixed column beside the content. Below that it would
+ * leave a phone about 120px for the page, so it becomes a drawer instead: hidden until the
+ * header's menu button opens it, and closed again on navigation, on the backdrop or on Escape.
+ */
+export default function OrgSidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
+  const pathname = usePathname();
+
+  // Navigating closes the drawer.
+  useEffect(() => {
+    onClose?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose?.();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
+  return (
+    <>
+      <aside className="hidden md:flex w-64 border-r border-[#e8e8f0] bg-white flex-col justify-between shrink-0 select-none sticky top-0 h-screen overflow-hidden">
+        <SidebarContent />
+      </aside>
+
+      {open && (
+        <div className="md:hidden fixed inset-0 z-40" role="dialog" aria-modal="true" aria-label="Navigation">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={onClose}
+            className="absolute inset-0 bg-black/40"
+          />
+          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-white flex flex-col justify-between overflow-y-auto shadow-xl select-none">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close menu"
+              className="absolute right-3 top-5 h-9 w-9 rounded-[10px] flex items-center justify-center text-[#5b5b6e] hover:bg-[#f1f1f6]"
+            >
+              <X size={18} />
+            </button>
+            <SidebarContent />
+          </aside>
+        </div>
+      )}
+    </>
+  );
+}
+
+function SidebarContent() {
   const pathname = usePathname();
   const { admin, logout } = useAdminAuth();
 
@@ -30,7 +84,7 @@ export default function OrgSidebar() {
   ];
 
   return (
-    <aside className="w-64 border-r border-[#e8e8f0] bg-white flex flex-col justify-between shrink-0 select-none sticky top-0 h-screen overflow-hidden">
+    <>
       <div>
         {/* Brand */}
         <div className="p-6 border-b border-[#e8e8f0]">
@@ -115,6 +169,6 @@ export default function OrgSidebar() {
           <span>Sign Out</span>
         </button>
       </div>
-    </aside>
+    </>
   );
 }

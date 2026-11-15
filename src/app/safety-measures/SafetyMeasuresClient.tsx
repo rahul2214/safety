@@ -208,7 +208,7 @@ export function SafetyMeasuresClient() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredHelplines.map((h) => (
               <div key={h.number} className="card-public p-6 flex flex-col justify-between space-y-5 hover:border-slate-300 transition">
                 <div className="space-y-3">
@@ -250,7 +250,7 @@ export function SafetyMeasuresClient() {
             <p className="text-slate-600 text-lg">Clear steps to take during different safety scenarios.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="rounded-3xl bg-white border border-slate-200 p-8 space-y-4">
               <span className="h-12 w-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold">
                 <AlertCircle className="h-6 w-6" aria-hidden="true" />
@@ -326,7 +326,7 @@ export function SafetyMeasuresClient() {
             <p className="text-slate-600 text-lg">Nothing here contacts anyone — it&rsquo;s a safe rehearsal.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="card-public p-7 flex flex-col justify-between gap-6">
               <div className="space-y-3">
                 <span className="h-12 w-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center">

@@ -132,7 +132,7 @@ export default function DashboardOverviewPage() {
     <div className="space-y-6 select-none pb-8">
       {/* Moderation Alert Banner */}
       {(moderationQueue > 0 || pendingReports > 0) && (
-        <div className="bg-white border-l-4 border-l-[#d97706] border border-[#e8e8f0] rounded-[16px] p-4 flex items-center justify-between shadow-sm">
+        <div className="bg-white border-l-4 border-l-[#d97706] border border-[#e8e8f0] rounded-[16px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-[12px] bg-[#fffbeb] text-[#d97706] flex items-center justify-center">
               <AlertTriangle size={20} />
@@ -182,9 +182,9 @@ export default function DashboardOverviewPage() {
 
       {/* OpenJev Triage & Live Incident Feed */}
       <section className="bg-white rounded-[20px] border border-[#e8e8f0] shadow-sm p-5 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-[16px] font-black text-[#16161d]">Incident Triage Queue</h2>
               <span className="px-2 py-0.5 rounded-full bg-[#f1edff] text-[#6d4aff] text-[10px] font-bold">
                 OpenJev Decision Engine

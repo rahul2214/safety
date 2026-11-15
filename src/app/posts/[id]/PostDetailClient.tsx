@@ -423,12 +423,12 @@ export function PostDetailClient() {
         <ArrowLeft className="h-4 w-4" /> Back
       </button>
 
-      <div className="grid lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* ── Main column ─────────────────────────────────────── */}
         <div className="lg:col-span-8 space-y-6">
           <article className="rounded-3xl bg-white border border-slate-200/80 overflow-hidden">
             <div className={`h-1.5 ${severity.dot}`} />
-            <div className="p-6 sm:p-8 space-y-6">
+            <div className="p-4 sm:p-8 space-y-6">
               {/* Author + status */}
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -463,13 +463,13 @@ export function PostDetailClient() {
               )}
 
               {/* Content */}
-              <p className="text-lg leading-relaxed text-ink whitespace-pre-wrap">{post.content}</p>
+              <p className="text-lg leading-relaxed text-ink whitespace-pre-wrap break-words">{post.content}</p>
 
               {/* Meta chips */}
               <div className="flex flex-wrap gap-2">
                 <span className="rounded-full bg-brand-tint px-3 py-1.5 text-sm font-semibold text-brand">{category}</span>
                 {post.location && (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-mist px-3 py-1.5 text-sm text-slate-700">
+                  <span className="inline-flex max-w-full items-center gap-1.5 rounded-full break-words bg-mist px-3 py-1.5 text-sm text-slate-700">
                     <MapPin className="h-3.5 w-3.5 text-coral" /> {post.location}
                   </span>
                 )}

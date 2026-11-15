@@ -259,8 +259,8 @@ export function PostCard({ post }: { post: PostItem }) {
   className={`relative bg-white rounded-[20px] border border-slate-200 border-l-4 ${stripeColor} p-4 sm:p-5 space-y-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group`}
   >
   {/* 1. Author row */}
-  <div className="flex items-center justify-between">
-  <div className="flex items-center gap-2.5">
+  <div className="flex items-center justify-between gap-2">
+  <div className="flex items-center gap-2.5 min-w-0">
   {/* 36px Avatar */}
   <div className="w-9 h-9 rounded-full bg-brand-tint text-brand flex items-center justify-center font-bold text-sm shrink-0">
   {isAnon ? (
@@ -272,7 +272,7 @@ export function PostCard({ post }: { post: PostItem }) {
 
   <div>
   <div className="flex items-center gap-1.5">
-  <span className="font-semibold text-ink text-[14px]">
+  <span className="font-semibold text-ink text-[14px] truncate">
   {displayName}
   </span>
   {isAnon && (
@@ -285,11 +285,11 @@ export function PostCard({ post }: { post: PostItem }) {
   </div>
   </div>
 
-  <div>{severityChip}</div>
+  <div className="shrink-0">{severityChip}</div>
   </div>
 
   {/* 2. Post content (line-clamped with 15px leading-21px Stitch spec) */}
-  <p className="text-[15px] text-ink leading-[21px] font-normal line-clamp-4">
+  <p className="text-[15px] text-ink leading-[21px] font-normal line-clamp-4 break-words">
   {post.content}
   </p>
 
@@ -344,7 +344,7 @@ export function PostCard({ post }: { post: PostItem }) {
   onClick={toggleSupport}
   title="Support this report"
   aria-label={`Support this report: ${supportCount} supports`}
-  className={`flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60 ${
+  className={`flex items-center gap-1.5 min-h-9 px-2 -mx-2 transition-colors cursor-pointer disabled:opacity-60 ${
   supported ? 'text-coral font-bold' : 'hover:text-ink'
   }`}
   >
@@ -361,7 +361,7 @@ export function PostCard({ post }: { post: PostItem }) {
   onClick={toggleFacedThis}
   title="I faced this incident too"
   aria-label={`I faced this too: ${similarCount} people faced this`}
-  className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors cursor-pointer disabled:opacity-60 ${
+  className={`flex items-center gap-1.5 min-h-9 px-2 py-1.5 rounded-full text-xs transition-colors cursor-pointer disabled:opacity-60 ${
   facedThis ? 'bg-brand-tint text-brand font-bold border border-brand/30' : 'hover:text-ink hover:bg-slate-100'
   }`}
   >

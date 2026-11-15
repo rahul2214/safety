@@ -78,7 +78,7 @@ export function AboutPageClient() {
 
       {/* The problem */}
       <section className="bg-ink text-white py-24 sm:py-28">
-        <div className="public-container grid lg:grid-cols-12 gap-12">
+        <div className="public-container grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-5 space-y-5">
             <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-coral">Why we built this</span>
             <h2 className="font-display text-3xl sm:text-[2.6rem] leading-[1.12] font-extrabold tracking-[-0.02em]">
@@ -89,7 +89,7 @@ export function AboutPageClient() {
               an unverified cab, a persistent follower, or a hostile workplace environment.
             </p>
           </div>
-          <div className="lg:col-span-7 grid sm:grid-cols-3 gap-4">
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { n: '01', t: 'Calling draws attention', b: 'Making a phone call in an escalated situation can be dangerous. Discreet emergency triggers and realistic fake calls help without alerting bystanders.' },
               { n: '02', t: 'Continuous tracking feels invasive', b: 'Constant GPS surveillance drains batteries and invades privacy. We access location telemetry strictly upon your direct emergency request.' },
@@ -112,7 +112,7 @@ export function AboutPageClient() {
             <span className="eyebrow">What we stand for</span>
             <h2 className="display-2">Four principles behind everything we build.</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {PILLARS.map((p) => (
               <div key={p.title} className="card-public p-7 space-y-4 hover:-translate-y-1 transition-transform">
                 <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${p.tint}`}>
@@ -140,7 +140,7 @@ export function AboutPageClient() {
               See all emergency helplines <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               { icon: ShieldCheck, t: 'POSH Act, 2013', b: 'Supports workplace grievance redressal with Internal Committees (IC), 90-day inquiry timelines, and Section 16 strict confidentiality.' },
               { icon: Phone, t: 'Emergency Response Support (112)', b: 'One-tap dialing to unified 112 ERSS, Women Helpline 1091, Distress 181, and National Cyber Crime 1930.' },
@@ -158,7 +158,7 @@ export function AboutPageClient() {
 
       {/* FAQ */}
       <section className="py-24 sm:py-32" aria-labelledby="faq-heading">
-        <div className="public-container grid lg:grid-cols-12 gap-12">
+        <div className="public-container grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-4 space-y-4">
             <span className="eyebrow">FAQ</span>
             <h2 id="faq-heading" className="display-2">Frequently asked questions.</h2>

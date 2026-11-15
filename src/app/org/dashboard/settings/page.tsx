@@ -62,8 +62,8 @@ export default function OrgSettingsPage() {
       )}
 
       {/* Join Code Card */}
-      <div className="bg-stone-900/60 border border-stone-800 rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-stone-900/60 border border-stone-800 rounded-2xl p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-3 mb-3">
           <div>
             <h2 className="text-sm font-bold text-white flex items-center gap-2">
               <Key size={16} className="text-indigo-400" />
@@ -73,13 +73,13 @@ export default function OrgSettingsPage() {
               Share this code or campus slug with students/employees to link their Sabhijude mobile app to this dashboard.
             </p>
           </div>
-          <div className="px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-indigo-300 text-[10px] font-black uppercase">
+          <div className="shrink-0 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-indigo-300 text-[10px] font-black uppercase">
             Active
           </div>
         </div>
 
         <div className="flex items-center gap-3 mt-4 bg-stone-950 p-3 rounded-xl border border-stone-800">
-          <code className="text-sm font-mono font-bold text-indigo-300 flex-1">{joinCode}</code>
+          <code className="text-sm font-mono font-bold text-indigo-300 flex-1 min-w-0 break-all">{joinCode}</code>
           <button
             onClick={handleCopyCode}
             className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold flex items-center gap-1.5 transition"
@@ -91,7 +91,7 @@ export default function OrgSettingsPage() {
       </div>
 
       {/* Institutional Details */}
-      <form onSubmit={handleSave} className="bg-stone-900/40 border border-stone-800 rounded-2xl p-6 space-y-4 text-xs">
+      <form onSubmit={handleSave} className="bg-stone-900/40 border border-stone-800 rounded-2xl p-4 sm:p-6 space-y-4 text-xs">
         <h3 className="text-xs font-bold uppercase tracking-wider text-stone-400 border-b border-stone-800 pb-2">
           Control Room Dispatch Coordinates
         </h3>

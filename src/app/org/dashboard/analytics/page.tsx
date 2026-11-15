@@ -103,10 +103,10 @@ export default function OrgAnalyticsPage() {
       </div>
 
       {/* Hero Banner: Operations Score & Executive Summary */}
-      <div className="bg-stone-900/60 border border-stone-800 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+      <div className="bg-stone-900/60 border border-stone-800 rounded-2xl p-4 sm:p-6 grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
         <div className="md:col-span-2 space-y-1.5">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-white">{org?.name || 'Organization'} Analytics</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-lg sm:text-xl font-black text-white break-words">{org?.name || 'Organization'} Analytics</h1>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">
               Multi-Tenant Isolated
             </span>

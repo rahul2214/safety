@@ -178,7 +178,7 @@ export function MapPinPicker({ value, onChange, initialCenter }: MapPinPickerPro
         style={{ isolation: 'isolate', zIndex: 0 }}
       />
 
-      <p className="flex items-start gap-2 text-sm text-slate-600">
+      <p className="flex items-start gap-2 text-sm text-slate-600 min-w-0 break-words">
         <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
         {value ? (
           <span>

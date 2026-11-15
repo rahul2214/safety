@@ -123,7 +123,7 @@ export default function NotificationsPage() {
               role="tab"
               aria-selected={active}
               onClick={() => setFilter(f.key)}
-              className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+              className={`rounded-full border px-3.5 py-2 min-h-9 text-xs font-semibold transition ${
                 active ? 'border-ink bg-ink text-white' : 'border-slate-200 text-slate-600 hover:border-slate-300'
               }`}
             >

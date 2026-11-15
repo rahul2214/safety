@@ -253,7 +253,7 @@ export default function OrganizationMembersRosterPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => {
               setInviteError(null);
@@ -279,10 +279,10 @@ export default function OrganizationMembersRosterPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-stone-800 gap-2">
+      <div className="flex border-b border-stone-800 gap-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('roster')}
-          className={`pb-3 px-4 text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
+          className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'roster'
               ? 'border-rose-500 text-white'
               : 'border-transparent text-stone-400 hover:text-stone-300'
@@ -294,7 +294,7 @@ export default function OrganizationMembersRosterPage() {
 
         <button
           onClick={() => setActiveTab('pending')}
-          className={`pb-3 px-4 text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
+          className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'pending'
               ? 'border-amber-500 text-white'
               : 'border-transparent text-stone-400 hover:text-stone-300'
@@ -309,7 +309,7 @@ export default function OrganizationMembersRosterPage() {
 
         <button
           onClick={() => setActiveTab('invitations')}
-          className={`pb-3 px-4 text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
+          className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'invitations'
               ? 'border-orange-500 text-white'
               : 'border-transparent text-stone-400 hover:text-stone-300'
@@ -321,7 +321,7 @@ export default function OrganizationMembersRosterPage() {
 
         <button
           onClick={() => setActiveTab('audit')}
-          className={`pb-3 px-4 text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
+          className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'audit'
               ? 'border-blue-500 text-white'
               : 'border-transparent text-stone-400 hover:text-stone-300'
@@ -670,7 +670,7 @@ export default function OrganizationMembersRosterPage() {
       {/* ─── CREATE INVITATION MODAL ─── */}
       {isInviteOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-2xl">
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-stone-900 border border-stone-800 rounded-2xl p-5 sm:p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-stone-800">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Key size={16} className="text-orange-500" />
@@ -817,7 +817,7 @@ export default function OrganizationMembersRosterPage() {
       {/* ─── ROLE MANAGEMENT MODAL (RBAC & LAST-OWNER) ─── */}
       {editingMember && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-2xl space-y-4 text-xs">
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-stone-900 border border-stone-800 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 text-xs">
             <div className="flex items-center justify-between pb-3 border-b border-stone-800">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <ShieldCheck size={16} className="text-blue-500" />
@@ -883,7 +883,7 @@ export default function OrganizationMembersRosterPage() {
       {/* ─── REMOVE MEMBER MODAL ─── */}
       {removingMember && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-2xl space-y-4 text-xs">
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-stone-900 border border-stone-800 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 text-xs">
             <div className="flex items-center justify-between pb-3 border-b border-stone-800">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Trash2 size={16} className="text-rose-500" />

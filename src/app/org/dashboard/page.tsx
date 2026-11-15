@@ -252,7 +252,7 @@ export default function OrgCommandCenterPage() {
       </div>
 
       {/* Main Command Center Header Banner (Stitch Spec) */}
-      <div className="bg-white border border-[#e8e8f0] p-6 rounded-[20px] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-white border border-[#e8e8f0] p-4 sm:p-6 rounded-[20px] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <div className="h-3 w-3 rounded-full bg-[#059669] animate-pulse" />
@@ -264,8 +264,8 @@ export default function OrgCommandCenterPage() {
               {currentOrg.type}
             </span>
           </div>
-          <p className="text-[12px] text-[#5b5b6e] mt-1 flex items-center gap-2">
-            <span>Perimeter: {currentOrg.domain || 'campus.sabhijude.internal'}</span>
+          <p className="text-[12px] text-[#5b5b6e] mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="break-all">Perimeter: {currentOrg.domain || 'campus.sabhijude.internal'}</span>
             <span className="text-[#9797ab]">â€¢</span>
             <span className="text-[#059669] font-semibold">Active Dispatch Ready</span>
           </p>
@@ -765,7 +765,7 @@ export default function OrgCommandCenterPage() {
       {/* DISPATCH PATROL UNIT MODAL */}
       {dispatchModalOpen && selectedIncident && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
+          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
               <div className="flex items-center gap-2 text-[#e11d48]">
                 <Truck size={18} />
@@ -840,7 +840,7 @@ export default function OrgCommandCenterPage() {
       {/* BROADCAST MODAL */}
       {broadcastOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
+          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
               <div className="flex items-center gap-2 text-[#e11d48]">
                 <Radio size={18} />
@@ -912,7 +912,7 @@ export default function OrgCommandCenterPage() {
       {/* ADD MEMBER MODAL */}
       {memberModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
+          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
               <div className="flex items-center gap-2 text-[#6d4aff]">
                 <UserPlus size={18} />

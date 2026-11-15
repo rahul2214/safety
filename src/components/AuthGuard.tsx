@@ -36,7 +36,7 @@ export function AuthGuard({
   <div className="space-y-6 max-w-4xl mx-auto py-6 animate-in fade-in-50 duration-200">
   <div className="space-y-2">
   <Skeleton className="h-8 w-64 rounded-xl" />
-  <Skeleton className="h-4 w-96 rounded-md" />
+  <Skeleton className="h-4 w-full max-w-96 rounded-md" />
   </div>
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
   <Skeleton className="h-28 rounded-[20px]" />

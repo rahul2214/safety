@@ -836,7 +836,7 @@ export default function ReportProblemPage() {
                 {currentStep === 5 && (
                   <>
                     {stepHeading('Tell us what happened', 'In your own words. Share only what you’re comfortable with.')}
-                    <div className="grid sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       {['What did you see or hear?', 'Who was involved?', 'Are you safe now?'].map((q) => (
                         <div key={q} className="rounded-xl bg-mist px-3.5 py-2.5 text-sm text-slate-600 flex items-center gap-2">
                           <HelpCircle className="h-4 w-4 text-brand shrink-0" /> {q}
@@ -891,7 +891,7 @@ export default function ReportProblemPage() {
                 {currentStep === 6 && (
                   <>
                     {stepHeading('Who can see this?', 'You’re in control of who sees your report.')}
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         { id: 'PUBLIC' as ReportVisibility, title: 'Community', desc: 'Shared on the safety feed to warn others nearby.', icon: Globe },
                         { id: 'ONLY_ME' as ReportVisibility, title: 'Only me', desc: 'A private record for yourself. Not shared with anyone.', icon: Lock },
@@ -1046,7 +1046,7 @@ export default function ReportProblemPage() {
                 <div className="rounded-2xl bg-mist p-5 grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-slate-500">Reference</p>
-                    <p className="font-mono font-bold text-ink">{submittedReport.id}</p>
+                    <p className="font-mono font-bold text-ink break-all">{submittedReport.id}</p>
                   </div>
                   <div>
                     <p className="text-slate-500">Status</p>

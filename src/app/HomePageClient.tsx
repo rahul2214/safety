@@ -227,7 +227,7 @@ export function HomePageClient() {
       <section className="relative overflow-hidden rounded-[1.75rem] bg-ink text-white p-6 sm:p-10">
         <div aria-hidden className="absolute -top-24 -right-20 h-80 w-80 rounded-full bg-brand/40 blur-3xl" />
         <div aria-hidden className="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-coral/25 blur-3xl" />
-        <div className="relative grid lg:grid-cols-12 gap-8 items-center">
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-5">
             <h1 className="font-display text-3xl sm:text-[2.75rem] leading-[1.1] font-extrabold tracking-[-0.02em]">
               {greeting()}, {firstName}.
@@ -279,7 +279,7 @@ export function HomePageClient() {
         })}
       </section>
 
-      <section className="grid lg:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Recent community reports ─────────────────────── */}
         <div className="lg:col-span-2 rounded-3xl bg-white border border-slate-200/80 p-5 sm:p-7">
           <div className="flex items-center justify-between gap-3 mb-5">

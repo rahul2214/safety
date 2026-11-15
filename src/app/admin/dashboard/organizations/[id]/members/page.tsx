@@ -309,7 +309,7 @@ export default function OrganizationMembersRosterPage() {
       {/* Add Single Member Modal */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white border border-[#e8e8f0] rounded-[22px] p-6 shadow-xl text-[#16161d]">
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-white border border-[#e8e8f0] rounded-[22px] p-5 sm:p-6 shadow-xl text-[#16161d]">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#e8e8f0]">
               <h3 className="text-sm font-bold text-[#16161d] flex items-center gap-2">
                 <Users size={16} className="text-[#6d4aff]" />
@@ -410,7 +410,7 @@ export default function OrganizationMembersRosterPage() {
       {/* Bulk CSV Upload Modal */}
       {isBulkOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="max-w-lg w-full bg-white border border-[#e8e8f0] rounded-[22px] p-6 shadow-xl text-[#16161d]">
+          <div className="max-w-lg w-full max-h-[90vh] overflow-y-auto bg-white border border-[#e8e8f0] rounded-[22px] p-5 sm:p-6 shadow-xl text-[#16161d]">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#e8e8f0]">
               <h3 className="text-sm font-bold text-[#16161d] flex items-center gap-2">
                 <FileSpreadsheet size={16} className="text-emerald-600" />
@@ -478,7 +478,7 @@ export default function OrganizationMembersRosterPage() {
                   className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-[14px] p-3 text-[#16161d] font-mono text-[11px] focus:outline-none focus:border-[#6d4aff] focus:bg-white placeholder-[#9797ab]"
                 />
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
                   <span className="text-[11px] text-[#747488]">
                     Format: email, name, role, dept, type
                   </span>

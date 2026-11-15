@@ -257,10 +257,10 @@ export default function OrganizationsPage() {
       </div>
 
       {/* Primary Tab Navigation */}
-      <div className="flex items-center gap-2 border-b border-[#e8e8f0] pb-3">
+      <div className="flex items-center gap-2 border-b border-[#e8e8f0] pb-3 overflow-x-auto">
         <button
           onClick={() => setActiveTab('ORGANIZATIONS')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[12px] text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'ORGANIZATIONS'
               ? 'bg-[#f1edff] text-[#6d4aff] border border-[#ddd6fe]'
               : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-white border border-transparent'
@@ -277,7 +277,7 @@ export default function OrganizationsPage() {
 
         <button
           onClick={() => setActiveTab('REQUESTS')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-[12px] text-xs font-bold transition-all relative ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[12px] text-xs font-bold transition-all relative shrink-0 whitespace-nowrap ${
             activeTab === 'REQUESTS'
               ? 'bg-[#f1edff] text-[#6d4aff] border border-[#ddd6fe]'
               : 'text-[#5b5b6e] hover:text-[#16161d] hover:bg-white border border-transparent'
@@ -421,7 +421,7 @@ export default function OrganizationsPage() {
                     <h3 className="text-base font-bold text-[#16161d] group-hover:text-[#6d4aff] transition-colors">
                       {org.name}
                     </h3>
-                    <p className="text-xs text-[#747488] font-mono mt-0.5">
+                    <p className="text-xs text-[#747488] font-mono mt-0.5 break-all">
                       {org.domain || `${org.slug}.sabhijude.internal`}
                     </p>
 
@@ -531,8 +531,8 @@ export default function OrganizationsPage() {
                       <div className="p-2.5 rounded-[12px] bg-amber-50 border border-amber-100 text-amber-600">
                         {getTypeIcon(req.organizationType)}
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
                           <h3 className="text-base font-bold text-[#16161d] tracking-tight">
                             {req.organizationName}
                           </h3>
@@ -540,12 +540,12 @@ export default function OrganizationsPage() {
                             {req.requestReference}
                           </span>
                         </div>
-                        <p className="text-xs text-[#5b5b6e] mt-0.5 flex items-center gap-2">
+                        <p className="text-xs text-[#5b5b6e] mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                           <span>{req.organizationType}</span>
                           {req.domain && (
                             <>
                               <span>•</span>
-                              <span className="font-mono text-[#16161d]">{req.domain}</span>
+                              <span className="font-mono text-[#16161d] break-all">{req.domain}</span>
                             </>
                           )}
                           {(req.city || req.state) && (
@@ -580,7 +580,7 @@ export default function OrganizationsPage() {
                         <div className="text-[11px] text-[#5b5b6e]">{req.contactTitle}</div>
                       )}
                       <div className="mt-1 flex flex-col gap-0.5 text-[11px] text-[#2d2d3a]">
-                        <span className="flex items-center gap-1 font-mono">
+                        <span className="flex items-center gap-1 font-mono min-w-0 break-all">
                           <Mail size={11} className="text-[#9797ab]" />
                           {req.contactEmail}
                         </span>
@@ -699,7 +699,7 @@ export default function OrganizationsPage() {
                 </div>
                 <div>
                   <span className="text-[#747488] block">Official Domain:</span>
-                  <span className="font-mono text-[#16161d]">{selectedRequest.domain || 'None'}</span>
+                  <span className="font-mono text-[#16161d] break-all">{selectedRequest.domain || 'None'}</span>
                 </div>
                 <div>
                   <span className="text-[#747488] block">Campus Size:</span>
@@ -798,7 +798,7 @@ export default function OrganizationsPage() {
       {/* Manual Onboard Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-[#e8e8f0] w-full max-w-md rounded-[22px] p-6 shadow-xl text-[#16161d]">
+          <div className="bg-white border border-[#e8e8f0] w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[22px] p-5 sm:p-6 shadow-xl text-[#16161d]">
             <div className="flex items-center justify-between pb-4 border-b border-[#e8e8f0]">
               <h2 className="text-base font-bold text-[#16161d] flex items-center gap-2">
                 <Building2 size={18} className="text-[#6d4aff]" />

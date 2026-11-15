@@ -237,14 +237,14 @@ export default function UserOrganizationsPage() {
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-16">
       {/* Top Banner / Header */}
       <div className="bg-[#1e293b] text-white border-b border-slate-700">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-6xl mx-auto px-0 sm:px-6 py-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-700/60 text-blue-200 text-xs font-medium mb-3">
                 <ShieldCheck className="w-4 h-4 text-orange-400" />
                 Verified Campus & Workplace Safety Network
               </div>
-              <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-white">
                 My Connected Organisations
               </h1>
               <p className="mt-1 text-sm sm:text-base text-blue-200 max-w-2xl">
@@ -279,7 +279,7 @@ export default function UserOrganizationsPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-6xl mx-auto px-0 sm:px-6 py-8">
         {error && (
           <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
@@ -336,21 +336,21 @@ export default function UserOrganizationsPage() {
                   className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col"
                 >
                   {/* Card Header */}
-                  <div className="p-6 border-b border-slate-100 flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3.5">
+                  <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="flex items-center gap-3.5 min-w-0">
                       <div className="w-12 h-12 rounded-xl bg-brand text-white flex items-center justify-center font-bold text-lg shadow-sm">
                         {org.organizationName.slice(0, 2).toUpperCase()}
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <h3 className="font-bold text-slate-900 text-lg leading-snug">
                           {org.organizationName}
                         </h3>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium uppercase tracking-wider">
                             {org.organizationType || 'Campus'}
                           </span>
                           <span className="text-xs text-slate-400">•</span>
-                          <span className="text-xs text-slate-500 font-mono">
+                          <span className="text-xs text-slate-500 font-mono break-all">
                             {org.organizationSlug}
                           </span>
                         </div>
@@ -396,7 +396,7 @@ export default function UserOrganizationsPage() {
                     </div>
 
                     {/* Privacy & Consents Summary */}
-                    <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-3.5 flex items-center justify-between gap-3">
+                    <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5">
                         <Shield className="w-5 h-5 text-blue-600 shrink-0" />
                         <div>
@@ -410,7 +410,7 @@ export default function UserOrganizationsPage() {
                       </div>
                       <button
                         onClick={() => handleOpenConsents(org)}
-                        className="text-xs font-semibold text-blue-700 hover:text-blue-900 bg-white px-3 py-1.5 rounded-lg border border-blue-200 hover:border-blue-300 shadow-sm transition"
+                        className="shrink-0 text-xs font-semibold text-blue-700 hover:text-blue-900 bg-white px-3 py-1.5 rounded-lg border border-blue-200 hover:border-blue-300 shadow-sm transition"
                       >
                         Manage Toggles
                       </button>
@@ -429,10 +429,10 @@ export default function UserOrganizationsPage() {
                   </div>
 
                   {/* Card Footer Actions */}
-                  <div className="p-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+                  <div className="p-4 bg-slate-50/80 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <button
                       onClick={() => handleExportData(org)}
-                      className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-medium p-1.5 rounded-lg hover:bg-slate-200/60 transition"
+                      className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-medium min-h-10 px-2.5 py-1.5 rounded-lg hover:bg-slate-200/60 transition"
                       title="Download DPDP Act Section 11 Data Report"
                     >
                       <Download className="w-4 h-4 text-slate-500" />
@@ -458,7 +458,7 @@ export default function UserOrganizationsPage() {
                           setActionError(null);
                           setIsLeaveModalOpen(true);
                         }}
-                        className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-medium p-1.5 rounded-lg hover:bg-slate-200/60 transition"
+                        className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-medium min-h-10 px-2.5 py-1.5 rounded-lg hover:bg-slate-200/60 transition"
                         title="Leave this organization"
                       >
                         <LogOut className="w-4 h-4 text-slate-500" />
@@ -476,7 +476,7 @@ export default function UserOrganizationsPage() {
       {/* ─── JOIN ORGANISATION MODAL ─── */}
       {isJoinOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border border-slate-200">
             <div className="p-6 bg-[#1e293b] text-white flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold">Join an Organisation</h3>
@@ -486,7 +486,7 @@ export default function UserOrganizationsPage() {
               </div>
               <button
                 onClick={() => setIsJoinOpen(false)}
-                className="text-blue-300 hover:text-white p-1 rounded-lg"
+                className="text-blue-300 hover:text-white h-10 w-10 flex items-center justify-center rounded-lg"
               >
                 ✕
               </button>
@@ -590,7 +590,7 @@ export default function UserOrganizationsPage() {
       {/* ─── CONSENT MANAGEMENT MODAL ─── */}
       {consentModalOpen && selectedOrg && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border border-slate-200">
             <div className="p-6 bg-slate-900 text-white flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold">Privacy & Consent Permissions</h3>
@@ -600,7 +600,7 @@ export default function UserOrganizationsPage() {
               </div>
               <button
                 onClick={() => setConsentModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg"
+                className="text-slate-400 hover:text-white h-10 w-10 flex items-center justify-center rounded-lg"
               >
                 ✕
               </button>

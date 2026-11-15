@@ -264,14 +264,14 @@ export default function OrgCommandCenterPage() {
               {org.type}
             </span>
           </div>
-          <p className="text-xs text-[#5b5b6e] mt-1.5 flex items-center gap-2">
-            <span>Primary Dispatch Perimeter: {org.domain || `${org.slug}.sabhijude.internal`}</span>
+          <p className="text-xs text-[#5b5b6e] mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="break-all">Primary Dispatch Perimeter: {org.domain || `${org.slug}.sabhijude.internal`}</span>
             <span className="text-[#9797ab]">•</span>
             <span className="text-emerald-600 font-semibold">All Systems Operational</span>
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <Link
             href={`/admin/dashboard/organizations/${orgId}/analytics`}
             className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-[12px] bg-white hover:bg-[#f7f7fa] text-[#16161d] border border-[#e8e8f0] text-xs font-bold transition-colors shadow-2xs"
@@ -290,7 +290,7 @@ export default function OrgCommandCenterPage() {
 
           <button
             onClick={() => setBroadcastOpen(true)}
-            className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-[12px] text-xs font-black shadow-sm transition-all active:scale-[0.98]"
+            className="w-full sm:w-auto sm:flex-1 md:flex-initial flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-[12px] text-xs font-black shadow-sm transition-all active:scale-[0.98]"
           >
             <Radio size={16} className="animate-pulse" />
             <span>Broadcast Campus Alert</span>
@@ -756,7 +756,7 @@ export default function OrgCommandCenterPage() {
                   <div>
                     <span className="text-[#747488] text-[10px] block">Reporter</span>
                     <span className="font-semibold text-[#16161d] block mt-0.5">{selectedIncident.reporterName}</span>
-                    <span className="text-[11px] text-[#5b5b6e] font-mono">{selectedIncident.reporterContact}</span>
+                    <span className="block text-[11px] text-[#5b5b6e] font-mono break-all">{selectedIncident.reporterContact}</span>
                   </div>
                 </div>
 
@@ -837,7 +837,7 @@ export default function OrgCommandCenterPage() {
       {/* DISPATCH PATROL UNIT MODAL */}
       {dispatchModalOpen && selectedIncident && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md p-6 space-y-5 shadow-xl animate-in zoom-in-95 duration-150 text-[#16161d]">
+          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-xl animate-in zoom-in-95 duration-150 text-[#16161d]">
             <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
               <div className="flex items-center gap-2 text-red-600">
                 <Truck size={18} />
@@ -926,7 +926,7 @@ export default function OrgCommandCenterPage() {
       {/* BROADCAST MODAL */}
       {broadcastOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md p-6 space-y-5 shadow-xl animate-in zoom-in-95 duration-150 text-[#16161d]">
+          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-xl animate-in zoom-in-95 duration-150 text-[#16161d]">
             <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
               <div className="flex items-center gap-2 text-red-600">
                 <Radio size={18} className="animate-pulse" />
@@ -998,7 +998,7 @@ export default function OrgCommandCenterPage() {
       {/* ADD MEMBER MODAL */}
       {memberModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md p-6 space-y-5 shadow-xl animate-in zoom-in-95 duration-150 text-[#16161d]">
+          <div className="bg-white border border-[#e8e8f0] rounded-[22px] w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-xl animate-in zoom-in-95 duration-150 text-[#16161d]">
             <div className="flex items-center justify-between border-b border-[#e8e8f0] pb-3">
               <div className="flex items-center gap-2 text-[#6d4aff]">
                 <UserPlus size={18} />

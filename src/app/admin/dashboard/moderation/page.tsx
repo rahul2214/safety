@@ -180,7 +180,7 @@ export default function ModerationQueuePage() {
               </div>
 
               {/* Meta details */}
-              <div className="flex items-center justify-between text-[11.5px] text-[#717184] pt-1 border-t border-[#f0f0f5]">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11.5px] text-[#717184] pt-1 border-t border-[#f0f0f5]">
                 <span className="font-medium">
                   Author: <span className="text-[#16161d] font-bold">{post.isAnonymous ? 'Anonymous Member' : `User #${post.authorId}`}</span>
                 </span>

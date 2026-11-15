@@ -659,6 +659,19 @@ export const api = {
     });
   },
 
+  /** Edits one of your own open requests. Same body as create. */
+  async updateBloodRequest(uuid: string, payload: CreateBloodRequestPayload) {
+    return request<BloodRequest>(`/api/bloodrequests/${encodeURIComponent(uuid)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  /** Permanently deletes one of your own requests. */
+  async deleteBloodRequest(uuid: string) {
+    return request<{ uuid: string }>(`/api/bloodrequests/${encodeURIComponent(uuid)}`, { method: 'DELETE' });
+  },
+
   // Emergency Contacts
   async getEmergencyContacts(forceRefresh = false) {
     return request<EmergencyContact[]>('/api/emergencycontacts', {}, 1, { forceRefresh });

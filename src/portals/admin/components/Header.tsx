@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useAdminAuth } from '@/portals/admin/lib/auth-context';
-import { Shield, Circle } from 'lucide-react';
+import { Shield, Circle, Menu } from 'lucide-react';
 
 const TITLE_MAP: Record<string, { title: string; subtitle: string }> = {
   '/admin/dashboard': {
@@ -43,7 +43,7 @@ const TITLE_MAP: Record<string, { title: string; subtitle: string }> = {
   },
 };
 
-export default function Header() {
+export default function Header({ onMenu }: { onMenu?: () => void }) {
   const pathname = usePathname();
   const { admin } = useAdminAuth();
 
@@ -53,15 +53,25 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 border-b border-[#e8e8f0] bg-white/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20 select-none">
-      <div>
-        <h1 className="text-sm font-bold text-[#16161d]">{meta.title}</h1>
-        <p className="text-[11.5px] text-[#5b5b6e]">{meta.subtitle}</p>
+    <header className="min-h-16 py-2 border-b border-[#e8e8f0] bg-white/80 backdrop-blur-md px-4 md:px-8 flex items-center justify-between gap-3 sticky top-0 z-20 select-none">
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          type="button"
+          onClick={onMenu}
+          aria-label="Open menu"
+          className="md:hidden -ml-1 h-10 w-10 shrink-0 rounded-[10px] flex items-center justify-center text-[#16161d] hover:bg-[#f1f1f6]"
+        >
+          <Menu size={20} />
+        </button>
+        <div className="min-w-0">
+          <h1 className="text-sm font-bold text-[#16161d] truncate">{meta.title}</h1>
+          <p className="hidden sm:block text-[11.5px] text-[#5b5b6e] truncate">{meta.subtitle}</p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4 shrink-0">
         {/* Live status badge */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ecfdf5] border border-[#059669]/20 text-[#059669] text-[11px] font-semibold">
+        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ecfdf5] border border-[#059669]/20 text-[#059669] text-[11px] font-semibold">
           <Circle size={6} className="fill-[#059669] animate-pulse" />
           <span>Cloud Run API Live</span>
         </div>

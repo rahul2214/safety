@@ -99,13 +99,13 @@ export default function OrgBroadcastPage() {
       )}
 
       {/* Broadcast Form */}
-      <div className="bg-stone-900/50 border border-stone-800 rounded-2xl p-6">
+      <div className="bg-stone-900/50 border border-stone-800 rounded-2xl p-4 sm:p-6">
         <form onSubmit={handleSendBroadcast} className="space-y-4 text-xs">
           <div>
             <label className="block text-stone-400 font-semibold mb-1.5 uppercase tracking-wider text-[10px]">
               Broadcast Urgency Level
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
               {[
                 { id: 'CRITICAL', label: 'Critical Emergency', color: 'border-rose-500 bg-rose-500/10 text-rose-300' },
                 { id: 'HIGH', label: 'High Alert', color: 'border-amber-500 bg-amber-500/10 text-amber-300' },

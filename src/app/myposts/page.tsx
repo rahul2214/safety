@@ -278,7 +278,7 @@ export default function MyPostsPage() {
             placeholder="Search posts, location, tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full h-10 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
         </div>
       </div>
@@ -326,7 +326,7 @@ export default function MyPostsPage() {
                     )}
                   </div>
 
-                  <p className="text-xs text-slate-800 line-clamp-3 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-xs text-slate-800 line-clamp-3 leading-relaxed whitespace-pre-wrap break-words">
                     {post.content}
                   </p>
 

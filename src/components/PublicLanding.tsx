@@ -93,7 +93,7 @@ export function PublicLanding({
           <div className="absolute inset-0 bg-[radial-gradient(#0b16300d_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
         </div>
 
-        <div className="public-container relative grid lg:grid-cols-12 gap-14 lg:gap-8 items-center pt-14 pb-20 sm:pt-20 lg:pt-24 lg:pb-28">
+        <div className="public-container relative grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-8 items-center pt-14 pb-20 sm:pt-20 lg:pt-24 lg:pb-28">
           <div className="lg:col-span-7 space-y-8">
             <h1 className="display-1">
               Feel safe,{' '}
@@ -168,7 +168,7 @@ export function PublicLanding({
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-6">
             {/* SOS */}
             <div className="md:col-span-4 relative overflow-hidden rounded-3xl bg-ink p-8 sm:p-10 text-white min-h-[340px] flex flex-col justify-between">
               <div aria-hidden className="absolute -right-16 -top-16 h-72 w-72 rounded-full bg-red-500/25 blur-3xl" />
@@ -246,7 +246,7 @@ export function PublicLanding({
             <h2 className="display-2">Ready in under two minutes.</h2>
           </div>
 
-          <ol className="grid gap-6 md:grid-cols-3 relative">
+          <ol className="grid grid-cols-1 gap-6 md:grid-cols-3 relative">
             <div aria-hidden className="hidden md:block absolute top-8 left-[16%] right-[16%] h-px border-t-2 border-dashed border-slate-300" />
             {[
               { icon: Users, title: 'Add your trusted circle', body: 'Pick the family and friends who should hear from you first.' },
@@ -339,7 +339,7 @@ export function PublicLanding({
       {/* ─── PRIVACY ──────────────────────────────────────────── */}
       <section className="pb-24 sm:pb-32">
         <div className="public-container">
-          <div className="rounded-[2rem] bg-gradient-to-br from-brand-tint via-white to-coral-tint border border-slate-200 p-8 sm:p-14 grid lg:grid-cols-12 gap-10 items-center">
+          <div className="rounded-[2rem] bg-gradient-to-br from-brand-tint via-white to-coral-tint border border-slate-200 p-8 sm:p-14 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-5 space-y-4">
               <span className="eyebrow"><Lock className="h-3.5 w-3.5" /> Privacy by design</span>
               <h2 className="display-2">Private live location sharing: your safety app shouldn&rsquo;t track you.</h2>
@@ -347,7 +347,7 @@ export function PublicLanding({
                 We built Sabhijude so you stay in control — of your location, your identity and your data.
               </p>
             </div>
-            <div className="lg:col-span-7 grid sm:grid-cols-3 gap-4">
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 { icon: MapPin, title: 'No background tracking', body: 'Location is read only when you send an SOS or choose to share.' },
                 { icon: EyeOff, title: 'Post anonymously', body: 'Reports are separated from your profile. No one sees who you are.' },
@@ -414,7 +414,7 @@ export function PublicLanding({
           <div className="relative overflow-hidden rounded-[2rem] bg-ink px-8 py-14 sm:px-14 sm:py-16 text-white">
             <div aria-hidden className="absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-brand/40 blur-3xl" />
             <div aria-hidden className="absolute -left-10 -top-24 h-72 w-72 rounded-full bg-coral/25 blur-3xl" />
-            <div className="relative grid lg:grid-cols-12 gap-10 items-center">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-8 space-y-5">
                 <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/60">
                   <Building2 className="h-3.5 w-3.5" /> For colleges &amp; companies

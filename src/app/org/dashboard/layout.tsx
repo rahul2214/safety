@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useState } from 'react';
 import Sidebar from '@/portals/org/components/Sidebar';
 import Header from '@/portals/org/components/Header';
 import { useAdminAuth } from '@/portals/org/lib/auth-context';
@@ -45,6 +46,9 @@ function OrgGate({ children }: { children: React.ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { admin, loading } = useAdminAuth();
+  // The phone-width navigation drawer; the sidebar is always visible from md up.
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   if (loading || !admin) {
     return (
@@ -57,10 +61,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <OrgProvider>
       <div className="flex min-h-screen bg-[#f7f7fa] text-[#16161d]">
-        <Sidebar />
+        <Sidebar open={menuOpen} onClose={closeMenu} />
         <div className="flex-1 flex flex-col min-w-0">
-          <Header />
-          <main className="flex-1 p-8 overflow-y-auto max-w-7xl w-full mx-auto">
+          <Header onMenu={() => setMenuOpen(true)} />
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
             <OrgGate>{children}</OrgGate>
           </main>
         </div>

@@ -369,13 +369,13 @@ export default function OrgIncidentsTriagePage() {
               </div>
 
               {/* Telemetry and Location Info */}
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="bg-stone-950/60 p-3 rounded-xl border border-stone-800/60">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="bg-stone-950/60 p-3 rounded-xl border border-stone-800/60 min-w-0">
                   <div className="text-[10px] uppercase font-bold text-stone-500 mb-1">Reporter Information</div>
                   <div className="font-semibold text-white">{selectedIncident.reporterName}</div>
                   <div className="text-[11px] text-stone-400 flex items-center gap-1 mt-0.5">
                     <PhoneCall size={11} />
-                    <span>{selectedIncident.reporterContact || 'Not provided'}</span>
+                    <span className="break-all">{selectedIncident.reporterContact || 'Not provided'}</span>
                   </div>
                 </div>
 

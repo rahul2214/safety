@@ -105,8 +105,8 @@ export default function OrgAnalyticsPage() {
       {/* Hero Banner: Operations Score & Executive Summary */}
       <div className="bg-white border border-[#e8e8f0] rounded-[20px] p-6 grid grid-cols-1 md:grid-cols-4 gap-6 items-center shadow-xs">
         <div className="md:col-span-2 space-y-1.5">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-[#16161d]">{org?.name || 'Organization'} Analytics</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-lg sm:text-xl font-black text-[#16161d] break-words">{org?.name || 'Organization'} Analytics</h1>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-[8px] bg-[#f1edff] text-[#6d4aff] border border-[#ddd6fe] font-bold">
               Multi-Tenant Isolated
             </span>
@@ -257,7 +257,7 @@ export default function OrgAnalyticsPage() {
             </div>
           ) : (
             <>
-              <div className="flex items-end gap-1 h-32 pt-6 border-b border-[#e8e8f0] px-1">
+              <div className="flex items-end gap-0.5 sm:gap-1 h-32 pt-6 border-b border-[#e8e8f0] px-1">
                 {timeBuckets.map((b) => {
                   const heightPct = Math.max(8, (b.count / maxHourCount) * 100);
                   const isNight = b.hour >= 20 || b.hour <= 5;
@@ -273,7 +273,8 @@ export default function OrgAnalyticsPage() {
                       <span className="hidden group-hover:block absolute -top-7 bg-white border border-[#e8e8f0] text-[9px] text-[#16161d] px-1.5 py-0.5 rounded font-mono z-10 whitespace-nowrap shadow-md font-bold">
                         {b.hour}:00 &rarr; {b.count} events
                       </span>
-                      <span className="text-[8px] font-mono text-[#747488]">{b.hour}</span>
+                      {/* Every third hour on phones, where 24 labels would collide. */}
+                      <span className={`text-[8px] font-mono text-[#747488] ${b.hour % 3 === 0 ? '' : 'invisible sm:visible'}`}>{b.hour}</span>
                     </div>
                   );
                 })}
