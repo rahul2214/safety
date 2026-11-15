@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -70,9 +70,13 @@ function SignupFormContent() {
   const [selectedOccupationId, setSelectedOccupationId] = useState<number | null>(1);
   const [savingProfile, setSavingProfile] = useState(false);
 
-  // If already logged in on initial load, redirect
+  // Set the moment this page starts creating an account. Registering signs the user in, and
+  // without this the "already signed in" redirect below would fire before step 2 is shown.
+  const registeringRef = useRef(false);
+
+  // Someone who was already signed in when they opened this page has nothing to do here.
   useEffect(() => {
-    if (!isLoading && isAuthenticated && stage === 1) {
+    if (!isLoading && isAuthenticated && stage === 1 && !registeringRef.current) {
       router.replace(redirectPath);
     }
   }, [isLoading, isAuthenticated, redirectPath, router, stage]);
@@ -149,18 +153,10 @@ function SignupFormContent() {
     setIsSubmitting(true);
 
     const standardPhone = cleanDigits.length === 10 ? '+91' + cleanDigits : '+' + cleanDigits;
+    registeringRef.current = true;
     const result = await register(cleanName, cleanEmail, standardPhone, password);
-
-    // Registration itself does not take a blood group, so it is saved on the new profile
-    // straight away, before step 2, so that skipping step 2 does not lose it. A failure here
-    // must not block sign-up: it can still be set from the profile page.
-    if (result.success && bloodGroup) {
-      try {
-        await api.updateProfile({ bloodGroup });
-      } catch {
-        // Ignored on purpose; see above.
-      }
-    }
+    // A failed attempt leaves the visitor signed out, so the guard can go back to normal.
+    if (!result.success) registeringRef.current = false;
 
     setIsSubmitting(false);
 
@@ -196,6 +192,8 @@ function SignupFormContent() {
         dob: dob.trim() || undefined,
         occupationStatusId: selectedOccupationId ?? undefined,
         occupationStatus: selectedOcc?.name.toLowerCase(),
+        // Optional: left out when not chosen, so nothing is written.
+        bloodGroup: bloodGroup || undefined,
       });
       router.push(redirectPath);
     } catch {
@@ -313,34 +311,6 @@ function SignupFormContent() {
                     <p className="text-[11px] text-slate-500 pl-0.5">
                       Used for emergency SOS broadcast telemetry and account recovery. Never displayed
                       publicly.
-                    </p>
-                  </div>
-
-                  {/* Blood Group (optional) */}
-                  <div className="space-y-1.5 text-left">
-                    <label htmlFor="bloodGroup" className="block text-xs font-semibold text-slate-700">
-                      Blood Group <span className="font-normal text-slate-500">(optional)</span>
-                    </label>
-                    <div className="relative flex items-center">
-                      <div className="absolute left-3.5 pointer-events-none text-red-500">
-                        <Droplet className="h-4 w-4" />
-                      </div>
-                      <select
-                        id="bloodGroup"
-                        value={bloodGroup}
-                        onChange={(e) => setBloodGroup(e.target.value)}
-                        className="w-full h-12 bg-white border border-slate-300 rounded-xl pl-10 pr-3.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors"
-                      >
-                        <option value="">Select blood group</option>
-                        {BLOOD_GROUPS.map((group) => (
-                          <option key={group} value={group}>
-                            {group}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <p className="text-[11px] text-slate-500 pl-0.5">
-                      Only you can see this. You can change it later from your profile.
                     </p>
                   </div>
 
@@ -568,6 +538,34 @@ function SignupFormContent() {
                         );
                       })}
                     </div>
+                  </div>
+
+                  {/* Blood Group (optional) */}
+                  <div className="space-y-1.5 text-left">
+                    <label htmlFor="bloodGroup" className="block text-xs font-semibold text-slate-700">
+                      Blood Group <span className="font-normal text-slate-500">(optional)</span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3.5 pointer-events-none text-red-500">
+                        <Droplet className="h-4 w-4" />
+                      </div>
+                      <select
+                        id="bloodGroup"
+                        value={bloodGroup}
+                        onChange={(e) => setBloodGroup(e.target.value)}
+                        className="w-full h-12 bg-white border border-slate-300 rounded-xl pl-10 pr-3.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors"
+                      >
+                        <option value="">Select blood group</option>
+                        {BLOOD_GROUPS.map((group) => (
+                          <option key={group} value={group}>
+                            {group}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-[11px] text-slate-500 pl-0.5">
+                      Only you can see this. You can change it later from your profile.
+                    </p>
                   </div>
 
                   {/* Action Buttons */}
