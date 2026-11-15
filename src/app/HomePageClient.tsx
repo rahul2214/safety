@@ -251,23 +251,6 @@ export function HomePageClient() {
               </button>
             </div>
           </div>
-
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
-            <button
-              type="button"
-              onClick={() => setSosConfirmOpen(true)}
-              className="relative flex h-48 w-48 sm:h-56 sm:w-56 items-center justify-center group"
-              aria-label="Send emergency SOS"
-            >
-              <span className="absolute inset-0 rounded-full bg-red-500/30 animate-ring" />
-              <span className="absolute inset-0 rounded-full bg-red-500/20 animate-ring [animation-delay:1.2s]" />
-              <span className="relative flex h-40 w-40 sm:h-44 sm:w-44 flex-col items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 shadow-[0_20px_50px_-12px_rgba(220,38,38,0.8)] ring-8 ring-white/10 group-hover:scale-105 group-active:scale-95 transition-transform">
-                <ShieldAlert className="h-8 w-8 mb-1" />
-                <span className="font-display text-4xl font-extrabold tracking-tight">SOS</span>
-                <span className="text-xs text-white/80">Tap for help</span>
-              </span>
-            </button>
-          </div>
         </div>
       </section>
 

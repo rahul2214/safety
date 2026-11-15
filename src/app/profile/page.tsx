@@ -429,15 +429,7 @@ export default function ProfilePage() {
               <h2 className="text-[22px] font-black text-ink truncate">
                 {profile?.displayName || authUser?.displayName || 'Protected Member'}
               </h2>
-              {profile?.isVerifiedExpert ? (
-                <span className="px-2.5 py-0.5 rounded-full bg-brand-tint text-brand text-xs font-bold flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" /> Verified Safety Expert
-                </span>
-              ) : (
-                <span className="px-2.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] text-xs font-bold flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Good Standing
-                </span>
-              )}
+            
 
             </div>
 
