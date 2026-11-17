@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Check, Droplet, GraduationCap, MapPin, Navigation, Phone, Share2 } from 'lucide-react';
 import { api, type BackendPost, type BloodRequest } from '@/lib/api-client';
-import { bloodRequestShareText, coarse, formatDistance } from '@/lib/requests';
+import { bloodRequestShareText, coarse, formatDistance, formatUnits } from '@/lib/requests';
 import { withCountryCode } from '@/lib/phone';
 
 type Stage = 'checking' | 'ask' | 'locating' | 'ready' | 'unavailable';
@@ -82,7 +82,7 @@ export function BloodRequestCard({ request }: { request: BloodRequest }) {
         </span>
         <div className="min-w-0">
           <p className="truncate font-semibold text-ink">
-            Blood needed · {request.unitsNeeded} unit{request.unitsNeeded === 1 ? '' : 's'}
+            Blood needed · {formatUnits(request.unitsNeeded)}
           </p>
           <p className="truncate text-xs font-semibold text-red-600">
             {distance ? `${distance} · ` : ''}

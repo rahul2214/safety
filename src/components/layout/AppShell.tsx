@@ -74,7 +74,9 @@ export function AppShell({ children }: AppShellProps) {
 
   // Single posts are shareable, so /posts/<id> is readable without signing in
   const isPostPage = pathname?.startsWith('/posts/') ?? false;
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isPostPage;
+  // A shared blood request (/blood/<uuid>) is public too; the /blood list itself is not.
+  const isBloodRequestPage = /^\/blood\/[^/]+$/.test(pathname ?? '');
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isPostPage || isBloodRequestPage;
   const isAuthPage = pathname === '/login' || pathname === '/signup';
 
   const standing = useAccountStanding(isAuthenticated && !isAuthPage);

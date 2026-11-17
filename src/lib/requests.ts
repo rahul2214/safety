@@ -33,14 +33,28 @@ export function formatDistance(km?: number | null): string | null {
   return `${km < 10 ? km.toFixed(1) : Math.round(km)} km away`;
 }
 
+/** Volume of one unit of whole blood, as collected in India. */
+export const ML_PER_UNIT = 450;
+
+/** "1 unit (~450 ml)", "2 units (~900 ml)". */
+export function formatUnits(units: number): string {
+  return `${units} unit${units === 1 ? '' : 's'} (~${units * ML_PER_UNIT} ml)`;
+}
+
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://sabhijude.veltria.in').replace(/\/+$/, '');
+
+/** The public page for one request: live status, call and directions, and a join prompt. */
+export const bloodRequestUrl = (uuid: string) => `${SITE_URL}/blood/${encodeURIComponent(uuid)}`;
+
 /**
  * The message used when a blood request is shared (WhatsApp, SMS, and so on).
  *
- * Everything a stranger needs to help without the app: what is needed, where, who to call,
- * and a directions link. It carries the contact number on purpose, because a share is
- * always started by a person who chose to pass the request on.
+ * Kept short on purpose: what is needed, who to call, directions, and the live status page
+ * (which has the place, the note and the invitation to join). It carries the contact number
+ * because a share is always started by a person who chose to pass the request on.
  */
 export function bloodRequestShareText(req: {
+  uuid: string;
   bloodGroup: string;
   unitsNeeded: number;
   location: string;
@@ -49,17 +63,12 @@ export function bloodRequestShareText(req: {
   contactPhone: string;
   note?: string | null;
 }): string {
-  const units = `${req.unitsNeeded} unit${req.unitsNeeded === 1 ? '' : 's'}`;
-  const lines = [
-    `🩸 Urgent: ${req.bloodGroup} blood needed (${units})`,
-    `📍 ${req.location}`,
+  return [
+    `🩸 Urgent: ${req.bloodGroup} blood needed · ${formatUnits(req.unitsNeeded)}`,
     `📞 Call: ${withCountryCode(req.contactPhone)}`,
-  ];
-  if (req.note?.trim()) lines.push(`📝 ${req.note.trim()}`);
-  lines.push(
     `🗺️ Directions: https://www.google.com/maps/dir/?api=1&destination=${req.latitude},${req.longitude}`,
+    `🔗 Live status: ${bloodRequestUrl(req.uuid)}`,
     '',
-    'Please share with anyone who can donate. Shared via Sabhijude.'
-  );
-  return lines.join('\n');
+    '🙏 Please share with anyone who can donate.',
+  ].join('\n');
 }

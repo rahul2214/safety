@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useAuth } from '@/lib/auth-context';
 import { api, type BloodRequest } from '@/lib/api-client';
 import { getCurrentCoordinates, reverseGeocodeCoords } from '@/lib/location';
-import { BLOOD_GROUPS, type RequestPin } from '@/lib/requests';
+import { BLOOD_GROUPS, ML_PER_UNIT, formatUnits, type RequestPin } from '@/lib/requests';
 import { COUNTRY_CODE, isCallableIndianNumber, nationalDigits } from '@/lib/phone';
 import { MapPinPicker } from '@/components/MapPinPicker';
 import { NearbyRequests, ShareBloodRequestButton, relativeTime } from '@/components/NearbyRequests';
@@ -283,7 +283,7 @@ export default function BloodRequestPage() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-ink">Units needed</p>
-            <p className="text-xs text-slate-500">One unit is one donation</p>
+            <p className="text-xs text-slate-500">One unit is one donation · ~{units * ML_PER_UNIT} ml total</p>
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -440,7 +440,7 @@ export default function BloodRequestPage() {
                     </span>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-ink">
-                        {req.unitsNeeded} unit{req.unitsNeeded === 1 ? '' : 's'} · {req.location}
+                        {formatUnits(req.unitsNeeded)} · {req.location}
                       </p>
                       <p className="text-xs text-slate-500">
                         {isOpen ? 'Open' : req.status === 'FULFILLED' ? 'Fulfilled' : 'Cancelled'} · {relativeTime(req.createdAt)}
