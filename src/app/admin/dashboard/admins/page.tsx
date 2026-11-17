@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { adminFetch } from '@/portals/admin/lib/api';
 import { useAdminAuth } from '@/portals/admin/lib/auth-context';
 import {
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function AdminStaffManagementPage() {
+  const [confirm, confirmDialog] = useConfirm();
   const { admin } = useAdminAuth();
   const [admins, setAdmins] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,12 @@ export default function AdminStaffManagementPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to remove administrative access for this staff member?')) return;
+    const ok = await confirm({
+      title: 'Remove admin access?',
+      message: 'This staff member will lose access to the admin portal straight away.',
+      confirmText: 'Remove access',
+    });
+    if (!ok) return;
 
     const res = await adminFetch(`/api/admin/admins/${id}`, {
       method: 'DELETE',
@@ -308,6 +315,7 @@ export default function AdminStaffManagementPage() {
           </form>
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 }

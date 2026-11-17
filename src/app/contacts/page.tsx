@@ -28,10 +28,12 @@ import { getCurrentCoordinates, buildEmergencySosText, buildWhatsAppLink } from'
 import { api, EmergencyContact } from'@/lib/api-client';
 import { useAuth } from'@/lib/auth-context';
 import { useToast } from'@/components/Toast';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 
 export default function TrustedContactsPage() {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const [confirm, confirmDialog] = useConfirm();
 
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +116,14 @@ export default function TrustedContactsPage() {
   }
   };
 
-  const handleDelete = async (phoneToDelete: string | number) => {
+  const handleDelete = async (phoneToDelete: string | number, name?: string) => {
+  const ok = await confirm({
+  title: 'Remove this contact?',
+  message: `${name || 'This person'} will no longer be alerted when you send an SOS.`,
+  confirmText: 'Remove contact',
+  cancelText: 'Keep',
+  });
+  if (!ok) return;
   try {
   const res = await api.deleteEmergencyContact(phoneToDelete);
   if (res.ok) {
@@ -322,7 +331,7 @@ export default function TrustedContactsPage() {
 
   <button
   type="button"
-  onClick={() => handleDelete(contact.phoneNumber)}
+  onClick={() => handleDelete(contact.phoneNumber, contact.name)}
   className="h-10 w-10 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
   title="Remove Contact"
   >
@@ -508,6 +517,7 @@ export default function TrustedContactsPage() {
   </div>
   </form>
   </Modal>
+  {confirmDialog}
   </div>
   );
 }

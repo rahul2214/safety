@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Compass, Droplet, Map as MapIcon, Minus, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/Toast';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useAuth } from '@/lib/auth-context';
 import { api, type BloodRequest } from '@/lib/api-client';
 import { getCurrentCoordinates, reverseGeocodeCoords } from '@/lib/location';
@@ -31,6 +32,7 @@ const inputClass =
 export default function BloodRequestPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const [confirm, confirmDialog] = useConfirm();
 
   const [bloodGroup, setBloodGroup] = useState<string | null>(null);
   const [units, setUnits] = useState(1);
@@ -175,7 +177,13 @@ export default function BloodRequestPage() {
   };
 
   const deleteRequest = async (req: BloodRequest) => {
-    if (!window.confirm('Delete this request permanently? This cannot be undone.')) return;
+    const ok = await confirm({
+      title: 'Delete this request?',
+      message: `Your ${req.bloodGroup} request at ${req.location} will be removed permanently. This cannot be undone.`,
+      confirmText: 'Delete permanently',
+      cancelText: 'Keep it',
+    });
+    if (!ok) return;
 
     const res = await api.deleteBloodRequest(req.uuid);
     if (!res.ok) {
@@ -189,11 +197,15 @@ export default function BloodRequestPage() {
   };
 
   const closeRequest = async (req: BloodRequest, status: 'FULFILLED' | 'CANCELLED') => {
-    const question =
-      status === 'FULFILLED'
-        ? 'Mark this request as fulfilled? It will stop being shown to people nearby.'
-        : 'Cancel this request? It will stop being shown to people nearby.';
-    if (!window.confirm(question)) return;
+    const fulfilled = status === 'FULFILLED';
+    const ok = await confirm({
+      title: fulfilled ? 'Mark as fulfilled?' : 'Cancel this request?',
+      message: 'It will stop being shown to people nearby, and can no longer be edited.',
+      confirmText: fulfilled ? 'Mark fulfilled' : 'Cancel request',
+      cancelText: 'Go back',
+      destructive: false,
+    });
+    if (!ok) return;
 
     const res = await api.setBloodRequestStatus(req.uuid, status);
     if (!res.ok) {
@@ -497,6 +509,7 @@ export default function BloodRequestPage() {
 
       {/* Requests from other people nearby */}
       <NearbyRequests key={nearbyKey} className="min-w-0 lg:col-span-5" />
+      {confirmDialog}
     </div>
   );
 }

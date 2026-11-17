@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { adminFetch } from '@/portals/admin/lib/api';
 import {
   Tags,
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 
 export default function CategoriesManagementPage() {
+  const [confirm, confirmDialog] = useConfirm();
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,7 +79,12 @@ export default function CategoriesManagementPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to remove this safety category?')) return;
+    const ok = await confirm({
+      title: 'Remove this category?',
+      message: 'People will no longer be able to choose it when reporting an incident.',
+      confirmText: 'Remove category',
+    });
+    if (!ok) return;
     const res = await adminFetch(`/api/admin/categories/${id}`, {
       method: 'DELETE',
     });
@@ -221,6 +228,7 @@ export default function CategoriesManagementPage() {
           </form>
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 }

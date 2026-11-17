@@ -429,7 +429,7 @@ export default function ProfilePage() {
               <h2 className="text-[22px] font-black text-ink truncate">
                 {profile?.displayName || authUser?.displayName || 'Protected Member'}
               </h2>
-            
+
 
             </div>
 
@@ -485,10 +485,10 @@ export default function ProfilePage() {
           <div className="p-4 rounded-[18px] bg-white border border-slate-200 text-center shadow-xs">
             <span
               className={`text-[22px] font-black block ${readinessPercent >= 80
-                  ? 'text-[#059669]'
-                  : readinessPercent >= 50
-                    ? 'text-[#d97706]'
-                    : 'text-[#e11d48]'
+                ? 'text-[#059669]'
+                : readinessPercent >= 50
+                  ? 'text-[#d97706]'
+                  : 'text-[#e11d48]'
                 }`}
             >
               {loading ? <Skeleton className="h-6 w-12 mx-auto rounded-md" /> : `${readinessPercent}%`}
