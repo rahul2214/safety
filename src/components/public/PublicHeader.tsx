@@ -6,14 +6,18 @@ import { usePathname } from 'next/navigation';
 import { Menu, X, Phone, ArrowRight } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 
-export const PUBLIC_NAV = [
-  { href: '/', label: 'Home' },
+// `wide`: shown in the desktop bar only on extra-wide screens (always in the mobile menu),
+// so the bar never wraps at laptop widths.
+export const PUBLIC_NAV: { href: string; label: string; wide?: boolean }[] = [
+  { href: '/', label: 'Home', wide: true },
   { href: '/emergency', label: 'Emergency SOS' },
   { href: '/feed', label: 'Live feed' },
+  { href: '/blood-donation', label: 'Blood donation' },
   { href: '/safety-measures', label: 'Helplines' },
   { href: '/resources', label: 'Safety guides' },
-  { href: '/about', label: 'About' },
-  { href: '/organization-request', label: 'For campuses' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About', wide: true },
+  { href: '/organization-request', label: 'For campuses', wide: true },
 ];
 
 export function PublicHeader() {
@@ -61,16 +65,16 @@ export function PublicHeader() {
             <span className="font-display text-[19px] font-extrabold tracking-tight text-ink">Sabhijude</span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Main">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1" aria-label="Main">
             {PUBLIC_NAV.map((item) => {
-              const active = pathname === item.href;
+              const active = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href + '/'));
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
-                    active ? 'text-ink bg-mist' : 'text-slate-600 hover:text-ink hover:bg-mist'
-                  }`}
+                  className={`relative whitespace-nowrap rounded-full px-3 xl:px-3.5 py-2 text-[14px] font-medium transition-colors ${
+                    item.wide ? 'hidden 2xl:inline-flex' : ''
+                  } ${active ? 'text-ink bg-mist' : 'text-slate-600 hover:text-ink hover:bg-mist'}`}
                 >
                   {item.label}
                 </Link>

@@ -20,7 +20,10 @@ import {
   Sparkles,
   HelpCircle,
   ChevronDown,
+  Droplet,
+  Share2,
 } from 'lucide-react';
+import { RequestShowcaseVisual } from '@/components/blood/RequestShowcaseVisual';
 import { PostCard, type PostItem, getCategoryName } from '@/components/PostCard';
 import { type Category } from '@/lib/api-client';
 import { PostCardSkeleton } from '@/components/ui/Skeleton';
@@ -233,6 +236,51 @@ export function PublicLanding({
               <Link href="/organization-request" className="mt-6 self-start inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-900">
                 Bring it to your campus <ArrowRight className="h-4 w-4" />
               </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── BLOOD REQUESTS ───────────────────────────────────── */}
+      <section className="relative overflow-hidden pb-24 sm:pb-32" aria-labelledby="blood-heading">
+        <div className="public-container">
+          <div className="relative overflow-hidden rounded-[2rem] border border-red-100 bg-gradient-to-br from-red-50 via-white to-coral-tint px-6 py-12 sm:px-12 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-10 items-center">
+            <div aria-hidden className="absolute -left-24 -bottom-24 h-80 w-80 rounded-full bg-red-500/10 blur-3xl" />
+            <div className="relative lg:col-span-6 space-y-7">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-xs font-bold text-red-600 shadow-sm">
+                <Droplet className="h-3.5 w-3.5" /> New · Blood requests
+              </span>
+              <h2 id="blood-heading" className="display-2">
+                Someone nearby could be the{' '}
+                <span className="bg-gradient-to-r from-red-600 to-coral bg-clip-text text-transparent">donor you need.</span>
+              </h2>
+              <p className="text-lg text-slate-600 leading-relaxed max-w-xl">
+                Post a blood request in under a minute. People within about 25 km of the hospital see it on their home screen and can call you directly. Free, with no middlemen.
+              </p>
+              <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { icon: Droplet, t: 'Request', b: 'Group, units and the hospital on a map' },
+                  { icon: Share2, t: 'Reach', b: 'Shown nearby, shared with a live link' },
+                  { icon: Phone, t: 'Respond', b: 'Donors call you, one tap' },
+                ].map((s) => (
+                  <li key={s.t} className="rounded-2xl bg-white/80 backdrop-blur border border-white p-4 shadow-sm">
+                    <s.icon className="h-5 w-5 text-red-600" />
+                    <p className="mt-2 font-semibold text-ink">{s.t}</p>
+                    <p className="text-[13.5px] leading-snug text-slate-600">{s.b}</p>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/blood" className="btn-sos">
+                  <Droplet className="h-4 w-4" /> Request blood
+                </Link>
+                <Link href="/blood-donation" className="btn-ghost">
+                  How it works <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+            <div className="relative lg:col-span-6 px-4 sm:px-10 pb-6">
+              <RequestShowcaseVisual compact />
             </div>
           </div>
         </div>

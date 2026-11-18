@@ -18,6 +18,13 @@ export interface FaqItem {
 
 export const HOMEPAGE_FAQS: FaqItem[] = [
   {
+    question: 'Can I request blood or find donors on Sabhijude?',
+    answer:
+      'Yes. Post a blood request with the blood group, units and the hospital, and signed-in members within about 25 km of that place see it on their home screen and can call you directly. Share it on WhatsApp with a live status link, and mark it fulfilled when you are covered. It is free, and Sabhijude never charges donors or families.',
+    linkHref: '/blood-donation',
+    linkText: 'See how blood requests work',
+  },
+  {
     question: 'What is Sabhijude and how does it protect me?',
     answer:
       'Sabhijude is a comprehensive personal safety app and emergency SOS platform designed for individuals, students, employees, and families. With one tap, users can trigger instant emergency SOS alerts, broadcast live GPS location coordinates to trusted contacts, access discreet fake call exits, and reach official national emergency helplines (112, 1091, 181, 1930).',

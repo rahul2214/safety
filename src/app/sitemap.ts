@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { BLOG_POSTS } from '@/lib/blog-posts';
 
 const BASE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -10,6 +11,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Public indexable routes
   return [
+    {
+      url: `${BASE_URL}/blood-donation`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    ...BLOG_POSTS.map((p) => ({
+      url: `${BASE_URL}/blog/${p.slug}`,
+      lastModified: `${p.date}T00:00:00+05:30`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
     {
       url: `${BASE_URL}/`,
       lastModified: currentDate,

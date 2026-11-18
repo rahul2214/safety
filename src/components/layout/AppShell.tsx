@@ -62,6 +62,8 @@ const PUBLIC_ROUTES = [
   '/map',
   '/login',
   '/signup',
+  '/blood-donation',
+  '/blog',
 ];
 
 export function AppShell({ children }: AppShellProps) {
@@ -76,7 +78,9 @@ export function AppShell({ children }: AppShellProps) {
   const isPostPage = pathname?.startsWith('/posts/') ?? false;
   // A shared blood request (/blood/<uuid>) is public too; the /blood list itself is not.
   const isBloodRequestPage = /^\/blood\/[^/]+$/.test(pathname ?? '');
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isPostPage || isBloodRequestPage;
+  // Blog articles (/blog/<slug>) are public marketing pages.
+  const isBlogArticle = /^\/blog\/[^/]+$/.test(pathname ?? '');
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || isPostPage || isBloodRequestPage || isBlogArticle;
   const isAuthPage = pathname === '/login' || pathname === '/signup';
 
   const standing = useAccountStanding(isAuthenticated && !isAuthPage);

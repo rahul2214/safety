@@ -9,6 +9,7 @@ const COLUMNS = [
     links: [
       { href: '/emergency', label: 'Emergency SOS' },
       { href: '/feed', label: 'Community Safety Feed' },
+      { href: '/blood-donation', label: 'Blood Requests & Donation' },
       { href: '/safety-measures', label: 'Helplines Directory' },
       { href: '/resources', label: 'Safety & Legal Guides' },
       { href: '/map', label: 'Interactive Safety Map' },
@@ -26,6 +27,7 @@ const COLUMNS = [
     title: 'Platform & Trust',
     links: [
       { href: '/about', label: 'About Sabhijude' },
+      { href: '/blog', label: 'Blog' },
       { href: '/privacy', label: 'Privacy Policy & Safeguards' },
       { href: '/support', label: 'Help Center & Contact' },
       { href: '/signup', label: 'Create Free Account' },
