@@ -191,6 +191,10 @@ export function PublicFooter() {
               Terms of Service
             </Link>
             <span>&bull;</span>
+            <Link href="/child-safety" className="hover:text-white transition-colors">
+              Child Safety
+            </Link>
+            <span>&bull;</span>
             <Link href="/support" className="hover:text-white transition-colors">
               Help &amp; Support
             </Link>

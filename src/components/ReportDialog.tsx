@@ -16,6 +16,9 @@ import { api } from '@/lib/api-client';
 export type ReportTarget = 'post' | 'author';
 
 const REASONS: { value: string; label: string; blurb: string; postOnly?: boolean }[] = [
+  // First on purpose: Google Play's child safety policy requires an obvious way to report
+  // child sexual abuse or exploitation. Needs API + migration 00034 to be live.
+  { value: 'CHILD_SAFETY', label: 'Child safety concern', blurb: 'Sexual content involving a child, grooming, or any risk to a child.' },
   { value: 'HARASSMENT', label: 'Harassment or bullying', blurb: 'Repeatedly targeting, mocking or intimidating someone.' },
   { value: 'THREAT', label: 'Threats or violence', blurb: 'Threatening to hurt someone, or encouraging others to.' },
   { value: 'DOXXING', label: 'Sharing private details', blurb: "Posting someone's address, phone number, workplace or photos." },
