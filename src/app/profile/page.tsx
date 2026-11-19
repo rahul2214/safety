@@ -718,6 +718,40 @@ export default function ProfilePage() {
           </div>
         </section>
 
+        {/* ─── 8. Account: sign out and delete ───────────────────────────── */}
+        {/* The delete dialog below existed but nothing opened it, so an account could not be
+            deleted from the website. Google Play's deletion policy (/delete-account) points here. */}
+        <section id="delete-account" className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-5 w-5 text-red-600" />
+            <h3 className="text-[16px] font-black text-ink">Account</h3>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-[12px] border border-slate-200 text-ink text-xs font-bold transition hover:bg-slate-50"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-[12px] border border-red-200 bg-red-50 text-red-700 text-xs font-bold transition hover:bg-red-100"
+            >
+              <ShieldAlert className="h-4 w-4" />
+              Delete my account
+            </button>
+          </div>
+          <p className="text-[12px] text-slate-500">
+            Deleting your account is permanent. See{' '}
+            <a href="/delete-account" className="font-semibold text-brand hover:underline">
+              what is deleted and what is kept
+            </a>
+            .
+          </p>
+        </section>
 
         {/* ─── Edit Profile Modal ─────────────────────────────────────────── */}
         <Modal
