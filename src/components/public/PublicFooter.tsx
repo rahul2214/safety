@@ -187,6 +187,10 @@ export function PublicFooter() {
               Privacy Policy
             </Link>
             <span>&bull;</span>
+            <Link href="/terms" className="hover:text-white transition-colors">
+              Terms of Service
+            </Link>
+            <span>&bull;</span>
             <Link href="/support" className="hover:text-white transition-colors">
               Help &amp; Support
             </Link>

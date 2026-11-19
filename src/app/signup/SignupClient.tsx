@@ -423,8 +423,16 @@ function SignupFormContent() {
                       className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
                     <label htmlFor="ageCheck" className="text-xs text-slate-600 leading-snug cursor-pointer">
-                      I confirm I am <strong className="text-slate-900">10 years of age or older</strong> and
-                      agree to the Sabhijude Community Guidelines and Emergency Response Protocols.
+                      I confirm I am <strong className="text-slate-900">10 years of age or older</strong> (with a
+                      parent&rsquo;s or guardian&rsquo;s consent if under 18) and agree to the{' '}
+                      <a href="/terms" target="_blank" rel="noopener" className="font-semibold text-blue-600 hover:underline">
+                        Terms of Service
+                      </a>{' '}
+                      and{' '}
+                      <a href="/privacy" target="_blank" rel="noopener" className="font-semibold text-blue-600 hover:underline">
+                        Privacy Policy
+                      </a>
+                      .
                     </label>
                   </div>
 

@@ -65,6 +65,7 @@ const PUBLIC_ROUTES = [
   '/join',
   // Google Play links here from the store listing; it must open without signing in.
   '/delete-account',
+  '/terms',
   '/blood-donation',
   '/blog',
 ];
