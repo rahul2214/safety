@@ -63,6 +63,8 @@ const PUBLIC_ROUTES = [
   '/login',
   '/signup',
   '/join',
+  '/forgot-password',
+  '/verify-email',
   // Google Play links here from the store listing; it must open without signing in.
   '/delete-account',
   '/terms',
@@ -89,7 +91,9 @@ export function AppShell({ children }: AppShellProps) {
   // /join (emailed college invitation) must open for signed-out students too, and it has its
   // own full-screen layout like the auth pages. Redirecting it to /login would drop the
   // invitation token, which lives in the URL fragment.
-  const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/join';
+  const isAuthPage = ['/login', '/signup', '/join', '/forgot-password', '/verify-email'].includes(
+    pathname ?? ''
+  );
 
   const standing = useAccountStanding(isAuthenticated && !isAuthPage);
 

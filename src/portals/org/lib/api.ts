@@ -148,6 +148,48 @@ export interface OrganizationMember {
   title?: string;
   isActive: boolean;
   joinedAt: string;
+  /** Set on pending requests from an emailed invite claimed with a different email. */
+  invitedName?: string | null;
+  invitedEmail?: string | null;
+  invitedRollNumber?: string | null;
+}
+
+export interface StudentInviteInput {
+  fullName: string;
+  email: string;
+  rollNumber?: string;
+  department?: string;
+}
+
+export type StudentInviteStatus =
+  | 'QUEUED' | 'SENT' | 'FAILED' | 'UNDELIVERABLE' | 'ACCEPTED' | 'PENDING_APPROVAL' | 'REVOKED' | 'EXPIRED';
+
+export interface StudentInvite {
+  id: string;
+  fullName: string;
+  email: string;
+  rollNumber?: string | null;
+  department?: string | null;
+  status: StudentInviteStatus;
+  expiresAt?: string | null;
+  lastSentAt?: string | null;
+  createdAt: string;
+  canResend: boolean;
+  canRevoke: boolean;
+}
+
+export interface StudentInviteQuota {
+  dayLimit: number;
+  monthLimit: number;
+  dayUsed: number;
+  monthUsed: number;
+}
+
+export interface CreateStudentInvitesResult {
+  created: number;
+  duplicates: number;
+  suppressed: number;
+  invalid: number;
 }
 
 export interface OrgDashboardStats {
@@ -335,6 +377,19 @@ export const organizationsApi = {
       method: 'PUT',
       body: JSON.stringify({ newRole }),
     }),
+  createStudentInvites: (id: number, students: StudentInviteInput[]) =>
+    adminFetch<CreateStudentInvitesResult>(`/api/Organizations/${id}/student-invites`, {
+      method: 'POST',
+      body: JSON.stringify({ students }),
+    }),
+  getStudentInvites: (id: number) =>
+    adminFetch<StudentInvite[]>(`/api/Organizations/${id}/student-invites`, { forceRefresh: true }),
+  getStudentInviteQuota: (id: number) =>
+    adminFetch<StudentInviteQuota>(`/api/Organizations/${id}/student-invites/quota`, { forceRefresh: true }),
+  resendStudentInvite: (id: number, inviteId: string) =>
+    adminFetch<{ queued: boolean }>(`/api/Organizations/${id}/student-invites/${inviteId}/resend`, { method: 'POST' }),
+  revokeStudentInvite: (id: number, inviteId: string) =>
+    adminFetch<{ revoked: boolean }>(`/api/Organizations/${id}/student-invites/${inviteId}/revoke`, { method: 'POST' }),
   getMembersWithConsents: (id: number) =>
     adminFetch<MemberWithConsents[]>(`/api/Organizations/${id}/members-with-consents`),
 };

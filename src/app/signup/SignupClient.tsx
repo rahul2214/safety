@@ -31,16 +31,20 @@ import { api } from '@/lib/api-client';
 import { BLOOD_GROUPS } from '@/lib/requests';
 import { Logo } from '@/components/ui/Logo';
 import { AuthLayout } from '@/components/public/AuthLayout';
+import { GoogleSignInButton } from '@/components/public/GoogleSignInButton';
 
 function SignupFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = safeRedirect(searchParams.get('redirect'));
 
-  const { register, isAuthenticated, isLoading } = useAuth();
+  const { register, loginWithGoogle, isAuthenticated, isLoading } = useAuth();
 
-  // Wizard Stage: 1 = Account Credentials, 2 = Safety Profile Onboarding
-  const [stage, setStage] = useState<1 | 2>(1);
+  // Wizard Stage: 1 = Account Credentials, 2 = Safety Profile Onboarding.
+  // `?stage=profile` opens straight on step 2, for someone who just confirmed their email or
+  // signed up with Google.
+  const [stage, setStage] = useState<1 | 2>(searchParams.get('stage') === 'profile' ? 2 : 1);
+  const [googleBusy, setGoogleBusy] = useState(false);
 
   // Stage 1 Fields (Matching mobile-app signup.tsx & backend validation)
   const [displayName, setDisplayName] = useState('');
@@ -111,6 +115,35 @@ function SignupFormContent() {
 
   const isPasswordMatch = password.length > 0 && password === confirmPassword;
 
+  // Step 2 needs a signed-in member. Arriving at ?stage=profile signed out goes to login.
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && stage === 2 && !registeringRef.current) {
+      router.replace(`/login?redirect=${encodeURIComponent(redirectPath)}`);
+    }
+  }, [isLoading, isAuthenticated, stage, redirectPath, router]);
+
+  const handleGoogle = async (idToken: string) => {
+    setErrorMsg(null);
+    // Google skips the form, but not the age rule.
+    if (!isAgeConfirmed) {
+      setErrorMsg('Tick the age confirmation box below before continuing with Google.');
+      return;
+    }
+
+    setGoogleBusy(true);
+    registeringRef.current = true;
+    const result = await loginWithGoogle(idToken);
+    setGoogleBusy(false);
+
+    if (!result.success) {
+      registeringRef.current = false;
+      setErrorMsg(result.error || 'Google sign-in did not work. Please try again.');
+      return;
+    }
+    if (result.needsProfile) setStage(2);
+    else router.push(redirectPath);
+  };
+
   // Handle Stage 1 Submit
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,7 +193,13 @@ function SignupFormContent() {
 
     setIsSubmitting(false);
 
-    if (result.success) {
+    if (result.success && result.requiresEmailVerification) {
+      // The account exists but needs the emailed code; the profile step comes after that.
+      registeringRef.current = false;
+      router.push(
+        `/verify-email?email=${encodeURIComponent(cleanEmail)}&next=profile&redirect=${encodeURIComponent(redirectPath)}`
+      );
+    } else if (result.success) {
       // Advance to mobile app Onboarding Stage
       setStage(2);
     } else {
@@ -242,6 +281,7 @@ function SignupFormContent() {
               {/* STAGE 1: ACCOUNT REGISTRATION (Mobile App Parity & DB Security) */}
               {/* ============================================================== */}
               {stage === 1 && (
+                <>
                 <form onSubmit={handleSignup} className="space-y-4">
                   {/* Display Name Input */}
                   <div className="space-y-1.5 text-left">
@@ -440,7 +480,7 @@ function SignupFormContent() {
                   <div className="pt-3">
                     <button
                       type="submit"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || googleBusy}
                       className="w-full h-12 rounded-full bg-ink hover:bg-ink-soft active:bg-black text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
                     >
                       {isSubmitting ? (
@@ -454,6 +494,15 @@ function SignupFormContent() {
                     </button>
                   </div>
                 </form>
+
+                <div className="mt-5">
+                  <GoogleSignInButton
+                    onCredential={handleGoogle}
+                    disabled={isSubmitting || googleBusy}
+                    text="signup_with"
+                  />
+                </div>
+                </>
               )}
 
               {/* ============================================================== */}

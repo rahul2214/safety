@@ -21,6 +21,7 @@ import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { getCurrentCoordinates } from '@/lib/location';
+import { ChangePasswordCard } from './ChangePasswordCard';
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
@@ -55,6 +56,7 @@ export default function SettingsPage() {
 
   const sections = [
     { id: 'Account', label: 'Account & Identity', icon: User },
+    { id: 'Security', label: 'Password & Security', icon: Shield },
     { id: 'Privacy', label: 'Privacy & Sharing', icon: Lock },
     { id: 'Notifications', label: 'Notification Preferences', icon: Bell },
     { id: 'Diagnostics', label: 'Device Diagnostics', icon: Smartphone },
@@ -170,6 +172,8 @@ export default function SettingsPage() {
               </form>
             </Card>
           )}
+
+          {activeTab === 'Security' && <ChangePasswordCard email={user?.email} />}
 
           {activeTab === 'Privacy' && (
             <Card className="p-6 space-y-5">

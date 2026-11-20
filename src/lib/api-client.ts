@@ -279,6 +279,21 @@ export interface DpdpExportResult {
   purpose: string;
 }
 
+export interface StudentInvitePreview {
+  inviteId: string;
+  orgName: string;
+  orgLogoUrl?: string | null;
+  orgType?: string | null;
+  expiresAt?: string | null;
+}
+
+export interface AcceptStudentInviteResult {
+  result: 'JOINED' | 'PENDING_APPROVAL' | 'ALREADY_MEMBER';
+  orgId: number;
+  orgName: string;
+  message: string;
+}
+
 function getAuthHeader(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   const headers: Record<string, string> = {};
@@ -428,6 +443,34 @@ export const api = {
   // Manual cache invalidation trigger
   invalidateCache(pattern?: string | RegExp) {
     apiCache.invalidate(pattern);
+  },
+
+  // Password reset & email verification. Signing in with the result (verify-email, google)
+  // lives in auth-context, since it changes who is signed in.
+  /** Emails a reset code. Succeeds whether or not the address has an account. */
+  async forgotPassword(email: string) {
+    return request<{ message: string }>('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email: email.trim() }),
+    });
+  },
+  async resetPassword(email: string, code: string, newPassword: string) {
+    return request<{ message: string }>('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email: email.trim(), code, newPassword }),
+    });
+  },
+  async changePassword(currentPassword: string, newPassword: string) {
+    return request<{ message: string }>('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+  async resendVerification(email: string) {
+    return request<{ message: string }>('/api/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({ email: email.trim() }),
+    });
   },
 
   // Feed & Posts
@@ -818,6 +861,32 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ token, consents }),
     });
+  },
+
+  // ─── Emailed college invitations ────────────────────────────────
+  async previewStudentInvite(token: string) {
+    return request<StudentInvitePreview>('/api/invites/preview', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  },
+
+  async acceptStudentInvite(input: { token?: string; inviteId?: string; consents?: string[] }) {
+    return request<AcceptStudentInviteResult>('/api/invites/accept', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  async declineStudentInvite(input: { token?: string; inviteId?: string; stopEmails?: boolean }) {
+    return request<{ declined: boolean }>('/api/invites/decline', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  async getMyStudentInvites() {
+    return request<StudentInvitePreview[]>('/api/invites/mine', {}, 1, { skipCache: true });
   },
 
   async getOrganizationConsents(organizationId: number) {

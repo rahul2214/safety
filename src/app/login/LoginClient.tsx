@@ -25,28 +25,53 @@ import { safeRedirect } from '@/lib/safe-redirect';
 import { useToast } from '@/components/Toast';
 import { Logo } from '@/components/ui/Logo';
 import { AuthLayout } from '@/components/public/AuthLayout';
+import { GoogleSignInButton } from '@/components/public/GoogleSignInButton';
 
 function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = safeRedirect(searchParams.get('redirect'));
 
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login, loginWithGoogle, isAuthenticated, isLoading } = useAuth();
   const { showToast } = useToast();
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(searchParams.get('email') ?? '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotSuccess, setForgotSuccess] = useState(false);
+
+  // Set while a Google sign-in is deciding where to go, so the "already signed in" redirect
+  // below does not send a brand-new account past its profile step.
+  const googleRef = React.useRef(false);
+
+  const handleGoogle = async (idToken: string) => {
+    setErrorMsg(null);
+    setGoogleBusy(true);
+    googleRef.current = true;
+    const result = await loginWithGoogle(idToken);
+    setGoogleBusy(false);
+
+    if (!result.success) {
+      googleRef.current = false;
+      const message = result.error || 'Google sign-in did not work. Please try again.';
+      setErrorMsg(message);
+      showToast(message, 'error');
+      return;
+    }
+    showToast('Signed in with Google.', 'success');
+    router.push(
+      result.needsProfile
+        ? `/signup?stage=profile&redirect=${encodeURIComponent(redirectPath)}`
+        : redirectPath
+    );
+  };
 
   // If already logged in, redirect immediately to target route
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading && isAuthenticated && !googleRef.current) {
       router.replace(redirectPath);
     }
   }, [isLoading, isAuthenticated, redirectPath, router]);
@@ -69,6 +94,12 @@ function LoginFormContent() {
       if (result.success) {
         showToast('Signed in successfully!', 'success');
         router.push(redirectPath);
+      } else if (result.code === 'EMAIL_NOT_VERIFIED') {
+        // The password was right; the address just was never confirmed.
+        showToast('Please confirm your email first. Enter the code we emailed you.', 'info');
+        router.push(
+          `/verify-email?email=${encodeURIComponent(email.trim())}&redirect=${encodeURIComponent(redirectPath)}`
+        );
       } else {
         const err = typeof result.error === 'string' ? result.error : '';
         let message = 'Invalid email or password. Please verify your credentials or create a new account.';
@@ -94,17 +125,6 @@ function LoginFormContent() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleForgotPasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!forgotEmail.trim()) return;
-    setForgotSuccess(true);
-    setTimeout(() => {
-      setShowForgotPasswordModal(false);
-      setForgotSuccess(false);
-      setForgotEmail('');
-    }, 3200);
   };
 
   return (
@@ -171,13 +191,12 @@ function LoginFormContent() {
                     <label htmlFor="password" className="block text-xs font-semibold text-slate-700">
                       Password
                     </label>
-                    <button
-                      type="button"
-                      onClick={() => setShowForgotPasswordModal(true)}
+                    <Link
+                      href={`/forgot-password${email.trim() ? `?email=${encodeURIComponent(email.trim())}` : ''}`}
                       className="text-xs font-semibold text-brand hover:text-brand-deep hover:underline transition-colors focus:outline-none"
                     >
                       Forgot password?
-                    </button>
+                    </Link>
                   </div>
                   <div className="relative flex items-center">
                     <div className="absolute left-3.5 pointer-events-none text-slate-400">
@@ -228,7 +247,7 @@ function LoginFormContent() {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || googleBusy}
                     className="w-full h-12 rounded-full bg-ink hover:bg-ink-soft active:bg-black text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
                   >
                     {isSubmitting ? (
@@ -242,6 +261,10 @@ function LoginFormContent() {
                   </button>
                 </div>
               </form>
+
+              <div className="mt-5">
+                <GoogleSignInButton onCredential={handleGoogle} disabled={isSubmitting || googleBusy} />
+              </div>
 
               {/* Registration Link Footer */}
               <div className="mt-6 pt-5 border-t border-slate-100 text-center">
@@ -260,72 +283,6 @@ function LoginFormContent() {
                 </p>
               </div>
 
-      {/* 3. FORGOT PASSWORD MODAL */}
-      {showForgotPasswordModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Reset Your Password</h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  Enter your registered email address. We will verify your account against the safety database
-                  and send an encrypted recovery link.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowForgotPasswordModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-sm font-semibold p-1"
-              >
-                ✕
-              </button>
-            </div>
-
-            {forgotSuccess ? (
-              <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <div className="leading-relaxed">
-                  <span className="font-semibold block mb-0.5">Recovery instructions dispatched</span>
-                  If this email is registered in the Sabhijude database, a secure password reset link has
-                  been dispatched to your inbox.
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotPasswordSubmit} className="space-y-3.5">
-                <div>
-                  <label htmlFor="forgotEmail" className="block text-xs font-semibold text-slate-700 mb-1">
-                    Registered Email Address
-                  </label>
-                  <input
-                    id="forgotEmail"
-                    type="email"
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    required
-                    placeholder="name@example.com"
-                    className="w-full h-10 border border-slate-300 rounded-lg px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  />
-                </div>
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPasswordModal(false)}
-                    className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
-                  >
-                    Send Recovery Link
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
 
     </AuthLayout>
   );

@@ -55,6 +55,8 @@ export function proxy(request: NextRequest) {
     "'unsafe-inline'",
     isDev ? "'unsafe-eval'" : '',
     'https://www.googletagmanager.com',
+    // Google Identity Services, for "Continue with Google" on /login and /signup.
+    'https://accounts.google.com/gsi/client',
   ]
     .filter(Boolean)
     .join(' ');
@@ -62,10 +64,11 @@ export function proxy(request: NextRequest) {
   const csp = `
     default-src 'self';
     script-src ${scriptSrc};
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style;
     img-src 'self' blob: data: https:;
     font-src 'self' data: https://fonts.gstatic.com;
-    connect-src 'self' ${apiOrigin} ${apiSocketOrigin} https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;
+    connect-src 'self' ${apiOrigin} ${apiSocketOrigin} https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://accounts.google.com/gsi/;
+    frame-src 'self' https://accounts.google.com/gsi/;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
@@ -84,7 +87,9 @@ export function proxy(request: NextRequest) {
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=()');
-  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  // same-origin-allow-popups rather than same-origin: Google sign-in opens a pop-up that has
+  // to report the chosen account back to this page. Pages that open us stay isolated.
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
   if (!isDev) {
     response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains');

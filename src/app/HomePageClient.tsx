@@ -258,19 +258,21 @@ export function HomePageClient() {
       <NearbyRequests />
 
       {/* ── Quick actions ──────────────────────────────────── */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {quickActions.map((a) => {
           const inner = (
             <>
-              <span className={`h-11 w-11 rounded-2xl flex items-center justify-center ${a.tint}`}>
-                {a.loading ? <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" /> : <a.icon className="h-5 w-5" />}
+              <span className={`h-9 w-9 shrink-0 rounded-xl flex items-center justify-center ${a.tint}`}>
+                {a.loading ? <span className="h-3.5 w-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" /> : <a.icon className="h-4 w-4" />}
               </span>
-              <span className="mt-4 block font-semibold text-ink">{a.label}</span>
-              <span className="block text-xs text-slate-500 mt-0.5">{a.hint}</span>
-              <ArrowRight className="absolute top-5 right-5 h-4 w-4 text-slate-300 group-hover:text-ink group-hover:translate-x-0.5 transition" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold text-ink">{a.label}</span>
+                <span className="block truncate text-[11px] text-slate-500">{a.hint}</span>
+              </span>
+              <ArrowRight className="hidden sm:block h-3.5 w-3.5 shrink-0 text-slate-300 group-hover:text-ink group-hover:translate-x-0.5 transition" />
             </>
           );
-          const cls = 'group relative text-left rounded-3xl bg-white border border-slate-200/80 p-5 hover:border-slate-300 hover:shadow-[0_12px_32px_-16px_rgba(11,22,48,0.2)] hover:-translate-y-0.5 transition';
+          const cls = 'group flex items-center gap-2.5 text-left rounded-2xl bg-white border border-slate-200/80 px-3 py-2.5 hover:border-slate-300 hover:shadow-[0_8px_20px_-12px_rgba(11,22,48,0.2)] transition disabled:opacity-60';
           return a.href ? (
             <Link key={a.label} href={a.href} className={cls}>{inner}</Link>
           ) : (
