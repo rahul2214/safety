@@ -273,16 +273,25 @@ async function handleProxy(
       });
     }
   } catch (err: any) {
-    console.error(`BFF Proxy failed to reach backend API at ${target.pathname}:`, err?.message || err);
+    const timedOut = err?.name === 'AbortError';
+    console.error(
+      `BFF Proxy ${timedOut ? 'timed out' : 'failed'} reaching backend API at ${target.pathname}:`,
+      err?.message || err
+    );
     return NextResponse.json(
       {
         success: false,
-        error: {
-          code: 'BACKEND_UNAVAILABLE',
-          message: 'Unable to reach the backend API server. Please verify the backend service is running.',
-        },
+        error: timedOut
+          ? {
+              code: 'GATEWAY_TIMEOUT',
+              message: 'Our server is taking too long to respond. Please try again in a moment.',
+            }
+          : {
+              code: 'BACKEND_UNAVAILABLE',
+              message: 'We cannot reach our server right now. Please try again in a moment.',
+            },
       },
-      { status: 502 }
+      { status: timedOut ? 504 : 502, headers: { 'Retry-After': '5', 'Cache-Control': 'no-store' } }
     );
   }
 }

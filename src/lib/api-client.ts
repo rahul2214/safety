@@ -14,6 +14,29 @@ const API_BASE =
       process.env.NEXT_PUBLIC_API_URL ||
       (process.env.NODE_ENV === 'production' ? DEFAULT_PROD_API : 'http://127.0.0.1:5000');
 
+/**
+ * Tells the connection banner (components/NetworkBanner) what the last request learned:
+ * 'up' when the server answered, 'down' when it could not be reached.
+ */
+export const NETWORK_EVENT = 'sabhijude_network';
+function reportNetwork(state: 'up' | 'down') {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(NETWORK_EVENT, { detail: state }));
+  }
+}
+
+/** What to show when the server answered with an error but no message of its own. */
+function fallbackMessage(status: number): string {
+  if (status === 401) return 'Please sign in to continue.';
+  if (status === 403) return 'You do not have access to this.';
+  if (status === 404) return 'This could not be found. It may have been removed.';
+  if (status === 408 || status === 504) return 'The server took too long to respond. Please try again.';
+  if (status === 413) return 'That is too large to send. Try a smaller file or shorter text.';
+  if (status === 429) return 'Too many attempts. Please wait a minute and try again.';
+  if (status >= 500) return 'We are having trouble on our side. Please try again in a moment.';
+  return `Something went wrong (${status}). Please try again.`;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -383,6 +406,9 @@ async function request<T>(
 
     const status = res.status;
 
+    // The proxy answers 502/504 itself when the backend cannot be reached.
+    reportNetwork(status === 502 || status === 504 ? 'down' : 'up');
+
     if (status === 401 && typeof window !== 'undefined' && localStorage.getItem('sabhijude_token')) {
       // Access token expired: renew it once and replay the request before giving up
       if (!isRetryAfterRefresh && !endpoint.startsWith('/api/auth/') && (await refreshSession())) {
@@ -428,14 +454,22 @@ async function request<T>(
       window.dispatchEvent(new Event('sabhijude_account_suspended'));
     }
 
-    const errorMsg = json?.error?.message || json?.message || `Request failed with status ${status}`;
+    const errorMsg = json?.error?.message || json?.message || fallbackMessage(status);
     return { ok: false, error: errorMsg, status };
   } catch (err: any) {
     if (isGet && retries > 0) {
       await new Promise((r) => setTimeout(r, 1000));
       return request<T>(endpoint, options, retries - 1, cacheOptions);
     }
-    return { ok: false, error: err.message || 'Network connection unavailable', status: 0 };
+    reportNetwork('down');
+    const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+    return {
+      ok: false,
+      error: offline
+        ? 'You are offline. Check your internet connection and try again.'
+        : 'We cannot reach our server right now. Please try again in a moment.',
+      status: 0,
+    };
   }
 }
 

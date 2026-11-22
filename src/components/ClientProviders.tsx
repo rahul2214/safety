@@ -7,6 +7,7 @@ import { ToastProvider } from '@/components/Toast';
 import { AppShell } from '@/components/layout/AppShell';
 import { SosModal } from '@/components/SosModal';
 import { FakeCallModal } from '@/components/FakeCallModal';
+import { NetworkBanner } from '@/components/NetworkBanner';
 
 interface ClientProvidersProps {
   children: React.ReactNode;
@@ -46,13 +47,19 @@ export function ClientProviders({ children }: ClientProvidersProps) {
   }, []);
 
   if (isPortalRoute) {
-    return <>{children}</>;
+    return (
+      <>
+        {children}
+        <NetworkBanner />
+      </>
+    );
   }
 
   return (
     <AuthProvider>
       <ToastProvider>
         <AppShell>{children}</AppShell>
+        <NetworkBanner />
 
         {/* Global Modals for Fast Emergency Access */}
         <SosModal isOpen={sosOpen} onClose={() => setSosOpen(false)} />
