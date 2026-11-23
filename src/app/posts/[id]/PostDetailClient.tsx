@@ -159,7 +159,14 @@ export function PostDetailClient() {
     return true;
   };
 
+  // Support and "faced this" are what others give; on your own post they are counts only.
+  // isMine also covers anonymous posts. An old self-reaction can still be taken back.
+  const ownPost = isOwner || !!post?.isMine;
+  const supportLocked = ownPost && !supported;
+  const facedLocked = ownPost && !facedThis;
+
   const toggleSupport = async () => {
+    if (supportLocked) return;
     if (requireSignIn('Please sign in to support this report.')) return;
     const next = !supported;
     setSupported(next);
@@ -178,6 +185,7 @@ export function PostDetailClient() {
   };
 
   const toggleFaced = async () => {
+    if (facedLocked) return;
     if (requireSignIn('Please sign in to react to this report.')) return;
     const next = !facedThis;
     setFacedThis(next);
@@ -496,8 +504,10 @@ export function PostDetailClient() {
                   <button
                     type="button"
                     onClick={toggleSupport}
+                    disabled={supportLocked}
+                    title={supportLocked ? 'Your post: others can support you here' : undefined}
                     aria-pressed={supported}
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
                       supported ? 'border-coral/30 bg-coral-tint text-coral' : 'border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
@@ -506,13 +516,20 @@ export function PostDetailClient() {
                   <button
                     type="button"
                     onClick={toggleFaced}
+                    disabled={facedLocked}
+                    title={facedLocked ? 'Your post: shows how many others faced this' : undefined}
                     aria-pressed={facedThis}
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
                       facedThis ? 'border-brand/30 bg-brand-tint text-brand' : 'border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     <Users className="h-4 w-4" /> {facedCount} faced this too
                   </button>
+                  {ownPost && (
+                    <p className="w-full text-xs text-slate-500">
+                      This is your post. These show how many people supported you or faced the same.
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"

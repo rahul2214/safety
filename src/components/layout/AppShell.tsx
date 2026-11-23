@@ -89,8 +89,10 @@ export function AppShell({ children }: AppShellProps) {
   const isBlogArticle = /^\/blog\/[^/]+$/.test(pathname ?? '');
   // An SOS live location link (/live/<token>) is opened by family who may have no account.
   const isLiveSosPage = /^\/live\/[^/]+$/.test(pathname ?? '');
+  // A live location share link (/share/<token>): also opened by people without an account.
+  const isLocationSharePage = /^\/share\/[^/]+$/.test(pathname ?? '');
   const isPublicRoute =
-    PUBLIC_ROUTES.includes(pathname) || isPostPage || isBloodRequestPage || isBlogArticle || isLiveSosPage;
+    PUBLIC_ROUTES.includes(pathname) || isPostPage || isBloodRequestPage || isBlogArticle || isLiveSosPage || isLocationSharePage;
   // /join (emailed college invitation) must open for signed-out students too, and it has its
   // own full-screen layout like the auth pages. Redirecting it to /login would drop the
   // invitation token, which lives in the URL fragment.

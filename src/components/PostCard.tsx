@@ -43,6 +43,8 @@ export interface PostItem {
   solutionsCount?: number;
   hasSupported?: boolean;
   hasFacedThis?: boolean;
+  /** True when the signed-in user wrote this post (also for their anonymous posts). */
+  isMine?: boolean;
   riskScore?: number;
   safetyAdvice?: string;
 }
@@ -144,8 +146,15 @@ export function PostCard({ post }: { post: PostItem }) {
   const [isTogglingSupport, setIsTogglingSupport] = useState<boolean>(false);
   const [isTogglingFacedThis, setIsTogglingFacedThis] = useState<boolean>(false);
 
+  // Support and "faced this" are what others give; on your own post they are counts only.
+  // An old self-reaction from before this rule can still be taken back.
+  const isMine = !!post.isMine;
+  const supportLocked = isMine && !supported;
+  const facedLocked = isMine && !facedThis;
+
   const toggleSupport = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (supportLocked) return;
     if (!isAuthenticated) {
       showToast('Please sign in to support community incident reports.', 'info');
       return;
@@ -180,6 +189,7 @@ export function PostCard({ post }: { post: PostItem }) {
 
   const toggleFacedThis = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (facedLocked) return;
     if (!isAuthenticated) {
       showToast('Please sign in to react to community incidents.', 'info');
       return;
@@ -340,11 +350,11 @@ export function PostCard({ post }: { post: PostItem }) {
   {/* Heart / Support */}
   <button
   type="button"
-  disabled={isTogglingSupport}
+  disabled={isTogglingSupport || supportLocked}
   onClick={toggleSupport}
-  title="Support this report"
+  title={supportLocked ? 'Your post: others can support you here' : 'Support this report'}
   aria-label={`Support this report: ${supportCount} supports`}
-  className={`flex items-center gap-1.5 min-h-9 px-2 -mx-2 transition-colors cursor-pointer disabled:opacity-60 ${
+  className={`flex items-center gap-1.5 min-h-9 px-2 -mx-2 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${
   supported ? 'text-coral font-bold' : 'hover:text-ink'
   }`}
   >
@@ -357,11 +367,11 @@ export function PostCard({ post }: { post: PostItem }) {
   {/* Faced This Too */}
   <button
   type="button"
-  disabled={isTogglingFacedThis}
+  disabled={isTogglingFacedThis || facedLocked}
   onClick={toggleFacedThis}
-  title="I faced this incident too"
+  title={facedLocked ? 'Your post: shows how many others faced this' : 'I faced this incident too'}
   aria-label={`I faced this too: ${similarCount} people faced this`}
-  className={`flex items-center gap-1.5 min-h-9 px-2 py-1.5 rounded-full text-xs transition-colors cursor-pointer disabled:opacity-60 ${
+  className={`flex items-center gap-1.5 min-h-9 px-2 py-1.5 rounded-full text-xs transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${
   facedThis ? 'bg-brand-tint text-brand font-bold border border-brand/30' : 'hover:text-ink hover:bg-slate-100'
   }`}
   >

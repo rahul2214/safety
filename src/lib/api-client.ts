@@ -100,6 +100,8 @@ export interface BackendPost {
   hasSupported?: boolean;
   hasFacedThis?: boolean;
   hasSaved?: boolean;
+  /** True when the signed-in user wrote this post (also for their anonymous posts). */
+  isMine?: boolean;
   safetyAdvice?: string;
   riskScore?: number;
   postSeverityId?: number;
