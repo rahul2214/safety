@@ -89,7 +89,7 @@ export function getOrganizationSchema() {
     contactPoint: [
       {
         '@type': 'ContactPoint',
-        telephone: '+91-6303563546',
+        email: 'admin@veltria.in',
         contactType: 'customer support',
         availableLanguage: ['English', 'Hindi'],
         areaServed: 'IN',

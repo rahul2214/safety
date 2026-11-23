@@ -703,7 +703,6 @@ export function PrivacyCenterClient() {
             <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-700 space-y-1">
               <div><strong>Grievance Officer:</strong> Sabhijude Data Protection Officer</div>
               <div><strong>Email:</strong> admin@veltria.in / support@veltria.in</div>
-              <div><strong>Emergency Triage Telephone:</strong> +91 6303563546</div>
               <div><strong>Jurisdiction:</strong> India</div>
             </div>
           </div>

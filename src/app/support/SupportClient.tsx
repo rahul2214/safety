@@ -46,7 +46,8 @@ export function SupportClient() {
   const [loadingTickets, setLoadingTickets] = useState(true);
   const [ticketsNeedLogin, setTicketsNeedLogin] = useState(false);
   const [supportConfig, setSupportConfig] = useState<SupportConfig>({
-    helplinePhone: '+91 6303563546',
+    // No support phone line at present; the call link is hidden while this is empty.
+    helplinePhone: '',
     supportEmail: 'admin@veltria.in',
     emergencyPolice: '112',
     womenHelpline: '1091',
@@ -209,20 +210,22 @@ export function SupportClient() {
       </div>
 
       {/* Direct Contact Channels Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
-            <Phone className="h-4 w-4 text-blue-600" />
-            <span>Support Helpline</span>
+      <div className={`grid grid-cols-1 gap-3 ${supportConfig.helplinePhone ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
+        {supportConfig.helplinePhone ? (
+          <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+              <Phone className="h-4 w-4 text-blue-600" />
+              <span>Support Helpline</span>
+            </div>
+            <p className="text-[11px] text-slate-500">{supportConfig.operatingHours}</p>
+            <a
+              href={`tel:${supportConfig.helplinePhone.replace(/\s+/g, '')}`}
+              className="font-mono text-xs font-bold text-slate-900 hover:text-blue-600 hover:underline pt-1 block"
+            >
+              {supportConfig.helplinePhone}
+            </a>
           </div>
-          <p className="text-[11px] text-slate-500">{supportConfig.operatingHours}</p>
-          <a
-            href={`tel:${supportConfig.helplinePhone.replace(/\s+/g, '')}`}
-            className="font-mono text-xs font-bold text-slate-900 hover:text-blue-600 hover:underline pt-1 block"
-          >
-            {supportConfig.helplinePhone}
-          </a>
-        </div>
+        ) : null}
 
         <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
