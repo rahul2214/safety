@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth-context';
 import { ToastProvider } from '@/components/Toast';
 import { AppShell } from '@/components/layout/AppShell';
-import { SosModal } from '@/components/SosModal';
 import { FakeCallModal } from '@/components/FakeCallModal';
 import { NetworkBanner } from '@/components/NetworkBanner';
 
@@ -14,7 +13,6 @@ interface ClientProvidersProps {
 }
 
 export function ClientProviders({ children }: ClientProvidersProps) {
-  const [sosOpen, setSosOpen] = useState(false);
   const [fakeCallOpen, setFakeCallOpen] = useState(false);
   const pathname = usePathname();
 
@@ -62,7 +60,6 @@ export function ClientProviders({ children }: ClientProvidersProps) {
         <NetworkBanner />
 
         {/* Global Modals for Fast Emergency Access */}
-        <SosModal isOpen={sosOpen} onClose={() => setSosOpen(false)} />
         <FakeCallModal isOpen={fakeCallOpen} onClose={() => setFakeCallOpen(false)} />
       </ToastProvider>
     </AuthProvider>

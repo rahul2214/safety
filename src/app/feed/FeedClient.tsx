@@ -58,6 +58,12 @@ function FeedPageContent() {
   const [statuses, setStatuses] = useState<PostStatusOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Which posts: everything the reader may see, community only, or their organizations only.
+  // 'ORGS' can be narrowed to one organization with orgFilterId.
+  const [feedScope, setFeedScope] = useState<'ALL' | 'COMMUNITY' | 'ORGS'>('ALL');
+  const [orgFilterId, setOrgFilterId] = useState<number | null>(null);
+  const [myOrgs, setMyOrgs] = useState<{ organizationId: number; organizationName: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Multi-Selection Filters (Driven by database IDs)
@@ -173,7 +179,12 @@ function FeedPageContent() {
 
     try {
       const [feedRes, catRes, sevRes, statusRes] = await Promise.all([
-        api.getFeed({ limit: 50 }),
+        api.getFeed({
+          limit: 50,
+          forceRefresh: true,
+          scope: feedScope === 'COMMUNITY' ? 'community' : feedScope === 'ORGS' ? 'organizations' : undefined,
+          organizationId: feedScope === 'ORGS' && orgFilterId ? orgFilterId : undefined,
+        }),
         api.getCategories(),
         api.getPostSeverities(),
         api.getPostStatuses(),
@@ -231,7 +242,27 @@ function FeedPageContent() {
 
   useEffect(() => {
     loadFeedData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feedScope, orgFilterId]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setMyOrgs([]);
+      return;
+    }
+    let cancelled = false;
+    api.getMyOrganizations().then((res) => {
+      if (cancelled || !res.ok || !res.data) return;
+      setMyOrgs(
+        res.data
+          .filter((m) => (m.status || '').toLowerCase() === 'active')
+          .map((m) => ({ organizationId: m.organizationId, organizationName: m.organizationName }))
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
 
   // Compute live category post counts
   const categoryCounts = useMemo(() => {
@@ -538,6 +569,59 @@ function FeedPageContent() {
       {/* 2. SEARCH & SINGLE UNIFIED FILTER TOOLBAR */}
       {/* ============================================================ */}
       <section className="space-y-3.5">
+        {myOrgs.length > 0 && (
+          <div className="space-y-2">
+            <div className="inline-flex rounded-2xl bg-slate-100 p-1 gap-1" role="tablist" aria-label="Which posts to show">
+              {([
+                { id: 'ALL', label: 'All posts' },
+                { id: 'COMMUNITY', label: 'Community' },
+                { id: 'ORGS', label: myOrgs.length === 1 ? myOrgs[0].organizationName : 'My organizations' },
+              ] as const).map((tab) => {
+                const active = feedScope === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => {
+                      setFeedScope(tab.id);
+                      if (tab.id !== 'ORGS') setOrgFilterId(null);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-xl text-sm font-semibold transition ${
+                      active ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {feedScope === 'ORGS' && myOrgs.length > 1 && (
+              <div className="flex flex-wrap gap-2">
+                {[{ organizationId: 0, organizationName: 'All my organizations' }, ...myOrgs].map((o) => {
+                  const active = (orgFilterId ?? 0) === o.organizationId;
+                  return (
+                    <button
+                      key={o.organizationId}
+                      type="button"
+                      onClick={() => setOrgFilterId(o.organizationId || null)}
+                      className={`px-3 py-1 rounded-full border text-xs font-semibold transition ${
+                        active
+                          ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                          : 'border-slate-200 bg-white text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {o.organizationName}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Main Search Bar with Search Button & Filter Icon Button Beside It */}
         <div className="flex items-center gap-2">
           {/* Search Input */}

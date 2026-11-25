@@ -41,7 +41,7 @@ export const HOMEPAGE_FAQS: FaqItem[] = [
   {
     question: 'How does the emergency SOS alert work?',
     answer:
-      'When you trigger an SOS alert, Sabhijude immediately captures your real-time GPS coordinates and dispatches an emergency notification to your designated emergency contacts and connected campus/organization security desks. The alert includes your live location map link and safety status, enabling immediate response.',
+      'When you trigger an SOS alert, Sabhijude immediately captures your real-time GPS coordinates and dispatches an emergency notification to your designated emergency contacts. SOS alerts are personal and are never sent to your college or employer. The alert includes your live location map link and safety status, enabling immediate response.',
     linkHref: '/safety-measures',
     linkText: 'View emergency helpline directory',
   },
@@ -187,7 +187,13 @@ export function getArticleSchema(article: {
   datePublished?: string;
   dateModified?: string;
   category?: string;
+  /** Defaults to the organisation itself. Never a made-up expert or team. */
+  author?: { name: string; url?: string };
+  image?: string;
+  keywords?: string[];
+  wordCount?: number;
 }) {
+  const abs = (u: string) => (u.startsWith('http') ? u : `${SITE_URL}${u}`);
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -195,18 +201,22 @@ export function getArticleSchema(article: {
     description: article.description,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': article.url.startsWith('http') ? article.url : `${SITE_URL}${article.url}`,
+      '@id': abs(article.url),
     },
     author: {
       '@type': 'Organization',
-      name: 'Sabhijude Safety Research & Legal Team',
-      url: SITE_URL,
+      name: article.author?.name || SITE_NAME,
+      url: abs(article.author?.url || '/'),
     },
     publisher: {
       '@id': `${SITE_URL}/#organization`,
     },
+    ...(article.image ? { image: [abs(article.image)] } : {}),
+    ...(article.keywords?.length ? { keywords: article.keywords.join(', ') } : {}),
+    ...(article.wordCount ? { wordCount: article.wordCount } : {}),
+    inLanguage: 'en-IN',
     datePublished: article.datePublished || '2026-01-15T00:00:00+05:30',
-    dateModified: article.dateModified || '2026-10-31T00:00:00+05:30',
+    dateModified: article.dateModified || article.datePublished || '2026-10-31T00:00:00+05:30',
     articleSection: article.category || 'Personal Safety',
   };
 }

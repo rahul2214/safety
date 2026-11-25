@@ -21,7 +21,6 @@ import {
   HelpCircle,
   Eye,
   UserCheck,
-  MapPin,
   Phone,
   User
 } from 'lucide-react';
@@ -40,13 +39,8 @@ const SCOPE_DETAILS: Record<string, { label: string; desc: string; icon: any }> 
   },
   contact_info: {
     label: 'Emergency Contact Info',
-    desc: 'Allows responders to view your phone number and verified email during campus emergency alerts.',
+    desc: 'Allows your organisation’s safety team to see your phone number and verified email so they can reach you.',
     icon: Phone,
-  },
-  location_during_sos: {
-    label: 'Location During Active SOS',
-    desc: 'Grants real-time GPS visibility to campus security ONLY while you have an active SOS alert open. Auto-expires when the alert is closed.',
-    icon: MapPin,
   },
   location_sharing: {
     label: 'Continuous Location Sharing',
@@ -68,7 +62,6 @@ export default function UserOrganizationsPage() {
   const [joinConsents, setJoinConsents] = useState<Record<string, boolean>>({
     profile: true,
     contact_info: true,
-    location_during_sos: true,
     location_sharing: false,
   });
   const [joining, setJoining] = useState(false);
@@ -111,11 +104,12 @@ export default function UserOrganizationsPage() {
   const handleOpenConsents = (org: UserOrganizationConnection) => {
     setSelectedOrg(org);
     const map: Record<string, boolean> = {};
+    // Only the scopes shown on screen. SOS alerts are never shared with organisations, so the
+    // old "location during an SOS" permission is no longer offered.
     org.consents.forEach((c) => {
-      map[c.scope] = c.isGranted;
+      if (c.scope in SCOPE_DETAILS) map[c.scope] = c.isGranted;
     });
-    // Ensure all 4 scopes exist
-    ['profile', 'contact_info', 'location_during_sos', 'location_sharing'].forEach((s) => {
+    ['profile', 'contact_info', 'location_sharing'].forEach((s) => {
       if (map[s] === undefined) map[s] = false;
     });
     setActiveConsents(map);
@@ -640,13 +634,24 @@ export default function UserOrganizationsPage() {
                           <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
                             {info.desc}
                           </div>
+                          {key === 'profile' && (
+                            <div className="text-[11px] text-slate-400 mt-1">
+                              Required while you are a member. Leave the organization to remove it.
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+                      <label
+                        className={`relative inline-flex items-center shrink-0 mt-1 ${
+                          key === 'profile' ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                        }`}
+                      >
                         <input
                           type="checkbox"
-                          checked={isChecked}
+                          checked={key === 'profile' ? true : isChecked}
+                          disabled={key === 'profile'}
+                          aria-label={info.label}
                           onChange={(e) =>
                             setActiveConsents((prev) => ({ ...prev, [key]: e.target.checked }))
                           }

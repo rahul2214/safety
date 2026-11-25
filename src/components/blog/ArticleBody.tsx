@@ -1,6 +1,38 @@
 import React from 'react';
+import Link from 'next/link';
 import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
-import type { Block } from '@/lib/blog-posts';
+import { headingId, type Block } from '@/lib/blog-posts';
+
+/**
+ * Renders the two inline marks the articles use: [label](href) and **bold**. Internal links use
+ * Next's Link; external links open in a new tab and send no referrer details.
+ */
+export function Inline({ text }: { text: string }) {
+  const parts: React.ReactNode[] = [];
+  const re = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(text))) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    if (m[3] !== undefined) {
+      parts.push(<strong key={k++} className="font-semibold text-ink">{m[3]}</strong>);
+    } else {
+      const [label, href] = [m[1], m[2]];
+      const cls = 'font-medium text-brand underline decoration-brand/30 underline-offset-[3px] hover:decoration-brand';
+      parts.push(
+        href.startsWith('/') ? (
+          <Link key={k++} href={href} className={cls}>{label}</Link>
+        ) : (
+          <a key={k++} href={href} target="_blank" rel="noopener noreferrer" className={cls}>{label}</a>
+        ),
+      );
+    }
+    last = re.lastIndex;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return <>{parts}</>;
+}
 
 /** Renders a blog article's blocks with the site's typography. Server component. */
 export function ArticleBody({ blocks }: { blocks: Block[] }) {
@@ -9,11 +41,11 @@ export function ArticleBody({ blocks }: { blocks: Block[] }) {
       {blocks.map((b, i) => {
         switch (b.type) {
           case 'p':
-            return <p key={i}>{b.text}</p>;
+            return <p key={i}><Inline text={b.text} /></p>;
           case 'h2':
             return (
-              <h2 key={i} id={b.id} className="font-display text-2xl sm:text-[1.7rem] font-bold tracking-tight text-ink pt-6 scroll-mt-24">
-                {b.text}
+              <h2 key={i} id={headingId(b)} className="font-display text-2xl sm:text-[1.7rem] font-bold tracking-tight text-ink pt-6 scroll-mt-24">
+                <Inline text={b.text} />
               </h2>
             );
           case 'h3':
@@ -24,7 +56,7 @@ export function ArticleBody({ blocks }: { blocks: Block[] }) {
                 {b.items.map((it) => (
                   <li key={it} className="flex gap-3">
                     <span aria-hidden className="mt-[0.7em] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                    <span>{it}</span>
+                    <span><Inline text={it} /></span>
                   </li>
                 ))}
               </ul>
@@ -35,7 +67,7 @@ export function ArticleBody({ blocks }: { blocks: Block[] }) {
                 {b.items.map((it, n) => (
                   <li key={it} className="flex gap-4">
                     <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-[13px] font-bold text-white">{n + 1}</span>
-                    <span>{it}</span>
+                    <span><Inline text={it} /></span>
                   </li>
                 ))}
               </ol>
@@ -51,7 +83,7 @@ export function ArticleBody({ blocks }: { blocks: Block[] }) {
                 <span className="mt-0.5 shrink-0">{tone.icon}</span>
                 <div className="space-y-1.5">
                   <p className={`font-semibold ${tone.title}`}>{b.title}</p>
-                  <p className="text-[15.5px] leading-relaxed text-slate-700">{b.text}</p>
+                  <p className="text-[15.5px] leading-relaxed text-slate-700"><Inline text={b.text} /></p>
                 </div>
               </aside>
             );
@@ -79,14 +111,14 @@ export function ArticleBody({ blocks }: { blocks: Block[] }) {
                       {b.rows.map((r) => (
                         <tr key={r.join('|')}>
                           {r.map((c, k) => (
-                            <td key={k} className={`px-4 py-3 align-top ${k === 0 ? 'font-semibold text-ink whitespace-nowrap' : ''}`}>{c}</td>
+                            <td key={k} className={`px-4 py-3 align-top ${k === 0 ? 'font-semibold text-ink whitespace-nowrap' : ''}`}><Inline text={c} /></td>
                           ))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                {b.caption && <figcaption className="text-sm text-slate-500">{b.caption}</figcaption>}
+                {b.caption && <figcaption className="text-sm text-slate-500"><Inline text={b.caption} /></figcaption>}
               </figure>
             );
           default:

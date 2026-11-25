@@ -1,453 +1,84 @@
 'use client';
 
-import { formatPhone, withCountryCode } from '@/lib/phone';
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import {
-  AlertTriangle,
-  Phone,
-  Share2,
-  Users,
-  MapPin,
-  CheckCircle2,
-  Clock,
-  ShieldAlert,
-  ArrowLeft,
-  Copy,
-  Check,
-  Send,
-  ExternalLink,
-} from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Modal } from '@/components/ui/Modal';
-import { getCurrentCoordinates, buildEmergencySosText, buildWhatsAppLink, type GeoLocationResult } from '@/lib/location';
-import { api, EmergencyContact } from '@/lib/api-client';
-import { useAuth } from '@/lib/auth-context';
+import React from 'react';
+import { BellRing, Clock, MapPin, ShieldCheck, Smartphone, Users } from 'lucide-react';
+import { SosDemo, HelplineLinks } from '@/components/SosDemo';
 
+/**
+ * Shows what Emergency SOS does. The website only presents the feature: it sends no alert,
+ * reads no location and loads no contacts. SOS itself runs in the Sabhijude mobile app.
+ */
 export function EmergencyClient() {
-  const { user } = useAuth();
-
-  // Active Emergency State
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [activeSeconds, setActiveSeconds] = useState<number>(0);
-  const [confirmSosOpen, setConfirmSosOpen] = useState<boolean>(false);
-  const [deactivateConfirmOpen, setDeactivateConfirmOpen] = useState<boolean>(false);
-
-  // Sensor & Contacts Data
-  const [gpsData, setGpsData] = useState<GeoLocationResult | null>(null);
-  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
-  const [contactsLoading, setContactsLoading] = useState<boolean>(true);
-  const [copiedLink, setCopiedLink] = useState<boolean>(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [sosState, setSosState] = useState<'locating' | 'sending' | 'sent' | 'failed'>('locating');
-
-  // Load Contacts
-  useEffect(() => {
-    async function fetchContacts() {
-      try {
-        const res = await api.getEmergencyContacts();
-        if (res.ok && res.data) {
-          setContacts(res.data);
-        }
-      } catch (err) {
-        console.warn('Error fetching emergency contacts:', err);
-      } finally {
-        setContactsLoading(false);
-      }
-    }
-    fetchContacts();
-  }, []);
-
-  // Timer for active emergency
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (isActive) {
-      interval = setInterval(() => {
-        setActiveSeconds((prev) => prev + 1);
-      }, 1000);
-    } else {
-      setActiveSeconds(0);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isActive]);
-
-  // Format active time as MM:SS
-  const formatTime = (secs: number) => {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
-
-  // Trigger SOS
-  const handleTriggerSos = async () => {
-    setConfirmSosOpen(false);
-    setIsActive(true);
-    setSosState('locating');
-    setGpsData(null);
-    setStatusMessage(null);
-
-    // The alert goes out whether or not a GPS fix arrives: a late SOS without a location is
-    // still far better than none.
-    let coords: GeoLocationResult | null = null;
-    try {
-      coords = await getCurrentCoordinates();
-      setGpsData(coords);
-    } catch (err) {
-      console.warn('SOS location unavailable:', err);
-    }
-
-    setSosState('sending');
-    const res = await api.triggerSos({
-      latitude: coords?.latitude ?? null,
-      longitude: coords?.longitude ?? null,
-      accuracy: coords?.accuracy ?? null,
-    });
-
-    setSosState(res.ok ? 'sent' : 'failed');
-    if (res.ok) {
-      const who =
-        typeof res.contactsCount === 'number' && res.contactsCount > 0
-          ? `${res.contactsCount} emergency contact${res.contactsCount === 1 ? '' : 's'}`
-          : 'your emergency contacts';
-      setStatusMessage(
-        coords
-          ? `SOS sent to ${who} with your location.`
-          : `SOS sent to ${who}, but your location could not be found. Share it from below if you can.`
-      );
-    } else {
-      setStatusMessage(
-        `The SOS could not be sent (${res.error}). Call 112 now, or use the call and WhatsApp buttons below.`
-      );
-    }
-  };
-
-  // Deactivate SOS
-  const handleDeactivateSos = () => {
-    setIsActive(false);
-    setDeactivateConfirmOpen(false);
-    setStatusMessage(null);
-  };
-
-  // Copy live coordinates
-  const handleCopyCoordinates = () => {
-    if (!gpsData) return;
-    const text = `https://www.google.com/maps?q=${gpsData.latitude},${gpsData.longitude}`;
-    navigator.clipboard.writeText(text);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
-
-  // Share Live Location to WhatsApp
-  const handleShareWhatsApp = async () => {
-    try {
-      const coords = gpsData || (await getCurrentCoordinates());
-      const msg = buildEmergencySosText(coords);
-      const url = buildWhatsAppLink('', msg);
-      window.open(url, '_blank');
-    } catch {
-      const msg = buildEmergencySosText();
-      const url = buildWhatsAppLink('', msg);
-      window.open(url, '_blank');
-    }
-  };
-
-  const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
+  const features = [
+    { icon: BellRing, title: 'One tap, or a long press', body: 'Start an SOS from the home screen in a second, even with shaking hands.' },
+    { icon: Clock, title: '3-second safety countdown', body: 'Pressed it by accident? Cancel before anything is sent.' },
+    { icon: MapPin, title: 'Your exact location', body: 'Your contacts get a map link to where you are, not just a message.' },
+    { icon: Users, title: 'Your whole circle at once', body: 'Every trusted contact you saved is alerted together, by message and notification.' },
+    { icon: ShieldCheck, title: 'Works if your account is limited', body: 'SOS stays available whatever happens to your account.' },
+    { icon: Smartphone, title: 'Built for your phone', body: 'It uses your phone’s GPS and messaging, which is why SOS lives in the app.' },
+  ];
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-     
+    <div className="mx-auto max-w-5xl space-y-10 sm:space-y-14">
+      {/* Hero */}
+      <section className="text-center space-y-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-red-600">Emergency SOS</p>
+        <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-[-0.02em] text-ink">
+          Help, one tap away
+        </h1>
+        <p className="mx-auto max-w-xl text-base text-slate-600">
+          When you feel unsafe, Sabhijude sends your location to the people you trust in seconds.
+          SOS works in the Sabhijude mobile app. Try the demo below to see how.
+        </p>
+      </section>
 
-      {/* ========================================================================= */}
-      {/* ACTIVE EMERGENCY MODE BANNER                                              */}
-      {/* ========================================================================= */}
-      {isActive ? (
-        <div className="p-5 rounded-lg bg-red-600 text-white shadow-lg space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <span className="relative flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-white" />
+      {/* Live demo */}
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-8">
+        <h2 className="mb-6 font-display text-xl font-bold text-ink">See it in action</h2>
+        <SosDemo />
+      </section>
+
+      {/* Features */}
+      <section>
+        <h2 className="mb-5 font-display text-xl font-bold text-ink">What SOS does for you</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <div key={f.title} className="rounded-2xl border border-slate-200 bg-white p-5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                <f.icon className="h-5 w-5" />
               </span>
-              <span className="text-sm font-bold uppercase tracking-wider">
-                Active Emergency In Progress
-              </span>
+              <p className="mt-3 font-semibold text-ink">{f.title}</p>
+              <p className="mt-1 text-sm text-slate-500">{f.body}</p>
             </div>
-            <div className="text-right">
-              <span className="font-mono text-lg font-black">{formatTime(activeSeconds)}</span>
-              <p className="text-[10px] text-red-100">Elapsed Time</p>
-            </div>
-          </div>
+          ))}
+        </div>
+      </section>
 
-          {/* What has actually happened — never claim contacts were alerted before the API says so. */}
-          <div className="p-3 rounded bg-red-700/80 text-xs space-y-1.5">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-red-100">SOS status</span>
-              <span className="font-bold text-white text-right">
-                {sosState === 'locating' && 'Finding your location...'}
-                {sosState === 'sending' && 'Sending...'}
-                {sosState === 'sent' && 'Sent'}
-                {sosState === 'failed' && 'NOT SENT'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-red-100">Location</span>
-              <span className="font-mono font-medium text-white text-right">
-                {gpsData
-                  ? `${gpsData.latitude.toFixed(4)}, ${gpsData.longitude.toFixed(4)} (±${Math.round(gpsData.accuracy)}m)`
-                  : sosState === 'locating'
-                    ? 'Acquiring GPS fix...'
-                    : 'Unavailable'}
-              </span>
-            </div>
-            {statusMessage && (
-              <p role="status" aria-live="assertive" className="pt-1.5 border-t border-red-500/60 font-semibold text-white leading-relaxed">
-                {statusMessage}
-              </p>
-            )}
-          </div>
-
-          {/* Quick Actions in Active Mode */}
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <a
-              href="tel:112"
-              className="flex items-center justify-center gap-2 p-3 rounded-lg bg-white text-red-700 font-bold text-xs hover:bg-red-50 transition-colors shadow-xs"
-            >
-              <Phone className="h-4 w-4" />
-              <span>Call Police (112)</span>
-            </a>
-
-            <a
-              href="tel:1091"
-              className="flex items-center justify-center gap-2 p-3 rounded-lg bg-red-800 text-white font-bold text-xs hover:bg-red-900 transition-colors shadow-xs"
-            >
-              <Phone className="h-4 w-4" />
-              <span>Women Helpline (1091)</span>
-            </a>
-          </div>
-
-          <div className="pt-2 text-center">
-            <button
-              type="button"
-              onClick={() => setDeactivateConfirmOpen(true)}
-              className="text-xs font-semibold text-red-100 hover:text-white underline"
-            >
-              I am safe now • Deactivate Emergency SOS
-            </button>
+      {/* What contacts receive */}
+      <section className="grid gap-6 md:grid-cols-2 md:items-center">
+        <div className="space-y-2">
+          <h2 className="font-display text-xl font-bold text-ink">What your contacts receive</h2>
+          <p className="text-sm text-slate-600">
+            A clear message saying you need help, with a link that opens your location on a map. They
+            can call you or the police straight away.
+          </p>
+        </div>
+        <div className="rounded-3xl bg-[#e7f6ee] p-4">
+          <div className="ml-auto max-w-sm rounded-2xl rounded-tr-sm bg-white p-3.5 text-sm text-ink shadow-sm">
+            <p className="font-semibold text-red-600">🚨 SOS from Ananya</p>
+            <p className="mt-1">I need help. This is my current location:</p>
+            <p className="mt-1 break-all text-brand underline">maps.google.com/?q=17.3850,78.4867</p>
+            <p className="mt-2 text-right text-[10px] text-slate-400">Sample message</p>
           </div>
         </div>
-      ) : (
-        /* ========================================================================= */
-        /* STANDBY EMERGENCY SCREEN                                                  */
-        /* ========================================================================= */
-        <div className="space-y-6">
-          {/* Main Emergency Header */}
-          <div className="text-center space-y-1">
-            <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-ink">
-              Emergency Assistance
-            </h1>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
-              If you feel unsafe or in immediate physical danger, take action below.
-            </p>
-          </div>
+      </section>
 
-          {/* Primary SOS Action Button */}
-          <Card className="p-6 sm:p-8 text-center space-y-4 border-red-200 bg-red-50/40">
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-red-700 uppercase tracking-wider">
-                Emergency Panic Trigger
-              </p>
-              <p className="text-xs text-slate-600 max-w-sm mx-auto">
-                Immediately captures your live coordinates, alerts your guardians, and enters active response mode.
-              </p>
-            </div>
-
-            <div>
-              <button
-                type="button"
-                onClick={() => setConfirmSosOpen(true)}
-                className="w-full sm:w-auto px-10 py-5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-black text-lg shadow-md transition-all active:scale-98 tracking-wider inline-flex items-center justify-center gap-3"
-              >
-                <AlertTriangle className="h-6 w-6" />
-                <span>ACTIVATE SOS</span>
-              </button>
-            </div>
-
-            <p className="text-[11px] text-slate-400">
-              A 1-click confirmation ensures no accidental triggers.
-            </p>
-          </Card>
-
-          {/* Core Emergency Actions Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Action 1: Call Emergency Services 112 */}
-            <a
-              href="tel:112"
-              className="p-4 rounded-lg border border-slate-200 bg-white hover:border-red-300 hover:bg-red-50/30 transition-colors flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-red-100 text-red-700 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-900">National Emergency (112)</p>
-                  <p className="text-[11px] text-slate-500">Police, Fire &amp; Emergency Dispatch</p>
-                </div>
-              </div>
-              <span className="font-mono text-sm font-bold text-red-600">112 &rarr;</span>
-            </a>
-
-            {/* Action 2: Call Women Safety Helpline 1091 */}
-            <a
-              href="tel:1091"
-              className="p-4 rounded-lg border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/30 transition-colors flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-blue-100 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-900">Women Helpline (1091)</p>
-                  <p className="text-[11px] text-slate-500">24/7 Dedicated Police Rapid Cell</p>
-                </div>
-              </div>
-              <span className="font-mono text-sm font-bold text-blue-600">1091 &rarr;</span>
-            </a>
-
-            {/* Action 3: Share Live Location */}
-            <button
-              type="button"
-              onClick={handleShareWhatsApp}
-              className="p-4 rounded-lg border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/30 transition-colors flex items-center justify-between text-left group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                  <Share2 className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-900">Share Live Location</p>
-                  <p className="text-[11px] text-slate-500">Dispatch GPS link via WhatsApp / SMS</p>
-                </div>
-              </div>
-              <span className="text-xs font-semibold text-emerald-600">Share &rarr;</span>
-            </button>
-
-            {/* Action 4: Contact Trusted Person */}
-            {primaryContact ? (
-              <a
-                href={`tel:${withCountryCode(primaryContact.phoneNumber)}`}
-                className="p-4 rounded-lg border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-lg bg-slate-100 text-slate-700 group-hover:bg-slate-900 group-hover:text-white transition-colors">
-                    <Users className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-900">
-                      Call {primaryContact.name} ({primaryContact.relationship})
-                    </p>
-                    <p className="text-[11px] text-slate-500">{formatPhone(primaryContact.phoneNumber)}</p>
-                  </div>
-                </div>
-                <span className="text-xs font-semibold text-slate-700">Dial &rarr;</span>
-              </a>
-            ) : (
-              <Link
-                href="/contacts"
-                className="p-4 rounded-lg border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-lg bg-slate-100 text-slate-700">
-                    <Users className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-900">Contact Trusted Person</p>
-                    <p className="text-[11px] text-slate-500">No primary contact set. Add one now.</p>
-                  </div>
-                </div>
-                <span className="text-xs font-semibold text-blue-600">Add &rarr;</span>
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Confirmation Modal to Activate SOS */}
-      <Modal
-        isOpen={confirmSosOpen}
-        onClose={() => setConfirmSosOpen(false)}
-        title="Confirm Emergency Activation"
-        size="sm"
-      >
-        <div className="space-y-4 text-center">
-          <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
-            <AlertTriangle className="h-6 w-6" />
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Activating SOS immediately records your live GPS position and dispatches alert notifications to your emergency contacts.
-            </p>
-          </div>
-
-          <div className="space-y-2 pt-2">
-            <Button
-              variant="emergency"
-              className="w-full justify-center"
-              onClick={handleTriggerSos}
-            >
-              <span>Yes, Trigger Emergency SOS</span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-center"
-              onClick={() => setConfirmSosOpen(false)}
-            >
-              <span>Cancel</span>
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Confirmation Modal to Deactivate SOS */}
-      <Modal
-        isOpen={deactivateConfirmOpen}
-        onClose={() => setDeactivateConfirmOpen(false)}
-        title="Deactivate Emergency Status"
-        size="sm"
-      >
-        <div className="space-y-4 text-center">
-          <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-            <CheckCircle2 className="h-6 w-6" />
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-xs font-semibold text-slate-900">Are you in a safe environment?</p>
-            <p className="text-xs text-slate-500">
-              Deactivating will end live GPS tracking and mark your emergency broadcast as resolved.
-            </p>
-          </div>
-
-          <div className="space-y-2 pt-2">
-            <Button
-              variant="primary"
-              className="w-full justify-center"
-              onClick={handleDeactivateSos}
-            >
-              <span>Confirm I Am Safe</span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-center"
-              onClick={() => setDeactivateConfirmOpen(false)}
-            >
-              <span>Keep SOS Active</span>
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      {/* Real help, now */}
+      <section className="rounded-3xl bg-red-50 p-5 sm:p-7">
+        <h2 className="font-display text-lg font-bold text-red-800">In danger right now?</h2>
+        <p className="mb-4 mt-1 text-sm text-red-900/80">Don&rsquo;t wait. Call one of these numbers directly.</p>
+        <HelplineLinks />
+      </section>
     </div>
   );
 }

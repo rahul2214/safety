@@ -157,8 +157,8 @@ export function OrganizationRequestClient() {
               A safer campus starts with a direct line to help.
             </h1>
             <p className="text-lg sm:text-xl text-white/70 leading-relaxed">
-              Give students and staff instant SOS alerts that reach your own security desk, plus a verified way to report
-              and resolve incidents. We review every request within 24 hours.
+              Give students and staff a verified way to report incidents to your own team, safety broadcasts that reach
+              everyone in minutes, and a clear workflow to resolve them. We review every request within 24 hours.
             </p>
             <div className="flex flex-wrap gap-x-6 gap-y-3 pt-2 text-[15px] text-white/80">
               <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-400" />No hardware to install</span>

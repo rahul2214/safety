@@ -38,7 +38,11 @@ function SignupFormContent() {
   const searchParams = useSearchParams();
   const redirectPath = safeRedirect(searchParams.get('redirect'));
 
-  const { register, loginWithGoogle, isAuthenticated, isLoading } = useAuth();
+  const { register, loginWithGoogle, isAuthenticated, isLoading, user, updateStoredUser, markDetailsDone, logout } =
+    useAuth();
+  // Google accounts arrive without a phone number, which every account needs.
+  const phoneRequired = isAuthenticated && !user?.phoneNumber;
+  const [profilePhone, setProfilePhone] = useState('');
 
   // Wizard Stage: 1 = Account Credentials, 2 = Safety Profile Onboarding.
   // `?stage=profile` opens straight on step 2, for someone who just confirmed their email or
@@ -223,20 +227,40 @@ function SignupFormContent() {
 
   // Handle Stage 2 Complete
   const handleCompleteOnboarding = async () => {
+    setErrorMsg(null);
+    const phoneDigits = profilePhone.replace(/\D/g, '').slice(-10);
+    if (phoneRequired && phoneDigits.length !== 10) {
+      setErrorMsg('Enter your 10-digit mobile number to continue.');
+      return;
+    }
+
     setSavingProfile(true);
     try {
       const selectedOcc = occupations.find((o) => o.id === selectedOccupationId);
-      await api.updateProfile({
+      const res = await api.updateProfile({
         genderId: selectedGenderId ?? undefined,
         dob: dob.trim() || undefined,
         occupationStatusId: selectedOccupationId ?? undefined,
         occupationStatus: selectedOcc?.name.toLowerCase(),
         // Optional: left out when not chosen, so nothing is written.
         bloodGroup: bloodGroup || undefined,
+        phoneNumber: phoneRequired ? `+91${phoneDigits}` : undefined,
       });
+      if (!res.ok && phoneRequired) {
+        // Without the number saved they cannot go on, so stay and say why.
+        setErrorMsg(res.error || 'Could not save your details. Please try again.');
+        return;
+      }
+      if (phoneRequired) updateStoredUser({ phoneNumber: `+91${phoneDigits}` });
+      markDetailsDone();
       router.push(redirectPath);
     } catch {
+      if (phoneRequired) {
+        setErrorMsg('Could not save your details. Please check your connection and try again.');
+        return;
+      }
       // Gracefully advance even if optional profile update encountered an issue
+      markDetailsDone();
       router.push(redirectPath);
     } finally {
       setSavingProfile(false);
@@ -510,6 +534,34 @@ function SignupFormContent() {
               {/* ============================================================== */}
               {stage === 2 && (
                 <div className="space-y-5 animate-in fade-in">
+                  {/* Mobile number: only for an account that has none (Google sign-up). */}
+                  {phoneRequired && (
+                    <div className="space-y-1.5 text-left">
+                      <label htmlFor="profilePhone" className="block text-xs font-semibold text-slate-700">
+                        Mobile Number (India)
+                      </label>
+                      <div className="flex items-center h-12 bg-white border border-slate-300 rounded-lg px-3 focus-within:ring-2 focus-within:ring-blue-600/20 focus-within:border-blue-600 transition-colors">
+                        <span className="text-xs font-bold text-blue-700 pr-2.5 border-r border-slate-200">
+                          +91
+                        </span>
+                        <input
+                          id="profilePhone"
+                          type="tel"
+                          autoComplete="tel"
+                          placeholder="9876543210"
+                          maxLength={10}
+                          value={profilePhone}
+                          onChange={(e) => setProfilePhone(e.target.value.replace(/\D/g, ''))}
+                          required
+                          className="w-full bg-transparent border-0 pl-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none tracking-wider font-mono"
+                        />
+                      </div>
+                      <p className="text-[11px] text-slate-500 pl-0.5">
+                        Required. Used for your safety alerts and account recovery. Never shown to other members.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Gender Selection */}
                   <div className="space-y-2 text-left">
                     <label className="block text-xs font-semibold text-slate-700">
@@ -643,13 +695,30 @@ function SignupFormContent() {
                       )}
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => router.push(redirectPath)}
-                      className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors text-center"
-                    >
-                      Skip this step &amp; proceed to dashboard →
-                    </button>
+                    {phoneRequired ? (
+                      // The number is required, so the way out is signing out rather than skipping.
+                      <button
+                        type="button"
+                        onClick={() => {
+                          logout();
+                          router.push('/');
+                        }}
+                        className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors text-center"
+                      >
+                        Sign out
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          markDetailsDone();
+                          router.push(redirectPath);
+                        }}
+                        className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors text-center"
+                      >
+                        Skip this step &amp; proceed to dashboard →
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

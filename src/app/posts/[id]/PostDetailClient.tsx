@@ -26,7 +26,7 @@ import {
   ChevronUp,
   CornerDownRight,
   Flag,
-  UserX,
+  Ban,
 } from 'lucide-react';
 import { api, type BackendPost, type Solution, type SolutionReply } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
@@ -36,7 +36,9 @@ import { getCategoryName, getAuthorName } from '@/components/PostCard';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ReportDialog, type ReportTarget } from '@/components/ReportDialog';
+import { ContentMenu } from '@/components/ContentMenu';
 import { Skeleton, SolutionSkeleton } from '@/components/ui/Skeleton';
+import { OrgUpdatesCard } from '@/components/OrgUpdatesCard';
 
 const SEVERITY: Record<string, { label: string; chip: string; dot: string }> = {
   ADVICE_NEEDED: { label: 'Advice needed', chip: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-500' },
@@ -93,8 +95,12 @@ export function PostDetailClient() {
   const [facedThis, setFacedThis] = useState(false);
   const [facedCount, setFacedCount] = useState(0);
 
-  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  // The open report dialog, and the block waiting for confirmation. A comment target names
+  // the comment (and reply). canBlock is false for anything shown anonymously.
+  const [reportTarget, setReportTarget] = useState<ModTarget | null>(null);
   const [reported, setReported] = useState<Set<ReportTarget>>(new Set());
+  const [blockTarget, setBlockTarget] = useState<ModTarget | null>(null);
+  const [isBlocking, setIsBlocking] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
@@ -218,6 +224,36 @@ export function PostDetailClient() {
     showToast('Your advice has been added.', 'success');
     const refreshed = await api.getSolutions(targetPostUuid, true);
     if (refreshed.ok && Array.isArray(refreshed.data)) setSolutions(refreshed.data);
+  };
+
+  const reloadSolutions = async () => {
+    const refreshed = await api.getSolutions(targetPostUuid, true);
+    if (refreshed.ok && Array.isArray(refreshed.data)) setSolutions(refreshed.data);
+  };
+
+  // Blocking the post's author hides the post itself, so leave it; a commenter's comments
+  // just disappear from the list.
+  const afterBlock = (target: ModTarget) => {
+    showToast(`Blocked. You will no longer see posts or comments from ${target.displayName}.`, 'success');
+    if (target.kind === 'post') router.push('/feed');
+    else void reloadSolutions();
+  };
+
+  const handleBlock = async () => {
+    if (!blockTarget) return;
+    setIsBlocking(true);
+    const res =
+      blockTarget.kind === 'post'
+        ? await api.blockPostAuthor(targetPostUuid)
+        : await api.blockCommentAuthor(targetPostUuid, blockTarget.solutionId!, blockTarget.replyId);
+    setIsBlocking(false);
+    if (!res.ok) {
+      showToast(res.error || 'Could not block this person.', 'error');
+      return;
+    }
+    const done = blockTarget;
+    setBlockTarget(null);
+    afterBlock(done);
   };
 
   const handleSupportSolution = async (sol: Solution) => {
@@ -542,6 +578,9 @@ export function PostDetailClient() {
             </div>
           </article>
 
+          {/* What the organization has done about it (organization posts only) */}
+          {post.organizationUpdates && <OrgUpdatesCard data={post.organizationUpdates} />}
+
           {/* Solutions & Community Advice */}
           <section className="rounded-3xl bg-white border border-slate-200/80 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-5">
             <div className="flex items-center justify-between">
@@ -638,6 +677,20 @@ export function PostDetailClient() {
                             </p>
                           </div>
                         </div>
+
+                        {isAuthenticated && !!user?.id && String(sol.authorId) !== String(user.id) && (
+                          <ContentMenu
+                            noun="comment"
+                            displayName={sol.author?.displayName || 'this member'}
+                            // The anonymous poster shows with id 0: report only.
+                            canBlock={Number(sol.authorId) > 0}
+                            onReport={() => setReportTarget(commentTarget(sol.id, undefined, sol.author?.displayName, sol.authorId))}
+                            onBlock={() => setBlockTarget(commentTarget(sol.id, undefined, sol.author?.displayName, sol.authorId))}
+                            onReportAndBlock={() =>
+                              setReportTarget({ ...commentTarget(sol.id, undefined, sol.author?.displayName, sol.authorId), alsoBlock: true })
+                            }
+                          />
+                        )}
 
                         {canDeleteSol && (
                           <button
@@ -753,6 +806,19 @@ export function PostDetailClient() {
                                       {timeAgo(reply.createdAt)}
                                     </span>
                                   </div>
+                                  {isAuthenticated && !!user?.id && String(reply.authorId) !== String(user.id) && (
+                                    <ContentMenu
+                                      size="sm"
+                                      noun="reply"
+                                      displayName={reply.author?.displayName || 'this member'}
+                                      canBlock={Number(reply.authorId) > 0}
+                                      onReport={() => setReportTarget(commentTarget(sol.id, reply.id, reply.author?.displayName, reply.authorId))}
+                                      onBlock={() => setBlockTarget(commentTarget(sol.id, reply.id, reply.author?.displayName, reply.authorId))}
+                                      onReportAndBlock={() =>
+                                        setReportTarget({ ...commentTarget(sol.id, reply.id, reply.author?.displayName, reply.authorId), alsoBlock: true })
+                                      }
+                                    />
+                                  )}
                                   {canDeleteReply && (
                                     <button
                                       type="button"
@@ -904,20 +970,33 @@ export function PostDetailClient() {
                   variant="outline"
                   className="w-full"
                   disabled={reported.has('post')}
-                  onClick={() => setReportTarget('post')}
+                  onClick={() => setReportTarget({ kind: 'post', displayName: author, canBlock: !isAnon })}
                   leftIcon={<Flag className="h-4 w-4" />}
                 >
                   {reported.has('post') ? 'Post reported' : 'Report this post'}
                 </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                  disabled={reported.has('author')}
-                  onClick={() => setReportTarget('author')}
-                  leftIcon={<UserX className="h-4 w-4" />}
-                >
-                  {reported.has('author') ? 'Author reported' : `Report ${isAnon ? 'the author' : author}`}
-                </Button>
+                {/* An anonymous post can only be reported. */}
+                {!isAnon && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => setBlockTarget({ kind: 'post', displayName: author, canBlock: true })}
+                      leftIcon={<Ban className="h-4 w-4" />}
+                    >
+                      Block {author}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                      disabled={reported.has('post')}
+                      onClick={() => setReportTarget({ kind: 'post', displayName: author, canBlock: true, alsoBlock: true })}
+                      leftIcon={<Flag className="h-4 w-4" />}
+                    >
+                      Report &amp; block
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -937,15 +1016,42 @@ export function PostDetailClient() {
       {post?.uuid && (
         <ReportDialog
           isOpen={reportTarget !== null}
-          target={reportTarget ?? 'post'}
+          target={reportTarget?.kind ?? 'post'}
           postUuid={post.uuid}
+          solutionId={reportTarget?.solutionId}
+          replyId={reportTarget?.replyId}
+          displayName={reportTarget?.displayName}
+          canBlock={reportTarget?.canBlock ?? false}
+          initialAlsoBlock={reportTarget?.alsoBlock ?? false}
           onClose={() => setReportTarget(null)}
-          onReported={(target) => {
-            setReported((prev) => new Set(prev).add(target));
-            showToast('Thanks. Moderators will review your report.', 'success');
+          onReported={(target, blocked) => {
+            if (target === 'post') setReported((prev) => new Set(prev).add(target));
+            if (blocked && reportTarget) afterBlock(reportTarget);
+            else showToast('Thanks. Moderators will review your report.', 'success');
           }}
         />
       )}
+
+      <Modal
+        isOpen={!!blockTarget}
+        onClose={() => !isBlocking && setBlockTarget(null)}
+        title={`Block ${blockTarget?.displayName ?? 'this person'}?`}
+        size="sm"
+      >
+        <div className="space-y-5">
+          <p className="text-sm text-slate-600 leading-relaxed">
+            You will no longer see their posts or comments. They are not told, and you can unblock them later.
+          </p>
+          <div className="flex items-center justify-end gap-2.5">
+            <Button variant="outline" onClick={() => setBlockTarget(null)} disabled={isBlocking}>
+              Cancel
+            </Button>
+            <Button variant="emergency" onClick={handleBlock} loading={isBlocking} leftIcon={<Ban className="h-4 w-4" />}>
+              Block
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal isOpen={confirmDelete} onClose={() => !isDeleting && setConfirmDelete(false)} title="Delete this post?" size="sm">
         <div className="space-y-5">
@@ -1032,4 +1138,28 @@ export function PostDetailClient() {
       </Modal>
     </div>
   );
+}
+
+/** What a report or block acts on: the post, or one comment (or reply) under it. */
+interface ModTarget {
+  kind: 'post' | 'comment';
+  solutionId?: number;
+  replyId?: number;
+  /** How the author appears, for wording only. */
+  displayName: string;
+  /** False when the author is shown anonymously: they can be reported, not blocked. */
+  canBlock: boolean;
+  /** Open the report dialog with "Also block" ticked. */
+  alsoBlock?: boolean;
+}
+
+function commentTarget(solutionId: number, replyId: number | undefined, name: string | undefined, authorId: number | string): ModTarget {
+  return {
+    kind: 'comment',
+    solutionId,
+    replyId,
+    displayName: name || 'this member',
+    // The anonymous poster's comments carry author id 0.
+    canBlock: Number(authorId) > 0,
+  };
 }

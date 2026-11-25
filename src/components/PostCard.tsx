@@ -20,6 +20,9 @@ import { useToast } from'@/components/Toast';
 
 export interface PostItem {
   id: number;
+  /** Set when the post is shared with one organization's members only. */
+  organizationId?: number | null;
+  organizationName?: string | null;
   uuid?: string;
   authorName?: string;
   isAnonymous?: boolean;
@@ -308,6 +311,15 @@ export function PostCard({ post }: { post: PostItem }) {
   <span className="text-[12px] font-bold text-brand bg-brand-tint px-3 py-1 rounded-full">
   {categoryName}
   </span>
+
+  {post.organizationId ? (
+  <span
+  className="text-[12px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full"
+  title="Only members of this organization can see this post"
+  >
+  Shared with {post.organizationName || 'your organization'}
+  </span>
+  ) : null}
 
   <span
   className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${

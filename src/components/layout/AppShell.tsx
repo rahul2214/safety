@@ -11,24 +11,23 @@ import {
   FileText,
   MapPin,
   Users,
-  AlertTriangle,
   BookOpen,
   Bell,
   HelpCircle,
   Settings,
-  Phone,
   LogOut,
   LogIn,
   UserPlus,
   Menu,
   X,
   Lock,
-  ChevronRight,
   ChevronDown,
   ShieldCheck,
   User,
   ArrowLeft,
   Radio,
+  Building2,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/Button';
@@ -44,10 +43,13 @@ interface AppShellProps {
 
 const NAV_GROUPS = [
   { label: 'Overview', hrefs: ['/', '/feed', '/map'] },
-  { label: 'Take action', hrefs: ['/report', '/blood', '/myposts', '/contacts', '/emergency'] },
-  { label: 'Learn & get help', hrefs: ['/resources', '/support'] },
-  { label: 'Account', hrefs: ['/profile', '/settings'] },
+  { label: 'Take action', hrefs: ['/report', '/blood', '/myposts', '/contacts'] },
+  { label: 'Learn & get help', hrefs: ['/resources', '/support', '/feedback'] },
+  { label: 'Account', hrefs: ['/profile', '/organizations', '/settings'] },
 ];
+
+/** Pages a member who still owes their details may open: the details step and the policies. */
+const DETAILS_EXEMPT = ['/signup', '/terms', '/privacy', '/child-safety', '/delete-account'];
 
 const PUBLIC_ROUTES = [
   '/',
@@ -58,6 +60,7 @@ const PUBLIC_ROUTES = [
   '/resources',
   '/privacy',
   '/support',
+  '/feedback',
   '/emergency',
   '/map',
   '/login',
@@ -76,7 +79,7 @@ const PUBLIC_ROUTES = [
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout, needsDetails } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -85,8 +88,9 @@ export function AppShell({ children }: AppShellProps) {
   const isPostPage = pathname?.startsWith('/posts/') ?? false;
   // A shared blood request (/blood/<uuid>) is public too; the /blood list itself is not.
   const isBloodRequestPage = /^\/blood\/[^/]+$/.test(pathname ?? '');
-  // Blog articles (/blog/<slug>) are public marketing pages.
-  const isBlogArticle = /^\/blog\/[^/]+$/.test(pathname ?? '');
+  // Blog articles (/blog/<slug>), category pages (/blog/category/<slug>) and their listing
+  // pages (/blog/page/<n>, /blog/category/<slug>/page/<n>) are public.
+  const isBlogArticle = /^\/blog\/([^/]+|page\/\d+|category\/[^/]+(\/page\/\d+)?)$/.test(pathname ?? '');
   // An SOS live location link (/live/<token>) is opened by family who may have no account.
   const isLiveSosPage = /^\/live\/[^/]+$/.test(pathname ?? '');
   // A live location share link (/share/<token>): also opened by people without an account.
@@ -115,6 +119,16 @@ export function AppShell({ children }: AppShellProps) {
     }
   }, [isLoading, isAuthenticated, isPublicRoute, pathname, router]);
 
+  // A new Google account (or any account without a phone number) fills in its details before
+  // anything else. Decided here for every page, so no sign-in path can skip past it. The
+  // details step itself lives on /signup, and the policy pages stay readable.
+  const detailsGate = !isLoading && needsDetails && !DETAILS_EXEMPT.includes(pathname ?? '');
+  useEffect(() => {
+    if (!detailsGate) return;
+    const back = pathname && pathname !== '/login' ? pathname : '/';
+    router.replace(`/signup?stage=profile&redirect=${encodeURIComponent(back)}`);
+  }, [detailsGate, pathname, router]);
+
   const navItems: Array<{
     href: string;
     label: string;
@@ -130,11 +144,12 @@ export function AppShell({ children }: AppShellProps) {
     { href: '/blood', label: 'Request blood', icon: Droplet },
     { href: '/myposts', label: 'My reports', icon: FileText },
     { href: '/contacts', label: 'Trusted contacts', icon: Users },
-    { href: '/emergency', label: 'Emergency', icon: AlertTriangle, isEmergency: true },
     { href: '/resources', label: 'Safety guides', icon: BookOpen },
     { href: '/support', label: 'Help & support', icon: HelpCircle },
+    { href: '/feedback', label: 'Send feedback', icon: MessageSquare },
     { href: '/notifications', label: 'Notifications', icon: Bell },
     { href: '/profile', label: 'My profile', icon: User },
+    { href: '/organizations', label: 'My organizations', icon: Building2 },
     { href: '/settings', label: 'Settings', icon: Settings },
   ];
 
@@ -222,6 +237,11 @@ export function AppShell({ children }: AppShellProps) {
     );
   }
 
+  // On the way to the details step: show nothing of the app in the meantime.
+  if (detailsGate) {
+    return <PageShellSkeleton />;
+  }
+
   // A suspended member sees the suspension screen instead of the app — except Emergency.
   // SOS must keep working whatever an account's standing.
   if (standing.status?.suspended && pathname !== '/emergency') {
@@ -269,23 +289,6 @@ export function AppShell({ children }: AppShellProps) {
     </nav>
   );
 
-  const sosCard = (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-700 p-4 text-white">
-      <div aria-hidden className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/15 blur-xl" />
-      <p className="relative text-[11px] font-semibold uppercase tracking-wider text-white/80">Feeling unsafe?</p>
-      <Link
-        href="/emergency"
-        className="relative mt-2 flex items-center justify-between rounded-xl bg-white px-3.5 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 transition"
-      >
-        <span className="flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> Emergency SOS</span>
-        <ChevronRight className="h-4 w-4" />
-      </Link>
-      <a href="tel:112" className="relative mt-2 flex items-center justify-center gap-1.5 text-xs font-semibold text-white/90 hover:text-white">
-        <Phone className="h-3.5 w-3.5" /> or call 112 directly
-      </a>
-    </div>
-  );
-
   return (
     <div className="app-shell min-h-screen bg-mist text-ink">
       {/* Desktop sidebar */}
@@ -304,7 +307,6 @@ export function AppShell({ children }: AppShellProps) {
         </div>
 
         <div className="relative shrink-0 space-y-3 p-4 border-t border-white/10">
-          {sosCard}
           <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
             <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-brand to-coral flex items-center justify-center font-bold text-sm">
               {initial}
@@ -381,6 +383,7 @@ export function AppShell({ children }: AppShellProps) {
                     </div>
                     {[
                       { href: '/profile', icon: User, label: 'My profile' },
+                      { href: '/organizations', icon: Building2, label: 'My organizations' },
                       { href: '/settings', icon: Settings, label: 'Account & security' },
                       { href: '/privacy', icon: Lock, label: 'Privacy center' },
                       { href: '/support', icon: HelpCircle, label: 'Help & support' },
@@ -423,25 +426,6 @@ export function AppShell({ children }: AppShellProps) {
         {[
           { href: '/', icon: Home, label: 'Home' },
           { href: '/report', icon: AlertCircle, label: 'Report' },
-        ].map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 text-[11px] font-medium ${pathname === l.href ? 'text-white' : 'text-white/50'}`}
-          >
-            <l.icon className="h-5 w-5" />
-            {l.label}
-          </Link>
-        ))}
-        <Link
-          href="/emergency"
-          className="-mt-8 flex h-16 w-16 flex-col items-center justify-center rounded-full bg-red-600 text-white ring-4 ring-mist shadow-[0_10px_24px_-6px_rgba(220,38,38,0.7)] active:bg-red-700"
-          title="Emergency SOS"
-        >
-          <AlertTriangle className="h-5 w-5" />
-          <span className="text-[10px] font-extrabold tracking-wider">SOS</span>
-        </Link>
-        {[
           { href: '/myposts', icon: FileText, label: 'My posts' },
           { href: '/profile', icon: User, label: 'Profile' },
         ].map((l) => (
@@ -484,7 +468,6 @@ export function AppShell({ children }: AppShellProps) {
             </div>
             <div className="flex-1 overflow-y-auto px-4 pb-4">{renderNav(() => setMobileMenuOpen(false))}</div>
             <div className="shrink-0 space-y-3 p-4 border-t border-white/10">
-              {sosCard}
               <button
                 type="button"
                 onClick={() => logout()}

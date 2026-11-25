@@ -121,6 +121,20 @@ export async function adminFetch<T = any>(
 
 // â”€â”€â”€ Organization Types & Client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+export interface OrgStaffAccount {
+  email: string;
+  fullName: string;
+  role: string;
+  organizationId: number;
+  organizationName: string;
+  /** True when the email already had a Sabhijude account; no password was set. */
+  existingAccount: boolean;
+  /** True when an existing account was given a new password. */
+  passwordReset?: boolean;
+  /** Shown once. Null for an existing account that kept its password. */
+  temporaryPassword: string | null;
+}
+
 export interface Organization {
   id: number;
   name: string;
@@ -289,6 +303,15 @@ export const organizationsApi = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+  /** Creates the organization's portal login and returns a one-time temporary password. */
+  createStaffAccount: (
+    id: number,
+    data: { fullName?: string; email: string; role?: string; resetPassword?: boolean }
+  ) =>
+    adminFetch<OrgStaffAccount>(`/api/Organizations/${id}/staff-accounts`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
   getMembers: (id: number) =>
     adminFetch<OrganizationMember[]>(`/api/Organizations/${id}/members`),
   addMember: (id: number, data: { email: string; role?: string; department?: string; title?: string }) =>
@@ -435,6 +458,38 @@ export interface SupportTicketsResponse {
   page: number;
   limit: number;
 }
+
+export interface FeedbackItem {
+  id: number;
+  rating: number | null;
+  category: 'BUG' | 'IDEA' | 'PRAISE' | 'OTHER' | string;
+  message: string;
+  platform: 'ANDROID' | 'IOS' | 'WEB' | string;
+  appVersion?: string | null;
+  page?: string | null;
+  status: 'NEW' | 'REVIEWED' | 'RESOLVED' | string;
+  adminNotes?: string | null;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  createdAt: string;
+  senderName?: string | null;
+  senderEmail?: string | null;
+}
+
+export const feedbackApi = {
+  list: (params?: { status?: string; category?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.status) q.set('status', params.status);
+    if (params?.category) q.set('category', params.category);
+    const qs = q.toString();
+    return adminFetch<FeedbackItem[]>(`/api/admin/feedback${qs ? `?${qs}` : ''}`, { forceRefresh: true });
+  },
+  update: (id: number, data: { status?: string; adminNotes?: string }) =>
+    adminFetch<{ updated: boolean }>(`/api/admin/feedback/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+};
 
 export const supportTicketsApi = {
   list: (params?: {

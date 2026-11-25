@@ -6,14 +6,14 @@ import { getBreadcrumbSchema, getSoftwareApplicationSchema } from '@/lib/seo-sch
 export const metadata: Metadata = {
   title: 'Emergency SOS & Live GPS Location Alert | Sabhijude',
   description:
-    'Instant emergency SOS dispatch tool. Share your real-time GPS coordinates with trusted contacts via WhatsApp and SMS, and connect directly to 112 emergency services.',
+    'How Sabhijude Emergency SOS works: one tap in the mobile app sends your live location to your trusted contacts. Try the demo, or call 112 directly.',
   alternates: {
     canonical: '/emergency',
   },
   openGraph: {
     title: 'Emergency SOS & Live GPS Location Alert | Sabhijude',
     description:
-      'Instant emergency SOS dispatch tool with live location sharing and direct 112 calling.',
+      'One tap in the Sabhijude app sends your live location to the people you trust.',
     url: '/emergency',
     type: 'website',
   },

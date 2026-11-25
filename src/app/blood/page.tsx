@@ -196,12 +196,13 @@ export default function BloodRequestPage() {
     showToast('Request deleted.', 'success');
   };
 
-  const closeRequest = async (req: BloodRequest, status: 'FULFILLED' | 'CANCELLED') => {
-    const fulfilled = status === 'FULFILLED';
+  // A request no longer needed is deleted, so the only way to close one is "fulfilled".
+  const markFulfilled = async (req: BloodRequest) => {
+    const status = 'FULFILLED' as const;
     const ok = await confirm({
-      title: fulfilled ? 'Mark as fulfilled?' : 'Cancel this request?',
+      title: 'Mark as fulfilled?',
       message: 'It will stop being shown to people nearby, and can no longer be edited.',
-      confirmText: fulfilled ? 'Mark fulfilled' : 'Cancel request',
+      confirmText: 'Mark fulfilled',
       cancelText: 'Go back',
       destructive: false,
     });
@@ -463,17 +464,10 @@ export default function BloodRequestPage() {
                     <div className="mt-2.5 flex gap-2">
                       <button
                         type="button"
-                        onClick={() => closeRequest(req, 'FULFILLED')}
+                        onClick={() => markFulfilled(req)}
                         className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-700"
                       >
                         Mark fulfilled
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => closeRequest(req, 'CANCELLED')}
-                        className="flex-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-ink transition hover:border-slate-300"
-                      >
-                        Cancel
                       </button>
                     </div>
                   )}

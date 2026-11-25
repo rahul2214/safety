@@ -55,7 +55,7 @@ const PARTIAL = [
   ['Blood group and other optional profile details', 'Profile → Edit profile → clear the field'],
   [
     'What a college or workplace holds about you',
-    'App: Profile → My institutions → Leave. Website: Organizations → Erase my data',
+    'App: Profile → My organizations → Leave. Website: Organizations → Erase my data',
   ],
 ];
 

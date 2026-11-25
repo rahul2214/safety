@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   Building2,
   Users,
-  ShieldAlert,
   BarChart3,
   Radio,
   Settings,
@@ -77,7 +76,6 @@ function SidebarContent() {
   const navItems = [
     { label: 'Campus Command', href: '/org/dashboard', icon: Building2 },
     { label: 'Students & Staff', href: '/org/dashboard/members', icon: Users },
-    { label: 'Live Incidents', href: '/org/dashboard/incidents', icon: ShieldAlert },
     { label: 'Safety Analytics', href: '/org/dashboard/analytics', icon: BarChart3 },
     { label: 'Emergency Broadcast', href: '/org/dashboard/broadcast', icon: Radio },
     { label: 'Settings & Zones', href: '/org/dashboard/settings', icon: Settings },

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { organizationsApi, type Organization } from './api';
-import { useAdminAuth } from './auth-context';
+import { adminFetch, organizationsApi, type Organization } from './api';
+import { STAFF_ROLES, useAdminAuth } from './auth-context';
 
 const SELECTED_ORG_KEY = 'sabhijude_selected_org';
 
@@ -54,7 +54,21 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    setOrganizations(res.data);
+    let visible = res.data;
+
+    // An organization's own login sees only the organizations where it is staff. The API
+    // also returns ones it merely belongs to as a member, whose dashboards it cannot open.
+    if (admin?.kind === 'staff') {
+      const mine = await adminFetch<{ organizationId: number; role: string }[]>('/api/users/me/organizations');
+      const staffOrgIds = new Set(
+        (mine.data ?? [])
+          .filter((m) => STAFF_ROLES.includes(m.role?.toUpperCase() as (typeof STAFF_ROLES)[number]))
+          .map((m) => m.organizationId)
+      );
+      visible = visible.filter((o) => staffOrgIds.has(o.id));
+    }
+
+    setOrganizations(visible);
 
     // Restore the last choice when it is still one this account can see; otherwise fall
     // back to the first available organization rather than a fixed id.
@@ -64,7 +78,7 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
 
     setSelectedId(restorable?.id ?? res.data[0]?.id ?? null);
     setLoading(false);
-  }, []);
+  }, [admin?.kind]);
 
   useEffect(() => {
     if (!admin) return;

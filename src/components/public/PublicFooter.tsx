@@ -30,6 +30,7 @@ const COLUMNS = [
       { href: '/blog', label: 'Blog' },
       { href: '/privacy', label: 'Privacy Policy & Safeguards' },
       { href: '/support', label: 'Help Center & Contact' },
+      { href: '/feedback', label: 'Send feedback' },
       { href: '/signup', label: 'Create Free Account' },
       { href: '/login', label: 'Member Log In' },
     ],

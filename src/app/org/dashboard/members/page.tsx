@@ -42,14 +42,14 @@ import {
 import { useOrgId } from '@/portals/org/lib/org-context';
 
 const STUDENT_INVITE_BADGE: Record<StudentInviteStatus, { label: string; cls: string }> = {
-  QUEUED: { label: 'Queued', cls: 'bg-stone-800 text-stone-300 border-stone-700' },
-  SENT: { label: 'Sent', cls: 'bg-blue-500/15 text-blue-300 border-blue-500/30' },
-  FAILED: { label: 'Send failed', cls: 'bg-rose-500/15 text-rose-300 border-rose-500/30' },
-  UNDELIVERABLE: { label: 'Undeliverable', cls: 'bg-rose-500/15 text-rose-300 border-rose-500/30' },
-  ACCEPTED: { label: 'Accepted', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
-  PENDING_APPROVAL: { label: 'Needs approval', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
-  REVOKED: { label: 'Revoked', cls: 'bg-stone-800 text-stone-400 border-stone-700' },
-  EXPIRED: { label: 'Expired', cls: 'bg-stone-800 text-stone-400 border-stone-700' },
+  QUEUED: { label: 'Queued', cls: 'bg-[#f1f1f6] text-[#3f3f4e] border-[#e8e8f0]' },
+  SENT: { label: 'Sent', cls: 'bg-blue-500/15 text-blue-700 border-blue-500/30' },
+  FAILED: { label: 'Send failed', cls: 'bg-rose-500/15 text-rose-700 border-rose-500/30' },
+  UNDELIVERABLE: { label: 'Undeliverable', cls: 'bg-rose-500/15 text-rose-700 border-rose-500/30' },
+  ACCEPTED: { label: 'Accepted', cls: 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30' },
+  PENDING_APPROVAL: { label: 'Needs approval', cls: 'bg-amber-500/15 text-amber-700 border-amber-500/30' },
+  REVOKED: { label: 'Revoked', cls: 'bg-[#f1f1f6] text-[#5b5b6e] border-[#e8e8f0]' },
+  EXPIRED: { label: 'Expired', cls: 'bg-[#f1f1f6] text-[#5b5b6e] border-[#e8e8f0]' },
 };
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -357,24 +357,24 @@ export default function OrganizationMembersRosterPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-800 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e8e8f0] pb-5">
         <div>
-          <div className="flex items-center gap-2 text-xs text-stone-400 mb-1">
+          <div className="flex items-center gap-2 text-xs text-[#5b5b6e] mb-1">
             <Link
               href={'/org/dashboard'}
-              className="hover:text-stone-200 transition-colors flex items-center gap-1"
+              className="hover:text-[#16161d] transition-colors flex items-center gap-1"
             >
               <ArrowLeft size={13} />
               <span>{org?.name || 'Organization'}</span>
             </Link>
             <span>/</span>
-            <span className="text-stone-300 font-semibold">Protected Roster & Access</span>
+            <span className="text-[#3f3f4e] font-semibold">Protected Roster & Access</span>
           </div>
-          <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl font-bold text-[#16161d] tracking-tight flex items-center gap-2.5">
             <Users className="text-rose-500" size={22} />
             <span>Organisation Membership & Security</span>
           </h1>
-          <p className="text-xs text-stone-400 mt-1">
+          <p className="text-xs text-[#5b5b6e] mt-1">
             Manage members, review join requests, issue cryptographic invite links, and review immutable audit logs.
           </p>
         </div>
@@ -402,13 +402,13 @@ export default function OrganizationMembersRosterPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-stone-800 gap-2 overflow-x-auto">
+      <div className="flex border-b border-[#e8e8f0] gap-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('roster')}
           className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'roster'
-              ? 'border-rose-500 text-white'
-              : 'border-transparent text-stone-400 hover:text-stone-300'
+              ? 'border-rose-500 text-[#16161d]'
+              : 'border-transparent text-[#5b5b6e] hover:text-[#16161d]'
           }`}
         >
           <Users size={15} />
@@ -419,8 +419,8 @@ export default function OrganizationMembersRosterPage() {
           onClick={() => setActiveTab('pending')}
           className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'pending'
-              ? 'border-amber-500 text-white'
-              : 'border-transparent text-stone-400 hover:text-stone-300'
+              ? 'border-amber-500 text-[#16161d]'
+              : 'border-transparent text-[#5b5b6e] hover:text-[#16161d]'
           }`}
         >
           <Clock size={15} />
@@ -434,8 +434,8 @@ export default function OrganizationMembersRosterPage() {
           onClick={() => setActiveTab('students')}
           className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'students'
-              ? 'border-rose-500 text-white'
-              : 'border-transparent text-stone-400 hover:text-stone-300'
+              ? 'border-rose-500 text-[#16161d]'
+              : 'border-transparent text-[#5b5b6e] hover:text-[#16161d]'
           }`}
         >
           <Mail size={15} />
@@ -446,8 +446,8 @@ export default function OrganizationMembersRosterPage() {
           onClick={() => setActiveTab('invitations')}
           className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'invitations'
-              ? 'border-orange-500 text-white'
-              : 'border-transparent text-stone-400 hover:text-stone-300'
+              ? 'border-orange-500 text-[#16161d]'
+              : 'border-transparent text-[#5b5b6e] hover:text-[#16161d]'
           }`}
         >
           <Key size={15} />
@@ -458,8 +458,8 @@ export default function OrganizationMembersRosterPage() {
           onClick={() => setActiveTab('audit')}
           className={`pb-3 px-3 sm:px-4 shrink-0 whitespace-nowrap text-xs font-semibold border-b-2 flex items-center gap-2 transition ${
             activeTab === 'audit'
-              ? 'border-blue-500 text-white'
-              : 'border-transparent text-stone-400 hover:text-stone-300'
+              ? 'border-blue-500 text-[#16161d]'
+              : 'border-transparent text-[#5b5b6e] hover:text-[#16161d]'
           }`}
         >
           <History size={15} />
@@ -472,13 +472,13 @@ export default function OrganizationMembersRosterPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div className="md:col-span-2 relative">
-              <Search size={15} className="absolute left-3.5 top-3 text-stone-500" />
+              <Search size={15} className="absolute left-3.5 top-3 text-[#747488]" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by student/employee name, email, or department..."
-                className="w-full bg-stone-900 border border-stone-800 text-stone-200 text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:border-rose-500 placeholder-stone-500"
+                className="w-full bg-white border border-[#e8e8f0] text-[#16161d] text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:border-rose-500 placeholder-[#9797ab]"
               />
             </div>
 
@@ -486,7 +486,7 @@ export default function OrganizationMembersRosterPage() {
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full bg-stone-900 border border-stone-800 text-stone-300 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-rose-500"
+                className="w-full bg-white border border-[#e8e8f0] text-[#3f3f4e] text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-rose-500"
               >
                 <option value="ALL">All Roles</option>
                 <option value="OWNER">Owner</option>
@@ -496,15 +496,15 @@ export default function OrganizationMembersRosterPage() {
               </select>
             </div>
 
-            <div className="flex items-center justify-end text-xs text-stone-400">
-              Active Members: <span className="text-white font-bold ml-1">{members.length}</span>
+            <div className="flex items-center justify-end text-xs text-[#5b5b6e]">
+              Active Members: <span className="text-[#16161d] font-bold ml-1">{members.length}</span>
             </div>
           </div>
 
-          <div className="bg-stone-900/40 border border-stone-800 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-[#e8e8f0] rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-stone-300">
-                <thead className="bg-stone-950/80 border-b border-stone-800 text-[11px] uppercase tracking-wider text-stone-400">
+              <table className="w-full text-left text-xs text-[#3f3f4e]">
+                <thead className="bg-[#f7f7fa] border-b border-[#e8e8f0] text-[11px] uppercase tracking-wider text-[#5b5b6e]">
                   <tr>
                     <th className="py-3 px-4">Member Name</th>
                     <th className="py-3 px-4">Role & Status</th>
@@ -513,24 +513,24 @@ export default function OrganizationMembersRosterPage() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-800/60">
+                <tbody className="divide-y divide-[#ececf2]">
                   {filteredMembers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="text-center py-10 text-stone-500">
+                      <td colSpan={5} className="text-center py-10 text-[#747488]">
                         No members found in directory.
                       </td>
                     </tr>
                   ) : (
                     filteredMembers.map((m) => (
-                      <tr key={m.id} className="hover:bg-stone-800/30 transition">
+                      <tr key={m.id} className="hover:bg-[#fafafc] transition">
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-stone-800 border border-stone-700 flex items-center justify-center font-bold text-stone-200">
+                            <div className="h-8 w-8 rounded-xl bg-[#f1f1f6] border border-[#e8e8f0] flex items-center justify-center font-bold text-[#16161d]">
                               {m.displayName ? m.displayName[0].toUpperCase() : 'U'}
                             </div>
                             <div>
-                              <div className="font-semibold text-white">{m.displayName}</div>
-                              <div className="text-[11px] text-stone-400 flex items-center gap-1">
+                              <div className="font-semibold text-[#16161d]">{m.displayName}</div>
+                              <div className="text-[11px] text-[#5b5b6e] flex items-center gap-1">
                                 <Mail size={11} />
                                 <span>{m.email}</span>
                               </div>
@@ -541,21 +541,21 @@ export default function OrganizationMembersRosterPage() {
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                               m.role === 'OWNER'
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                ? 'bg-amber-500/20 text-amber-700 border border-amber-500/30'
                                 : m.role === 'ORG_ADMIN'
-                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                ? 'bg-purple-500/20 text-purple-700 border border-purple-500/30'
                                 : m.role === 'SECURITY_OFFICER'
-                                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                ? 'bg-blue-500/20 text-blue-700 border border-blue-500/30'
+                                : 'bg-emerald-500/20 text-emerald-700 border border-emerald-500/30'
                             }`}
                           >
                             {m.role}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-stone-300">
+                        <td className="py-3.5 px-4 text-[#3f3f4e]">
                           <div>{m.department || 'General'}</div>
                         </td>
-                        <td className="py-3.5 px-4 text-stone-400 text-[11px]">
+                        <td className="py-3.5 px-4 text-[#5b5b6e] text-[11px]">
                           {m.joinedAt ? new Date(m.joinedAt).toLocaleDateString() : 'Active'}
                         </td>
                         <td className="py-3.5 px-4 text-right">
@@ -566,7 +566,7 @@ export default function OrganizationMembersRosterPage() {
                                 setNewRole(m.role);
                                 setRoleError(null);
                               }}
-                              className="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-medium transition"
+                              className="px-2.5 py-1 rounded-lg bg-[#f1f1f6] hover:bg-[#e8e8f0] text-[#3f3f4e] text-[11px] font-medium transition"
                             >
                               Edit Role
                             </button>
@@ -575,7 +575,7 @@ export default function OrganizationMembersRosterPage() {
                                 setRemovingMember(m);
                                 setRemoveError(null);
                               }}
-                              className="p-1 rounded-lg hover:bg-rose-950/40 text-stone-500 hover:text-rose-400 transition"
+                              className="p-1 rounded-lg hover:bg-rose-50 text-[#747488] hover:text-rose-600 transition"
                               title="Remove Member"
                             >
                               <Trash2 size={14} />
@@ -594,17 +594,17 @@ export default function OrganizationMembersRosterPage() {
 
       {/* ─── TAB 2: PENDING APPROVALS ─── */}
       {activeTab === 'pending' && (
-        <div className="bg-stone-900/40 border border-stone-800 rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-stone-800 bg-stone-950/60 flex items-center justify-between">
-            <div className="text-xs font-bold text-stone-300 flex items-center gap-2">
-              <Clock size={16} className="text-amber-400" />
+        <div className="bg-white border border-[#e8e8f0] rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-[#e8e8f0] bg-[#f7f7fa] flex items-center justify-between">
+            <div className="text-xs font-bold text-[#3f3f4e] flex items-center gap-2">
+              <Clock size={16} className="text-amber-600" />
               <span>Pending Join Requests ({pendingRequests.length})</span>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-stone-300">
-              <thead className="bg-stone-950/80 border-b border-stone-800 text-[11px] uppercase tracking-wider text-stone-400">
+            <table className="w-full text-left text-xs text-[#3f3f4e]">
+              <thead className="bg-[#f7f7fa] border-b border-[#e8e8f0] text-[11px] uppercase tracking-wider text-[#5b5b6e]">
                 <tr>
                   <th className="py-3 px-4">Applicant</th>
                   <th className="py-3 px-4">Email</th>
@@ -612,20 +612,20 @@ export default function OrganizationMembersRosterPage() {
                   <th className="py-3 px-4 text-right">Decision</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-800/60">
+              <tbody className="divide-y divide-[#ececf2]">
                 {pendingRequests.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-center py-10 text-stone-500">
+                    <td colSpan={4} className="text-center py-10 text-[#747488]">
                       No pending membership requests awaiting approval.
                     </td>
                   </tr>
                 ) : (
                   pendingRequests.map((req) => (
-                    <tr key={req.id} className="hover:bg-stone-800/30 transition">
-                      <td className="py-3.5 px-4 font-semibold text-white">
+                    <tr key={req.id} className="hover:bg-[#fafafc] transition">
+                      <td className="py-3.5 px-4 font-semibold text-[#16161d]">
                         {req.displayName || 'Applicant'}
                         {req.invitedEmail && (
-                          <div className="mt-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-[11px] font-normal text-amber-200">
+                          <div className="mt-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-[11px] font-normal text-amber-800">
                             Used the emailed invite sent to <span className="font-mono">{req.invitedEmail}</span>
                             {' '}for <span className="font-semibold">{req.invitedName}</span>
                             {req.invitedRollNumber ? ` (roll ${req.invitedRollNumber})` : ''}, but signed in with a
@@ -633,10 +633,10 @@ export default function OrganizationMembersRosterPage() {
                           </div>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 text-stone-400 font-mono">
+                      <td className="py-3.5 px-4 text-[#5b5b6e] font-mono">
                         {req.email}
                       </td>
-                      <td className="py-3.5 px-4 text-stone-400 text-[11px]">
+                      <td className="py-3.5 px-4 text-[#5b5b6e] text-[11px]">
                         {req.joinedAt ? new Date(req.joinedAt).toLocaleDateString() : 'Recent'}
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -650,7 +650,7 @@ export default function OrganizationMembersRosterPage() {
                           </button>
                           <button
                             onClick={() => handleReviewPending(req.id, false)}
-                            className="px-3 py-1 bg-stone-800 hover:bg-rose-950 text-stone-300 hover:text-rose-300 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                            className="px-3 py-1 bg-[#f1f1f6] hover:bg-rose-50 text-[#3f3f4e] hover:text-rose-700 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
                           >
                             <UserX size={13} />
                             <span>Reject</span>
@@ -669,15 +669,15 @@ export default function OrganizationMembersRosterPage() {
       {/* ─── TAB: STUDENT EMAIL INVITES ─── */}
       {activeTab === 'students' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-stone-900/60 border border-stone-800 p-4 rounded-xl">
-            <div className="text-xs text-stone-300 space-y-1">
-              <span className="font-bold text-white block">Emailed student invitations</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-[#e8e8f0] p-4 rounded-xl">
+            <div className="text-xs text-[#3f3f4e] space-y-1">
+              <span className="font-bold text-[#16161d] block">Emailed student invitations</span>
               <span className="block">
                 Each student gets a single-use link that expires in 7 days. If they sign in with a different email,
                 the request appears under Pending Approvals for you to confirm.
               </span>
               {quota && (
-                <span className="block text-stone-400">
+                <span className="block text-[#5b5b6e]">
                   Emails used: {quota.dayUsed}/{quota.dayLimit} today · {quota.monthUsed}/{quota.monthLimit} in 30 days
                 </span>
               )}
@@ -692,22 +692,22 @@ export default function OrganizationMembersRosterPage() {
           </div>
 
           {studentInviteResult && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-start gap-2">
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-xs flex items-start gap-2">
               <CheckCircle2 size={14} className="shrink-0 mt-0.5" />
               <span>{studentInviteResult}</span>
             </div>
           )}
           {inviteActionError && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 text-xs flex items-start gap-2">
               <AlertCircle size={14} className="shrink-0 mt-0.5" />
               <span>{inviteActionError}</span>
             </div>
           )}
 
-          <div className="bg-stone-900/40 border border-stone-800 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-[#e8e8f0] rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-stone-300">
-                <thead className="bg-stone-950/80 border-b border-stone-800 text-[11px] uppercase tracking-wider text-stone-400">
+              <table className="w-full text-left text-xs text-[#3f3f4e]">
+                <thead className="bg-[#f7f7fa] border-b border-[#e8e8f0] text-[11px] uppercase tracking-wider text-[#5b5b6e]">
                   <tr>
                     <th className="py-3 px-4">Student</th>
                     <th className="py-3 px-4">Email</th>
@@ -717,10 +717,10 @@ export default function OrganizationMembersRosterPage() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-800/60">
+                <tbody className="divide-y divide-[#ececf2]">
                   {studentInvites.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-10 text-stone-500">
+                      <td colSpan={6} className="text-center py-10 text-[#747488]">
                         No student invitations yet. Click Invite Students to add one or upload a CSV.
                       </td>
                     </tr>
@@ -728,17 +728,17 @@ export default function OrganizationMembersRosterPage() {
                     studentInvites.map((inv) => {
                       const badge = STUDENT_INVITE_BADGE[inv.status] ?? STUDENT_INVITE_BADGE.EXPIRED;
                       return (
-                        <tr key={inv.id} className="hover:bg-stone-800/30 transition">
-                          <td className="py-3.5 px-4 font-semibold text-white">
+                        <tr key={inv.id} className="hover:bg-[#fafafc] transition">
+                          <td className="py-3.5 px-4 font-semibold text-[#16161d]">
                             {inv.fullName}
-                            {inv.department && <span className="block text-[11px] font-normal text-stone-500">{inv.department}</span>}
+                            {inv.department && <span className="block text-[11px] font-normal text-[#747488]">{inv.department}</span>}
                           </td>
-                          <td className="py-3.5 px-4 text-stone-400 font-mono text-[11px]">{inv.email}</td>
-                          <td className="py-3.5 px-4 text-stone-400">{inv.rollNumber || '—'}</td>
+                          <td className="py-3.5 px-4 text-[#5b5b6e] font-mono text-[11px]">{inv.email}</td>
+                          <td className="py-3.5 px-4 text-[#5b5b6e]">{inv.rollNumber || '—'}</td>
                           <td className="py-3.5 px-4">
                             <span className={`px-2 py-0.5 rounded text-[10px] border font-semibold ${badge.cls}`}>{badge.label}</span>
                           </td>
-                          <td className="py-3.5 px-4 text-stone-400 text-[11px]">
+                          <td className="py-3.5 px-4 text-[#5b5b6e] text-[11px]">
                             {inv.lastSentAt ? new Date(inv.lastSentAt).toLocaleString() : '—'}
                           </td>
                           <td className="py-3.5 px-4 text-right">
@@ -746,7 +746,7 @@ export default function OrganizationMembersRosterPage() {
                               {inv.canResend && (
                                 <button
                                   onClick={() => handleResendStudentInvite(inv.id)}
-                                  className="px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold flex items-center gap-1 transition"
+                                  className="px-2.5 py-1 rounded bg-[#f1f1f6] hover:bg-[#e8e8f0] text-[#16161d] text-xs font-semibold flex items-center gap-1 transition"
                                 >
                                   <RefreshCw size={12} />
                                   <span>Resend</span>
@@ -755,7 +755,7 @@ export default function OrganizationMembersRosterPage() {
                               {inv.canRevoke && (
                                 <button
                                   onClick={() => handleRevokeStudentInvite(inv.id)}
-                                  className="px-2.5 py-1 rounded bg-stone-800 hover:bg-rose-900/60 text-stone-300 hover:text-rose-200 text-xs font-semibold transition"
+                                  className="px-2.5 py-1 rounded bg-[#f1f1f6] hover:bg-rose-50 text-[#3f3f4e] hover:text-rose-800 text-xs font-semibold transition"
                                 >
                                   Revoke
                                 </button>
@@ -776,9 +776,9 @@ export default function OrganizationMembersRosterPage() {
       {/* ─── TAB 3: INVITATIONS ─── */}
       {activeTab === 'invitations' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center bg-stone-900/60 border border-stone-800 p-4 rounded-xl">
-            <div className="text-xs text-stone-300">
-              <span className="font-bold text-white block">Cryptographic Invite Tokens</span>
+          <div className="flex justify-between items-center bg-white border border-[#e8e8f0] p-4 rounded-xl">
+            <div className="text-xs text-[#3f3f4e]">
+              <span className="font-bold text-[#16161d] block">Cryptographic Invite Tokens</span>
               Tokens are generated using 256-bit CSPRNG entropy and stored as SHA-256 digests. Raw tokens are shown only upon creation.
             </div>
             <button
@@ -794,10 +794,10 @@ export default function OrganizationMembersRosterPage() {
             </button>
           </div>
 
-          <div className="bg-stone-900/40 border border-stone-800 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-[#e8e8f0] rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-stone-300">
-                <thead className="bg-stone-950/80 border-b border-stone-800 text-[11px] uppercase tracking-wider text-stone-400">
+              <table className="w-full text-left text-xs text-[#3f3f4e]">
+                <thead className="bg-[#f7f7fa] border-b border-[#e8e8f0] text-[11px] uppercase tracking-wider text-[#5b5b6e]">
                   <tr>
                     <th className="py-3 px-4">Role Assigned</th>
                     <th className="py-3 px-4">Restricted To Email</th>
@@ -806,38 +806,38 @@ export default function OrganizationMembersRosterPage() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-800/60">
+                <tbody className="divide-y divide-[#ececf2]">
                   {invitations.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="text-center py-10 text-stone-500">
+                      <td colSpan={5} className="text-center py-10 text-[#747488]">
                         No invitations created yet. Click Create Invite Link to generate one.
                       </td>
                     </tr>
                   ) : (
                     invitations.map((inv) => (
-                      <tr key={inv.uuid} className="hover:bg-stone-800/30 transition">
-                        <td className="py-3.5 px-4 font-semibold text-white">
-                          <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-300 text-[10px] font-bold">
+                      <tr key={inv.uuid} className="hover:bg-[#fafafc] transition">
+                        <td className="py-3.5 px-4 font-semibold text-[#16161d]">
+                          <span className="px-2 py-0.5 rounded bg-[#f1f1f6] text-[#3f3f4e] text-[10px] font-bold">
                             {inv.role}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-stone-400 font-mono text-[11px]">
-                          {inv.email || <span className="text-stone-500 italic">Any email</span>}
+                        <td className="py-3.5 px-4 text-[#5b5b6e] font-mono text-[11px]">
+                          {inv.email || <span className="text-[#747488] italic">Any email</span>}
                         </td>
-                        <td className="py-3.5 px-4 text-stone-300">
+                        <td className="py-3.5 px-4 text-[#3f3f4e]">
                           {inv.usedCount} / {inv.maxUses}
                         </td>
                         <td className="py-3.5 px-4">
                           {inv.isRevoked ? (
-                            <span className="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
+                            <span className="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-700 border border-rose-500/30 font-semibold">
                               Revoked
                             </span>
                           ) : new Date(inv.expiresAt) < new Date() ? (
-                            <span className="px-2 py-0.5 rounded text-[10px] bg-stone-800 text-stone-400 border border-stone-700 font-semibold">
+                            <span className="px-2 py-0.5 rounded text-[10px] bg-[#f1f1f6] text-[#5b5b6e] border border-[#e8e8f0] font-semibold">
                               Expired
                             </span>
                           ) : (
-                            <span className="text-emerald-400 text-[11px]">
+                            <span className="text-emerald-600 text-[11px]">
                               Expires {new Date(inv.expiresAt).toLocaleDateString()}
                             </span>
                           )}
@@ -846,7 +846,7 @@ export default function OrganizationMembersRosterPage() {
                           {!inv.isRevoked && new Date(inv.expiresAt) >= new Date() && (
                             <button
                               onClick={() => handleRevokeInvite(inv.uuid)}
-                              className="px-2.5 py-1 rounded bg-stone-800 hover:bg-rose-900/60 text-stone-300 hover:text-rose-200 text-xs font-semibold transition"
+                              className="px-2.5 py-1 rounded bg-[#f1f1f6] hover:bg-rose-50 text-[#3f3f4e] hover:text-rose-800 text-xs font-semibold transition"
                             >
                               Revoke
                             </button>
@@ -864,17 +864,17 @@ export default function OrganizationMembersRosterPage() {
 
       {/* ─── TAB 4: AUDIT LOG VIEWER ─── */}
       {activeTab === 'audit' && (
-        <div className="bg-stone-900/40 border border-stone-800 rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-stone-800 bg-stone-950/60 flex items-center justify-between">
-            <div className="text-xs font-bold text-stone-300 flex items-center gap-2">
-              <History size={16} className="text-blue-400" />
+        <div className="bg-white border border-[#e8e8f0] rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-[#e8e8f0] bg-[#f7f7fa] flex items-center justify-between">
+            <div className="text-xs font-bold text-[#3f3f4e] flex items-center gap-2">
+              <History size={16} className="text-blue-600" />
               <span>Immutable Organization Audit Trail (DPDP & CERT-In Compliant)</span>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-stone-300">
-              <thead className="bg-stone-950/80 border-b border-stone-800 text-[11px] uppercase tracking-wider text-stone-400">
+            <table className="w-full text-left text-xs text-[#3f3f4e]">
+              <thead className="bg-[#f7f7fa] border-b border-[#e8e8f0] text-[11px] uppercase tracking-wider text-[#5b5b6e]">
                 <tr>
                   <th className="py-3 px-4">Timestamp</th>
                   <th className="py-3 px-4">Actor</th>
@@ -883,29 +883,29 @@ export default function OrganizationMembersRosterPage() {
                   <th className="py-3 px-4">Details</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-800/60">
+              <tbody className="divide-y divide-[#ececf2]">
                 {auditLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-10 text-stone-500">
+                    <td colSpan={5} className="text-center py-10 text-[#747488]">
                       No audit events recorded yet.
                     </td>
                   </tr>
                 ) : (
                   auditLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-stone-800/30 transition">
-                      <td className="py-3.5 px-4 text-stone-400 text-[11px]">
+                    <tr key={log.id} className="hover:bg-[#fafafc] transition">
+                      <td className="py-3.5 px-4 text-[#5b5b6e] text-[11px]">
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-white">
+                      <td className="py-3.5 px-4 font-semibold text-[#16161d]">
                         {log.actor}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-[11px] text-amber-300">
+                      <td className="py-3.5 px-4 font-mono text-[11px] text-amber-700">
                         {log.action}
                       </td>
-                      <td className="py-3.5 px-4 text-stone-400 text-[11px]">
+                      <td className="py-3.5 px-4 text-[#5b5b6e] text-[11px]">
                         {log.resourceType}: {log.resourceId}
                       </td>
-                      <td className="py-3.5 px-4 text-stone-300 text-[11px]">
+                      <td className="py-3.5 px-4 text-[#3f3f4e] text-[11px]">
                         {log.details || '—'}
                       </td>
                     </tr>
@@ -919,16 +919,16 @@ export default function OrganizationMembersRosterPage() {
 
       {/* ─── CREATE INVITATION MODAL ─── */}
       {isInviteOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-stone-900 border border-stone-800 rounded-2xl p-5 sm:p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-stone-800">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-white border border-[#e8e8f0] rounded-2xl p-5 sm:p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#e8e8f0]">
+              <h3 className="text-sm font-bold text-[#16161d] flex items-center gap-2">
                 <Key size={16} className="text-orange-500" />
                 <span>Create Cryptographic Invite Token</span>
               </h3>
               <button
                 onClick={() => setIsInviteOpen(false)}
-                className="p-1 rounded-lg hover:bg-stone-800 text-stone-400"
+                className="p-1 rounded-lg hover:bg-[#f1f1f6] text-[#5b5b6e]"
               >
                 <X size={16} />
               </button>
@@ -936,13 +936,13 @@ export default function OrganizationMembersRosterPage() {
 
             {generatedInvite ? (
               <div className="space-y-4 text-xs">
-                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 flex items-center gap-2">
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-700 flex items-center gap-2">
                   <CheckCircle2 size={16} className="shrink-0" />
                   <span>Invitation generated successfully!</span>
                 </div>
 
                 <div>
-                  <label className="block text-stone-400 mb-1 font-semibold">
+                  <label className="block text-[#5b5b6e] mb-1 font-semibold">
                     Cryptographic Raw Token (Share this once)
                   </label>
                   <div className="flex items-center gap-2">
@@ -950,7 +950,7 @@ export default function OrganizationMembersRosterPage() {
                       type="text"
                       readOnly
                       value={generatedInvite.token || ''}
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 font-mono text-xs focus:outline-none"
+                      className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] font-mono text-xs focus:outline-none"
                     />
                     <button
                       onClick={() => {
@@ -966,7 +966,7 @@ export default function OrganizationMembersRosterPage() {
                       <span>{copiedToken ? 'Copied' : 'Copy'}</span>
                     </button>
                   </div>
-                  <span className="text-[10px] text-stone-500 mt-1 block">
+                  <span className="text-[10px] text-[#747488] mt-1 block">
                     This token is never stored in plaintext and cannot be recovered if closed.
                   </span>
                 </div>
@@ -977,7 +977,7 @@ export default function OrganizationMembersRosterPage() {
                       setIsInviteOpen(false);
                       setGeneratedInvite(null);
                     }}
-                    className="px-4 py-2 rounded-xl bg-stone-800 text-stone-200 hover:bg-stone-700"
+                    className="px-4 py-2 rounded-xl bg-[#f1f1f6] text-[#16161d] hover:bg-[#e8e8f0]"
                   >
                     Done
                   </button>
@@ -986,17 +986,17 @@ export default function OrganizationMembersRosterPage() {
             ) : (
               <form onSubmit={handleCreateInvite} className="space-y-3 text-xs">
                 {inviteError && (
-                  <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-[11px] text-rose-300">
+                  <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-[11px] text-rose-700">
                     {inviteError}
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-stone-400 mb-1 font-semibold">Role to Grant</label>
+                  <label className="block text-[#5b5b6e] mb-1 font-semibold">Role to Grant</label>
                   <select
                     value={inviteRole}
                     onChange={(e) => setInviteRole(e.target.value)}
-                    className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 focus:outline-none focus:border-orange-500"
+                    className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] focus:outline-none focus:border-orange-500"
                   >
                     <option value="MEMBER">Member (Student / Staff)</option>
                     <option value="SECURITY_OFFICER">Security Officer / Responder</option>
@@ -1005,7 +1005,7 @@ export default function OrganizationMembersRosterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-stone-400 mb-1 font-semibold">
+                  <label className="block text-[#5b5b6e] mb-1 font-semibold">
                     Restrict to Specific Email (Optional)
                   </label>
                   <input
@@ -1013,31 +1013,31 @@ export default function OrganizationMembersRosterPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="Leave empty for public link"
-                    className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 focus:outline-none focus:border-orange-500"
+                    className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] focus:outline-none focus:border-orange-500"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-stone-400 mb-1 font-semibold">Max Uses</label>
+                    <label className="block text-[#5b5b6e] mb-1 font-semibold">Max Uses</label>
                     <input
                       type="number"
                       min={1}
                       max={100}
                       value={inviteMaxUses}
                       onChange={(e) => setInviteMaxUses(Number(e.target.value))}
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 focus:outline-none focus:border-orange-500"
+                      className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] focus:outline-none focus:border-orange-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-stone-400 mb-1 font-semibold">Expires In (Days)</label>
+                    <label className="block text-[#5b5b6e] mb-1 font-semibold">Expires In (Days)</label>
                     <input
                       type="number"
                       min={1}
                       max={30}
                       value={inviteDays}
                       onChange={(e) => setInviteDays(Number(e.target.value))}
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 focus:outline-none focus:border-orange-500"
+                      className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] focus:outline-none focus:border-orange-500"
                     />
                   </div>
                 </div>
@@ -1046,7 +1046,7 @@ export default function OrganizationMembersRosterPage() {
                   <button
                     type="button"
                     onClick={() => setIsInviteOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 hover:bg-stone-700"
+                    className="px-4 py-2 rounded-xl bg-[#f1f1f6] text-[#3f3f4e] hover:bg-[#e8e8f0]"
                   >
                     Cancel
                   </button>
@@ -1066,16 +1066,16 @@ export default function OrganizationMembersRosterPage() {
 
       {/* ─── INVITE STUDENTS MODAL ─── */}
       {isStudentInviteOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-lg w-full max-h-[90vh] overflow-y-auto bg-stone-900 border border-stone-800 rounded-2xl p-5 sm:p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-stone-800">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-lg w-full max-h-[90vh] overflow-y-auto bg-white border border-[#e8e8f0] rounded-2xl p-5 sm:p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#e8e8f0]">
+              <h3 className="text-sm font-bold text-[#16161d] flex items-center gap-2">
                 <Mail size={16} className="text-rose-500" />
                 <span>Invite Students by Email</span>
               </h3>
               <button
                 onClick={() => setIsStudentInviteOpen(false)}
-                className="p-1 rounded-lg hover:bg-stone-800 text-stone-400"
+                className="p-1 rounded-lg hover:bg-[#f1f1f6] text-[#5b5b6e]"
                 aria-label="Close"
               >
                 <X size={16} />
@@ -1084,14 +1084,14 @@ export default function OrganizationMembersRosterPage() {
 
             {studentInviteResult ? (
               <div className="space-y-4 text-xs">
-                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 flex items-start gap-2">
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-700 flex items-start gap-2">
                   <CheckCircle2 size={16} className="shrink-0" />
                   <span>{studentInviteResult}</span>
                 </div>
                 <div className="flex justify-end">
                   <button
                     onClick={() => setIsStudentInviteOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-stone-800 text-stone-200 hover:bg-stone-700"
+                    className="px-4 py-2 rounded-xl bg-[#f1f1f6] text-[#16161d] hover:bg-[#e8e8f0]"
                   >
                     Done
                   </button>
@@ -1099,14 +1099,14 @@ export default function OrganizationMembersRosterPage() {
               </div>
             ) : (
               <form onSubmit={handleSendStudentInvites} className="space-y-3 text-xs">
-                <div className="grid grid-cols-2 gap-1 p-1 bg-stone-950 rounded-xl border border-stone-800">
+                <div className="grid grid-cols-2 gap-1 p-1 bg-[#f7f7fa] rounded-xl border border-[#e8e8f0]">
                   {(['single', 'csv'] as const).map((m) => (
                     <button
                       key={m}
                       type="button"
                       onClick={() => { setInviteMode(m); setStudentInviteError(null); }}
                       className={`py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition ${
-                        inviteMode === m ? 'bg-stone-800 text-white' : 'text-stone-400 hover:text-stone-200'
+                        inviteMode === m ? 'bg-[#f1f1f6] text-[#16161d]' : 'text-[#5b5b6e] hover:text-[#16161d]'
                       }`}
                     >
                       {m === 'single' ? <Plus size={13} /> : <FileSpreadsheet size={13} />}
@@ -1116,7 +1116,7 @@ export default function OrganizationMembersRosterPage() {
                 </div>
 
                 {studentInviteError && (
-                  <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-[11px] text-rose-300">
+                  <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-[11px] text-rose-700">
                     {studentInviteError}
                   </div>
                 )}
@@ -1130,21 +1130,21 @@ export default function OrganizationMembersRosterPage() {
                       ['department', 'Department', 'text', 'Computer Science'],
                     ] as const).map(([key, label, type, ph]) => (
                       <div key={key}>
-                        <label className="block text-stone-400 mb-1 font-semibold">{label}</label>
+                        <label className="block text-[#5b5b6e] mb-1 font-semibold">{label}</label>
                         <input
                           type={type}
                           value={single[key] ?? ''}
                           onChange={(e) => setSingle((prev) => ({ ...prev, [key]: e.target.value }))}
                           placeholder={ph}
-                          className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 focus:outline-none focus:border-rose-500 placeholder-stone-600"
+                          className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] focus:outline-none focus:border-rose-500 placeholder-[#9797ab]"
                         />
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <p className="text-stone-400">
-                      Columns: <span className="font-mono text-stone-300">name, email, roll number, department</span>.
+                    <p className="text-[#5b5b6e]">
+                      Columns: <span className="font-mono text-[#3f3f4e]">name, email, roll number, department</span>.
                       A header row is optional. Use whatever email the college has on file.
                     </p>
                     <input
@@ -1154,17 +1154,17 @@ export default function OrganizationMembersRosterPage() {
                         const file = e.target.files?.[0];
                         if (file) setCsvText(await file.text());
                       }}
-                      className="block w-full text-stone-400 file:mr-3 file:rounded-lg file:border-0 file:bg-stone-800 file:px-3 file:py-2 file:text-stone-200"
+                      className="block w-full text-[#5b5b6e] file:mr-3 file:rounded-lg file:border-0 file:bg-[#f1f1f6] file:px-3 file:py-2 file:text-[#16161d]"
                     />
                     <textarea
                       value={csvText}
                       onChange={(e) => setCsvText(e.target.value)}
                       rows={6}
                       placeholder={'name,email,roll number,department\nPriya Sharma,priya@example.com,21CS042,CSE'}
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 font-mono text-[11px] focus:outline-none focus:border-rose-500 placeholder-stone-600"
+                      className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] font-mono text-[11px] focus:outline-none focus:border-rose-500 placeholder-[#9797ab]"
                     />
                     {csvText.trim() && (
-                      <p className="text-stone-400">
+                      <p className="text-[#5b5b6e]">
                         {csvPreview.students.length} student{csvPreview.students.length === 1 ? '' : 's'} ready
                         {csvPreview.skipped > 0 && `, ${csvPreview.skipped} row${csvPreview.skipped === 1 ? '' : 's'} skipped (missing name or invalid email)`}.
                       </p>
@@ -1172,7 +1172,7 @@ export default function OrganizationMembersRosterPage() {
                   </div>
                 )}
 
-                <p className="text-[11px] text-stone-500">
+                <p className="text-[11px] text-[#747488]">
                   Students choose whether to accept and what to share. You will see whether each invitation was
                   accepted, but not whether an address belongs to a Sabhijude account.
                 </p>
@@ -1181,7 +1181,7 @@ export default function OrganizationMembersRosterPage() {
                   <button
                     type="button"
                     onClick={() => setIsStudentInviteOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 hover:bg-stone-700"
+                    className="px-4 py-2 rounded-xl bg-[#f1f1f6] text-[#3f3f4e] hover:bg-[#e8e8f0]"
                   >
                     Cancel
                   </button>
@@ -1206,47 +1206,47 @@ export default function OrganizationMembersRosterPage() {
 
       {/* ─── ROLE MANAGEMENT MODAL (RBAC & LAST-OWNER) ─── */}
       {editingMember && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-stone-900 border border-stone-800 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 text-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-white border border-[#e8e8f0] rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-[#e8e8f0]">
+              <h3 className="text-sm font-bold text-[#16161d] flex items-center gap-2">
                 <ShieldCheck size={16} className="text-blue-500" />
                 <span>Change Member Role</span>
               </h3>
               <button
                 onClick={() => setEditingMember(null)}
-                className="p-1 rounded-lg hover:bg-stone-800 text-stone-400"
+                className="p-1 rounded-lg hover:bg-[#f1f1f6] text-[#5b5b6e]"
               >
                 <X size={16} />
               </button>
             </div>
 
             {roleError && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 flex items-center gap-2">
                 <AlertCircle size={14} className="shrink-0" />
                 <span>{roleError}</span>
               </div>
             )}
 
             <div>
-              <span className="text-stone-400 block mb-1">Target Member:</span>
-              <span className="font-bold text-white block text-sm">{editingMember.displayName}</span>
-              <span className="text-stone-500 font-mono text-[11px] block">{editingMember.email}</span>
+              <span className="text-[#5b5b6e] block mb-1">Target Member:</span>
+              <span className="font-bold text-[#16161d] block text-sm">{editingMember.displayName}</span>
+              <span className="text-[#747488] font-mono text-[11px] block">{editingMember.email}</span>
             </div>
 
             <div>
-              <label className="block text-stone-400 mb-1 font-semibold">Assign Role</label>
+              <label className="block text-[#5b5b6e] mb-1 font-semibold">Assign Role</label>
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}
-                className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-stone-200 focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#f7f7fa] border border-[#e8e8f0] rounded-xl px-3 py-2 text-[#16161d] focus:outline-none focus:border-blue-500"
               >
                 <option value="MEMBER">Member (Student / Staff)</option>
                 <option value="SECURITY_OFFICER">Security Officer / Responder</option>
                 <option value="ORG_ADMIN">Organisation Admin</option>
                 <option value="OWNER">Owner</option>
               </select>
-              <span className="text-[10px] text-stone-500 mt-1 block">
+              <span className="text-[10px] text-[#747488] mt-1 block">
                 Privilege escalation protection active. Last-owner protection ensures the organization is never orphaned.
               </span>
             </div>
@@ -1254,7 +1254,7 @@ export default function OrganizationMembersRosterPage() {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setEditingMember(null)}
-                className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 hover:bg-stone-700"
+                className="px-4 py-2 rounded-xl bg-[#f1f1f6] text-[#3f3f4e] hover:bg-[#e8e8f0]"
               >
                 Cancel
               </button>
@@ -1272,37 +1272,37 @@ export default function OrganizationMembersRosterPage() {
 
       {/* ─── REMOVE MEMBER MODAL ─── */}
       {removingMember && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-stone-900 border border-stone-800 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 text-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full max-h-[90vh] overflow-y-auto bg-white border border-[#e8e8f0] rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-[#e8e8f0]">
+              <h3 className="text-sm font-bold text-[#16161d] flex items-center gap-2">
                 <Trash2 size={16} className="text-rose-500" />
                 <span>Remove Member</span>
               </h3>
               <button
                 onClick={() => setRemovingMember(null)}
-                className="p-1 rounded-lg hover:bg-stone-800 text-stone-400"
+                className="p-1 rounded-lg hover:bg-[#f1f1f6] text-[#5b5b6e]"
               >
                 <X size={16} />
               </button>
             </div>
 
             {removeError && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 flex items-center gap-2">
                 <AlertCircle size={14} className="shrink-0" />
                 <span>{removeError}</span>
               </div>
             )}
 
-            <p className="text-stone-300">
-              Are you sure you want to remove <span className="font-bold text-white">{removingMember.displayName}</span>?
+            <p className="text-[#3f3f4e]">
+              Are you sure you want to remove <span className="font-bold text-[#16161d]">{removingMember.displayName}</span>?
               Their organization access and privacy consents will be immediately terminated.
             </p>
 
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setRemovingMember(null)}
-                className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 hover:bg-stone-700"
+                className="px-4 py-2 rounded-xl bg-[#f1f1f6] text-[#3f3f4e] hover:bg-[#e8e8f0]"
               >
                 Cancel
               </button>

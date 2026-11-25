@@ -38,7 +38,19 @@ interface AuthContextType {
   verifyEmail: (email: string, code: string) => Promise<AuthResultInfo>;
   logout: () => void;
   setAnonymousMode: (anon: boolean) => void;
+  /**
+   * The signed-in member must fill in their details before using the site: a Google sign-up
+   * that has just created the account, or any account still without a phone number.
+   */
+  needsDetails: boolean;
+  /** Merges saved profile fields (e.g. the phone number) into the stored user. */
+  updateStoredUser: (patch: Partial<AuthUser>) => void;
+  /** The details step is done (or skipped once a phone number is on file). */
+  markDetailsDone: () => void;
 }
+
+/** Survives page loads inside the tab, so a refresh mid-step does not skip it. */
+const DETAILS_PENDING_KEY = 'sabhijude_details_pending';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -55,6 +67,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [detailsPending, setDetailsPendingState] = useState(false);
+  // For a stored user with no phone number: whether the server confirmed there is none.
+  // Until then nobody is redirected, so an older session missing the field is not bounced.
+  const [phoneConfirmedMissing, setPhoneConfirmedMissing] = useState(false);
+
+  const setDetailsPending = (pending: boolean) => {
+    setDetailsPendingState(pending);
+    try {
+      if (pending) sessionStorage.setItem(DETAILS_PENDING_KEY, '1');
+      else sessionStorage.removeItem(DETAILS_PENDING_KEY);
+    } catch {
+      // Storage blocked: the in-memory flag still holds for this page.
+    }
+  };
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -64,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
+        setDetailsPendingState(sessionStorage.getItem(DETAILS_PENDING_KEY) === '1');
       }
     } catch (e) {
       console.error('Failed to restore auth session:', e);
@@ -71,6 +98,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   }, []);
+
+  const updateStoredUser = (patch: Partial<AuthUser>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      try {
+        localStorage.setItem('sabhijude_user', JSON.stringify(next));
+      } catch {
+        // Storage blocked: React state is still updated.
+      }
+      return next;
+    });
+  };
+
+  // A stored user without a phone number: ask the server before deciding they must add one.
+  useEffect(() => {
+    if (!user || !token || user.phoneNumber) {
+      setPhoneConfirmedMissing(false);
+      return;
+    }
+    let cancelled = false;
+    fetch(`${API_BASE}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => {
+        if (cancelled || !body) return;
+        const phone = body?.data?.phoneNumber;
+        if (phone) updateStoredUser({ phoneNumber: phone });
+        else setPhoneConfirmedMissing(true);
+      })
+      .catch(() => {
+        // Offline: do not lock anyone out on a guess.
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.phoneNumber, token]);
+
+  const needsDetails = !!user && (detailsPending || (!user.phoneNumber && phoneConfirmedMissing));
+  const markDetailsDone = () => setDetailsPending(false);
 
   // api-client renews expired tokens and ends dead sessions; keep React state in step with it
   useEffect(() => {
@@ -143,8 +210,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return readError(data, 'Google sign-in did not work. Please try again.');
       }
       const u = data.data.user || {};
-      // A brand-new Google account has no profile details yet.
-      return { success: true, needsProfile: !u.genderId && !u.dob };
+      // A new Google account has no profile details, and Google never supplies a phone number.
+      const needsProfile = !!data.data.isNewUser || !u.phoneNumber || (!u.genderId && !u.dob);
+      setDetailsPending(needsProfile);
+      return { success: true, needsProfile };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Unable to connect to the safety server.' };
     }
@@ -288,6 +357,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     apiCache.clear();
     setToken(null);
     setUser(null);
+    setDetailsPending(false);
     localStorage.removeItem('sabhijude_token');
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem('sabhijude_user');
@@ -314,6 +384,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         verifyEmail,
         logout,
         setAnonymousMode,
+        needsDetails,
+        updateStoredUser,
+        markDetailsDone,
       }}
     >
       {children}

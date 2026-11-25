@@ -7,16 +7,12 @@ import { Shield, Circle, Building2, Menu } from 'lucide-react';
 
 const TITLE_MAP: Record<string, { title: string; subtitle: string }> = {
   '/org/dashboard': {
-    title: 'Safety Command Overview',
-    subtitle: 'Real-time telemetry, campus incident triage, and responder dispatch',
+    title: 'Campus Command',
+    subtitle: 'Member reports, their status and what members are saying',
   },
   '/org/dashboard/members': {
     title: 'Student & Employee Directory',
     subtitle: 'Enrolled members, trusted guardian circles, and safety roster',
-  },
-  '/org/dashboard/incidents': {
-    title: 'Active Crisis & Incident Queue',
-    subtitle: 'Real-time SOS emergencies and safety grievances in monitored zones',
   },
   '/org/dashboard/analytics': {
     title: 'Institutional Safety Analytics',

@@ -32,6 +32,7 @@ import {
   type Organization,
   type OrganizationRequest,
 } from '@/portals/admin/lib/api';
+import { StaffAccountDialog } from '@/portals/admin/components/StaffAccountDialog';
 
 export default function OrganizationsPage() {
   const [activeTab, setActiveTab] = useState<'ORGANIZATIONS' | 'REQUESTS'>('ORGANIZATIONS');
@@ -60,6 +61,10 @@ export default function OrganizationsPage() {
   const [type, setType] = useState('CORPORATE');
   const [domain, setDomain] = useState('');
   const [plan, setPlan] = useState('PRO');
+  const [ownerName, setOwnerName] = useState('');
+  const [ownerEmail, setOwnerEmail] = useState('');
+  // After creating an organization with an owner email, the login dialog opens pre-filled.
+  const [loginFor, setLoginFor] = useState<{ id: number; name: string; ownerName: string; ownerEmail: string } | null>(null);
 
   const fetchOrgs = async () => {
     setLoadingOrgs(true);
@@ -104,10 +109,17 @@ export default function OrganizationsPage() {
     setCreating(false);
 
     if (res.data) {
+      if (ownerEmail.trim()) {
+        setLoginFor({ id: res.data.id, name: res.data.name, ownerName: ownerName.trim(), ownerEmail: ownerEmail.trim() });
+      }
       setName('');
       setDomain('');
+      setOwnerName('');
+      setOwnerEmail('');
       setModalOpen(false);
       fetchOrgs();
+    } else {
+      alert(res.error?.message || 'Failed to create organization. Please try again.');
     }
   };
 
@@ -422,7 +434,7 @@ export default function OrganizationsPage() {
                       {org.name}
                     </h3>
                     <p className="text-xs text-[#747488] font-mono mt-0.5 break-all">
-                      {org.domain || `${org.slug}.sabhijude.internal`}
+                      {org.domain || 'No domain set'}
                     </p>
 
                     {/* Score & Metrics Bar */}
@@ -867,6 +879,29 @@ export default function OrganizationsPage() {
                 </select>
               </div>
 
+              <div className="pt-3 border-t border-[#e8e8f0] space-y-3">
+                <div>
+                  <p className="text-xs font-semibold text-[#16161d]">Portal login (optional)</p>
+                  <p className="text-[11px] text-[#5b5b6e] mt-0.5">
+                    Enter the organization contact to create their login right after the organization is created.
+                  </p>
+                </div>
+                <input
+                  type="text"
+                  value={ownerName}
+                  onChange={(e) => setOwnerName(e.target.value)}
+                  placeholder="Contact name"
+                  className="w-full bg-[#f7f7fa] border border-[#e8e8f0] px-3.5 py-2.5 rounded-[12px] text-xs text-[#16161d] focus:outline-none focus:border-[#6d4aff] focus:bg-white placeholder-[#9797ab]"
+                />
+                <input
+                  type="email"
+                  value={ownerEmail}
+                  onChange={(e) => setOwnerEmail(e.target.value)}
+                  placeholder="Contact email"
+                  className="w-full bg-[#f7f7fa] border border-[#e8e8f0] px-3.5 py-2.5 rounded-[12px] text-xs text-[#16161d] focus:outline-none focus:border-[#6d4aff] focus:bg-white placeholder-[#9797ab]"
+                />
+              </div>
+
               <div className="pt-2 flex items-center justify-end gap-2 border-t border-[#e8e8f0]">
                 <button
                   type="button"
@@ -886,6 +921,15 @@ export default function OrganizationsPage() {
             </form>
           </div>
         </div>
+      )}
+      {loginFor && (
+        <StaffAccountDialog
+          orgId={loginFor.id}
+          orgName={loginFor.name}
+          initialName={loginFor.ownerName}
+          initialEmail={loginFor.ownerEmail}
+          onClose={() => setLoginFor(null)}
+        />
       )}
     </div>
   );

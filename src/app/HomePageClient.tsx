@@ -25,7 +25,6 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { Modal } from '@/components/ui/Modal';
 import { PublicLanding } from '@/components/PublicLanding';
 import { SosModal } from '@/components/SosModal';
 import { NearbyRequests } from '@/components/NearbyRequests';
@@ -92,7 +91,6 @@ export function HomePageClient() {
 
   const [sosModalOpen, setSosModalOpen] = useState(false);
   const [fakeCallOpen, setFakeCallOpen] = useState(false);
-  const [sosConfirmOpen, setSosConfirmOpen] = useState(false);
   const [shareLocationLoading, setShareLocationLoading] = useState(false);
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -193,7 +191,7 @@ export function HomePageClient() {
   const unread = displayNotifications.filter((n) => !n.isRead).length;
 
   const checklist = [
-    { done: contactCount > 0, label: 'Add a trusted contact', hint: contactCount > 0 ? `${contactCount} saved` : 'They get your SOS alerts', href: '/contacts' },
+    { done: contactCount > 0, label: 'Add a trusted contact', hint: contactCount > 0 ? `${contactCount} saved` : 'People to reach when you need help', href: '/contacts' },
     { done: contactCount >= 3, label: 'Build a circle of three', hint: 'More people, faster help', href: '/contacts' },
     { done: false, label: 'Practise a fake call', hint: 'Know how it feels before you need it', action: () => setFakeCallOpen(true) },
     { done: false, label: 'Read the safety guides', hint: 'Your rights, in plain language', href: '/resources' },
@@ -215,7 +213,7 @@ export function HomePageClient() {
         <div className="rounded-2xl bg-amber-50 border border-amber-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-sm text-amber-900">
             <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
-            <span><strong>Can&rsquo;t reach the server.</strong> SOS, fake call and helplines still work.</span>
+            <span><strong>Can&rsquo;t reach the server.</strong> Fake call and helplines still work.</span>
           </div>
           <Button variant="outline" size="sm" onClick={() => loadDashboardData()} className="shrink-0">
             Try again
@@ -223,7 +221,7 @@ export function HomePageClient() {
         </div>
       )}
 
-      {/* ── Hero: greeting + SOS ───────────────────────────── */}
+      {/* ── Hero: greeting + helplines ─────────────────────── */}
       <section className="relative overflow-hidden rounded-[1.75rem] bg-ink text-white p-6 sm:p-10">
         <div aria-hidden className="absolute -top-24 -right-20 h-80 w-80 rounded-full bg-brand/40 blur-3xl" />
         <div aria-hidden className="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-coral/25 blur-3xl" />
@@ -411,46 +409,6 @@ export function HomePageClient() {
         </Link>
       </section>
 
-      {/* SOS confirmation */}
-      <Modal
-        isOpen={sosConfirmOpen}
-        onClose={() => setSosConfirmOpen(false)}
-        title="Send an emergency SOS?"
-        description="Confirm you need help right now."
-        maxWidth="sm"
-      >
-        <div className="space-y-5 text-sm text-slate-700">
-          <ul className="space-y-2.5">
-            {[
-              'Your precise GPS location is captured from this device.',
-              'An alert with a Google Maps pin goes to your trusted contacts.',
-              'A direct call to Police (112) is prepared for you.',
-            ].map((t) => (
-              <li key={t} className="flex items-start gap-2.5">
-                <CheckCircle2 className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
-                {t}
-              </li>
-            ))}
-          </ul>
-          <div className="flex items-center justify-end gap-2.5">
-            <Button variant="outline" onClick={() => setSosConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="emergency"
-              leftIcon={<AlertTriangle className="h-4 w-4" />}
-              onClick={() => {
-                setSosConfirmOpen(false);
-                setSosModalOpen(true);
-              }}
-            >
-              Send SOS
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      <SosModal isOpen={sosModalOpen} onClose={() => setSosModalOpen(false)} />
       <FakeCallModal isOpen={fakeCallOpen} onClose={() => setFakeCallOpen(false)} />
     </div>
   );

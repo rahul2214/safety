@@ -30,6 +30,7 @@ import {
   FileText,
   AlertOctagon,
   UserPlus,
+  KeyRound,
 } from 'lucide-react';
 import {
   organizationsApi,
@@ -39,6 +40,7 @@ import {
   type OrgIncident,
   type OrgIncidentEvent,
 } from '@/portals/admin/lib/api';
+import { StaffAccountDialog } from '@/portals/admin/components/StaffAccountDialog';
 
 export default function OrgCommandCenterPage() {
   const params = useParams();
@@ -50,6 +52,7 @@ export default function OrgCommandCenterPage() {
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [incidents, setIncidents] = useState<OrgIncident[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   // Broadcast Alert Modal
   const [broadcastOpen, setBroadcastOpen] = useState(false);
@@ -265,9 +268,7 @@ export default function OrgCommandCenterPage() {
             </span>
           </div>
           <p className="text-xs text-[#5b5b6e] mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <span className="break-all">Primary Dispatch Perimeter: {org.domain || `${org.slug}.sabhijude.internal`}</span>
-            <span className="text-[#9797ab]">•</span>
-            <span className="text-emerald-600 font-semibold">All Systems Operational</span>
+            <span className="break-all">Domain: {org.domain || 'No domain set'}</span>
           </p>
         </div>
 
@@ -279,6 +280,14 @@ export default function OrgCommandCenterPage() {
             <TrendingUp size={15} className="text-[#6d4aff]" />
             <span>Safety Analytics</span>
           </Link>
+
+          <button
+            onClick={() => setLoginDialogOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-[12px] bg-white hover:bg-[#f7f7fa] text-[#16161d] border border-[#e8e8f0] text-xs font-bold transition-colors shadow-2xs"
+          >
+            <KeyRound size={15} className="text-[#6d4aff]" />
+            <span>Create login</span>
+          </button>
 
           <button
             onClick={loadAll}
@@ -719,13 +728,23 @@ export default function OrgCommandCenterPage() {
                   </button>
                 )}
 
-                <a
-                  href={`tel:${selectedIncident.reporterContact}`}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-[12px] bg-white hover:bg-[#f7f7fa] text-[#16161d] text-xs font-bold transition-all border border-[#e8e8f0] shadow-2xs"
-                >
-                  <Phone size={14} />
-                  <span>Call Reporter</span>
-                </a>
+                {selectedIncident.reporterContact ? (
+                  <a
+                    href={`tel:${selectedIncident.reporterContact}`}
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-[12px] bg-white hover:bg-[#f7f7fa] text-[#16161d] text-xs font-bold transition-all border border-[#e8e8f0] shadow-2xs"
+                  >
+                    <Phone size={14} />
+                    <span>Call Reporter</span>
+                  </a>
+                ) : (
+                  <span
+                    title="The member has not shared a phone number with your organisation, or posted anonymously."
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-[12px] bg-[#f7f7fa] text-[#a1a1b5] text-xs font-semibold border border-dashed border-[#e8e8f0] cursor-not-allowed"
+                  >
+                    <Phone size={14} />
+                    <span>No contact shared</span>
+                  </span>
+                )}
               </div>
 
               {/* Incident Details Card */}
@@ -756,7 +775,13 @@ export default function OrgCommandCenterPage() {
                   <div>
                     <span className="text-[#747488] text-[10px] block">Reporter</span>
                     <span className="font-semibold text-[#16161d] block mt-0.5">{selectedIncident.reporterName}</span>
-                    <span className="block text-[11px] text-[#5b5b6e] font-mono break-all">{selectedIncident.reporterContact}</span>
+                    {selectedIncident.reporterContact ? (
+                      <a href={`tel:${selectedIncident.reporterContact}`} className="block text-[11px] text-[#5b5b6e] font-mono break-all hover:text-rose-600">
+                        {selectedIncident.reporterContact}
+                      </a>
+                    ) : (
+                      <span className="block text-[11px] text-[#a1a1b5]">No contact shared</span>
+                    )}
                   </div>
                 </div>
 
@@ -1068,6 +1093,16 @@ export default function OrgCommandCenterPage() {
             </form>
           </div>
         </div>
+      )}
+      {loginDialogOpen && (
+        <StaffAccountDialog
+          orgId={orgId}
+          orgName={org.name}
+          onClose={() => {
+            setLoginDialogOpen(false);
+            void loadAll();
+          }}
+        />
       )}
     </div>
   );

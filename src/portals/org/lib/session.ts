@@ -1,6 +1,7 @@
 const TOKEN_KEY = 'org_token';
 const USER_KEY = 'org_user';
 const LAST_SEEN_KEY = 'org_last_seen';
+const REFRESH_KEY = 'org_refresh';
 
 /**
  * How long a portal tab may sit untouched before the session is dropped.
@@ -93,6 +94,27 @@ export function saveSession(token: string, user: unknown) {
   }
 }
 
+/**
+ * Organization staff sign in with an ordinary Sabhijude account, whose access token lasts
+ * about an hour. The refresh token lets the portal renew it without asking for the password.
+ */
+export function getRefreshToken(): string | null {
+  return store()?.getItem(REFRESH_KEY) ?? null;
+}
+
+export function saveRefreshToken(token: string | null | undefined) {
+  const s = store();
+  if (!s) return;
+  if (token) s.setItem(REFRESH_KEY, token);
+  else s.removeItem(REFRESH_KEY);
+}
+
+/** Replaces only the access token, keeping the stored user (used after a refresh). */
+export function replaceToken(token: string) {
+  store()?.setItem(TOKEN_KEY, token);
+  touchSession();
+}
+
 export function saveUser(user: unknown) {
   store()?.setItem(USER_KEY, JSON.stringify(user));
 }
@@ -105,6 +127,7 @@ export function clearSession() {
   s.removeItem(TOKEN_KEY);
   s.removeItem(USER_KEY);
   s.removeItem(LAST_SEEN_KEY);
+  s.removeItem(REFRESH_KEY);
 
   if (typeof document !== 'undefined') {
     document.cookie = 'org_session=; path=/org; max-age=0; SameSite=Lax';

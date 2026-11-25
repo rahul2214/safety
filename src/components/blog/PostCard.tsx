@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, Clock } from 'lucide-react';
-import { formatPostDate, type BlogPost } from '@/lib/blog-posts';
+import { formatPostDate, getCategory, readingMinutes, type BlogPost } from '@/lib/blog-posts';
 
 const ART = {
   red: 'from-red-600 via-rose-500 to-coral text-white',
@@ -23,7 +23,7 @@ export function PostArt({ post, size = 'card' }: { post: BlogPost; size?: 'card'
       </svg>
       <div className={`absolute inset-0 flex flex-col justify-between ${hero ? 'p-8 sm:p-12' : 'p-5'}`}>
         <span className={`self-start rounded-full bg-white/20 backdrop-blur px-3 py-1 font-semibold ${hero ? 'text-sm' : 'text-[11px]'} ${post.accent === 'coral' ? 'bg-white/70' : ''}`}>
-          {post.category}
+          {getCategory(post.category)?.name}
         </span>
         <span className={`font-display font-extrabold tracking-tight leading-none ${hero ? 'text-6xl sm:text-8xl' : 'text-5xl'}`}>{post.art}</span>
       </div>
@@ -39,9 +39,9 @@ export function BlogPostCard({ post }: { post: BlogPost }) {
       </div>
       <div className="space-y-2 px-1">
         <div className="flex items-center gap-3 text-[13px] text-slate-500">
-          <time dateTime={post.date}>{formatPostDate(post.date)}</time>
+          <time dateTime={post.updatedAt}>{formatPostDate(post.updatedAt)}</time>
           <span aria-hidden className="h-1 w-1 rounded-full bg-slate-300" />
-          <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {post.readMinutes} min read</span>
+          <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {readingMinutes(post)} min read</span>
         </div>
         <h3 className="font-display text-xl font-bold leading-snug tracking-tight text-ink group-hover:text-brand transition-colors">
           {post.title}

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { BLOG_POSTS } from '@/lib/blog-posts';
+import { BLOG_POSTS, CATEGORIES } from '@/lib/blog-posts';
 
 const BASE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -25,9 +25,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...BLOG_POSTS.map((p) => ({
       url: `${BASE_URL}/blog/${p.slug}`,
-      lastModified: `${p.date}T00:00:00+05:30`,
+      lastModified: `${p.updatedAt}T00:00:00+05:30`,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
+    })),
+    // Category pages, only for categories that have published articles (as the pages do).
+    ...CATEGORIES.filter((c) => BLOG_POSTS.some((p) => p.category === c.slug)).map((c) => ({
+      url: `${BASE_URL}/blog/category/${c.slug}`,
+      lastModified: BLOG_POSTS.filter((p) => p.category === c.slug)
+        .map((p) => p.updatedAt)
+        .sort()
+        .reverse()[0] + 'T00:00:00+05:30',
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
     })),
     {
       url: `${BASE_URL}/`,

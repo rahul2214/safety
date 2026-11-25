@@ -31,6 +31,7 @@ import {
   Users,
   User,
   Sparkles,
+  Building2,
 } from'lucide-react';
 import { Button } from'@/components/ui/Button';
 import { Card } from'@/components/ui/Card';
@@ -45,7 +46,7 @@ import {
   ReportVisibility,
   SafetyReport,
 } from'@/lib/reports-store';
-import { api, PostVisibility } from'@/lib/api-client';
+import { api, PostVisibility, type UserOrganizationConnection } from'@/lib/api-client';
 import { useAuth } from'@/lib/auth-context';
 import { MapPinPicker } from '@/components/MapPinPicker';
 import type { RequestPin } from '@/lib/requests';
@@ -99,6 +100,28 @@ export default function ReportProblemPage() {
 
   // Dynamic PostVisibility lookup from database
   const [visibilities, setVisibilities] = useState<PostVisibility[]>([]);
+
+  // Organizations the reporter is an active member of. "My organization" is offered only when
+  // there is at least one; the API also checks membership before saving.
+  const [myOrgs, setMyOrgs] = useState<UserOrganizationConnection[]>([]);
+  const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
+
+  useEffect(() => {
+  if (!user) return;
+  let cancelled = false;
+  api.getMyOrganizations().then((res) => {
+  if (cancelled || !res.ok || !res.data) return;
+  const active = res.data.filter((m) => (m.status || '').toLowerCase() === 'active');
+  setMyOrgs(active);
+  setSelectedOrgId((prev) => prev ?? active[0]?.organizationId ?? null);
+  });
+  return () => {
+  cancelled = true;
+  };
+  }, [user]);
+
+  const selectedOrg = myOrgs.find((o) => o.organizationId === selectedOrgId) ?? null;
+  const sharingWithOrg = visibility === 'MY_ORGANIZATION' && selectedOrg != null;
 
   // A shortcut can open this form with the category already chosen.
   useEffect(() => {
@@ -321,6 +344,7 @@ export default function ReportProblemPage() {
   evidenceNames: [],
   visibility,
   postVisibilityId: visibility === 'PUBLIC' ? postVisibilityId : 1,
+  // (organization posts are addressed to that organization's members, not a gender audience)
   audienceGenderId: visibility === 'PUBLIC' ? (postVisibilityId === 2 ? 1 : postVisibilityId === 3 ? 2 : postVisibilityId === 4 ? 3 : null) : null,
   isAnonymous,
   });
@@ -349,6 +373,7 @@ export default function ReportProblemPage() {
   };
 
   const backendVis = visibility === 'ONLY_ME' ? 'PRIVATE' : 'PUBLIC';
+  const orgAudience = sharingWithOrg;
   const postRes = await api.createPost({
   content: description.trim(),
   categoryId: categoryIdMap[category] ?? 1,
@@ -357,8 +382,9 @@ export default function ReportProblemPage() {
   postStatusId: 1,
   isAnonymous,
   visibility: backendVis,
-  postVisibilityId,
-  audienceGenderId: postVisibilityId === 2 ? 1 : postVisibilityId === 3 ? 2 : postVisibilityId === 4 ? 3 : null,
+  postVisibilityId: orgAudience ? 1 : postVisibilityId,
+  audienceGenderId: orgAudience ? null : postVisibilityId === 2 ? 1 : postVisibilityId === 3 ? 2 : postVisibilityId === 4 ? 3 : null,
+  organizationId: orgAudience ? selectedOrg!.organizationId : null,
   incidentDateTime: incidentIso,
   location: locationName,
   // Only sent for a ragging report; the API drops a pin on anything else.
@@ -891,9 +917,19 @@ export default function ReportProblemPage() {
                 {currentStep === 6 && (
                   <>
                     {stepHeading('Who can see this?', 'You’re in control of who sees your report.')}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className={`grid grid-cols-1 gap-3 ${myOrgs.length > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
                       {[
                         { id: 'PUBLIC' as ReportVisibility, title: 'Community', desc: 'Shared on the safety feed to warn others nearby.', icon: Globe },
+                        ...(myOrgs.length > 0
+                          ? [{
+                              id: 'MY_ORGANIZATION' as ReportVisibility,
+                              title: 'My organization',
+                              desc: myOrgs.length === 1
+                                ? `Only members of ${myOrgs[0].organizationName} can see it.`
+                                : 'Only members of the organization you choose can see it.',
+                              icon: Building2,
+                            }]
+                          : []),
                         { id: 'ONLY_ME' as ReportVisibility, title: 'Only me', desc: 'A private record for yourself. Not shared with anyone.', icon: Lock },
                       ].map((v) => {
                         const selected = visibility === v.id;
@@ -911,6 +947,29 @@ export default function ReportProblemPage() {
                         );
                       })}
                     </div>
+
+                    {visibility === 'MY_ORGANIZATION' && myOrgs.length > 1 && (
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold text-ink">Which organization?</p>
+                        <div className="flex flex-wrap gap-2">
+                          {myOrgs.map((o) => {
+                            const selected = selectedOrgId === o.organizationId;
+                            return (
+                              <button
+                                key={o.organizationId}
+                                type="button"
+                                onClick={() => setSelectedOrgId(o.organizationId)}
+                                className={`flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold transition ${
+                                  selected ? 'border-brand bg-brand-tint text-brand' : 'border-slate-200 bg-white text-slate-600 hover:text-ink'
+                                }`}
+                              >
+                                <Building2 className="h-4 w-4" /> {o.organizationName}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
 
                     {visibility === 'PUBLIC' && (
                       <div className="space-y-3">
@@ -985,7 +1044,13 @@ export default function ReportProblemPage() {
                         {
                           step: 6,
                           label: 'Visibility',
-                          value: `${visibility === 'ONLY_ME' ? 'Only me' : `Community · ${audienceLabel}`} · ${isAnonymous ? 'Anonymous' : 'Named'}`,
+                          value: `${
+                            visibility === 'ONLY_ME'
+                              ? 'Only me'
+                              : sharingWithOrg
+                              ? `Organization · ${selectedOrg!.organizationName}`
+                              : `Community · ${audienceLabel}`
+                          } · ${isAnonymous ? 'Anonymous' : 'Named'}`,
                         },
                       ].map((row) => (
                         <div key={row.label} className="flex items-start gap-4 px-4 sm:px-5 py-4">

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { AlertTriangle, CheckCircle2, EyeOff, Lock, LogOut, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/ui/Logo';
@@ -108,10 +107,10 @@ export function SuspendedScreen({
           <li className="flex gap-3">
             <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0 text-emerald-600" />
             <span>
-              Your emergency contacts and SOS still work. Safety is never suspended.{' '}
-              <Link href="/emergency" className="font-semibold text-red-600 underline">
-                Open Emergency
-              </Link>
+              SOS in the mobile app still works. Safety is never suspended. In danger now?{' '}
+              <a href="tel:112" className="font-semibold text-red-600 underline">
+                Call 112
+              </a>
             </span>
           </li>
         </ul>

@@ -114,9 +114,9 @@ export function PublicLanding({
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <button type="button" onClick={onOpenSos} className="btn-sos text-base px-7 py-4" aria-label="Send Emergency SOS Alert">
+              <button type="button" onClick={onOpenSos} className="btn-sos text-base px-7 py-4" aria-label="See how Emergency SOS works">
                 <ShieldAlert className="h-5 w-5" aria-hidden="true" />
-                Send SOS now
+                See how SOS works
               </button>
               <Link href="/signup" className="btn-brand text-base px-7 py-4 bg-ink hover:bg-ink-soft shadow-none">
                 Create free account
@@ -230,7 +230,7 @@ export function PublicLanding({
                 </div>
                 <h3 className="font-display text-2xl font-bold tracking-tight text-ink">Campus &amp; workplace security desks</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Alerts from students and staff reach your own security team in real time — no extra hardware needed.
+                  Incident reports from students and staff reach your own safety team, and you can send campus-wide alerts — no extra hardware needed.
                 </p>
               </div>
               <Link href="/organization-request" className="mt-6 self-start inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-900">

@@ -6,16 +6,18 @@ import { Button } from '@/components/ui/Button';
 import { api } from '@/lib/api-client';
 
 /**
- * Reporting a post, or the person who wrote it. Mirrors the mobile app's report sheet.
+ * Reporting a post, a comment (or reply) under it, or the person who wrote the post. Mirrors
+ * the mobile app's report sheet.
  *
- * Reporting the author goes through the post rather than a user id, so an anonymous author
- * stays anonymous: the reporter never learns who they reported.
+ * Everything is addressed through the post, never a user id, so an anonymous author stays
+ * anonymous: the reporter never learns who they reported. Anything shown anonymously can only
+ * be reported; for everyone else the dialog offers "Also block".
  *
  * The reasons are a closed list because moderation triages on them.
  */
-export type ReportTarget = 'post' | 'author';
+export type ReportTarget = 'post' | 'author' | 'comment';
 
-const REASONS: { value: string; label: string; blurb: string; postOnly?: boolean }[] = [
+const REASONS: { value: string; label: string; blurb: string; contentOnly?: boolean }[] = [
   // First on purpose: Google Play's child safety policy requires an obvious way to report
   // child sexual abuse or exploitation. Needs API + migration 00034 to be live.
   { value: 'CHILD_SAFETY', label: 'Child safety concern', blurb: 'Sexual content involving a child, grooming, or any risk to a child.' },
@@ -25,7 +27,7 @@ const REASONS: { value: string; label: string; blurb: string; postOnly?: boolean
   { value: 'SEXUAL_CONTENT', label: 'Sexual content or advances', blurb: 'Unwanted sexual messages, or explicit material.' },
   { value: 'IMPERSONATION', label: 'Pretending to be someone', blurb: 'Posing as another person, an organisation or an official.' },
   { value: 'SCAM', label: 'Scam or fraud', blurb: 'Asking for money, or trying to trick people.' },
-  { value: 'FALSE_INFORMATION', label: 'False information', blurb: 'Something in this post is untrue or misleading.', postOnly: true },
+  { value: 'FALSE_INFORMATION', label: 'False information', blurb: 'Something in it is untrue or misleading.', contentOnly: true },
   { value: 'DANGEROUS_ADVICE', label: 'Dangerous advice', blurb: 'Suggesting something that could put someone at risk.' },
   { value: 'SPAM', label: 'Spam', blurb: 'Repetitive posting, or advertising.' },
   { value: 'OTHER', label: 'Something else', blurb: "Tell us what happened and we'll look at it." },
@@ -39,25 +41,50 @@ interface ReportDialogProps {
   /** The post's public uuid. */
   postUuid: string;
   target: ReportTarget;
-  onReported: (target: ReportTarget) => void;
+  /** For target 'comment': the comment, and the reply under it when a reply is reported. */
+  solutionId?: number;
+  replyId?: number;
+  /** How the author appears, for wording only. */
+  displayName?: string;
+  /** Offer "Also block". False for anything shown anonymously. */
+  canBlock?: boolean;
+  /** Start with "Also block" ticked: the menu's "Report & block". */
+  initialAlsoBlock?: boolean;
+  onReported: (target: ReportTarget, blocked: boolean) => void;
 }
 
-export function ReportDialog({ isOpen, onClose, postUuid, target, onReported }: ReportDialogProps) {
+export function ReportDialog({
+  isOpen,
+  onClose,
+  postUuid,
+  target,
+  solutionId,
+  replyId,
+  displayName = 'this person',
+  canBlock = false,
+  initialAlsoBlock = false,
+  onReported,
+}: ReportDialogProps) {
   const [reason, setReason] = useState<string | null>(null);
   const [details, setDetails] = useState('');
+  const [alsoBlock, setAlsoBlock] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Each opening starts clean.
+  const isContent = target !== 'author';
+  const thing = target === 'comment' ? (replyId ? 'reply' : 'comment') : 'post';
+
+  // Each opening starts clean, with "Also block" as the menu asked.
   useEffect(() => {
     if (isOpen) {
       setReason(null);
       setDetails('');
       setError(null);
+      setAlsoBlock(canBlock && initialAlsoBlock);
     }
-  }, [isOpen, target]);
+  }, [isOpen, target, canBlock, initialAlsoBlock]);
 
-  const reasons = REASONS.filter((r) => target === 'post' || !r.postOnly);
+  const reasons = REASONS.filter((r) => isContent || !r.contentOnly);
 
   const submit = async () => {
     if (!reason) {
@@ -67,17 +94,21 @@ export function ReportDialog({ isOpen, onClose, postUuid, target, onReported }: 
     setSubmitting(true);
     setError(null);
     const trimmed = details.trim() || undefined;
+    const block = canBlock && alsoBlock;
     const res =
       target === 'post'
-        ? await api.reportPost(postUuid, reason, trimmed)
-        : await api.reportPostAuthor(postUuid, reason, trimmed);
+        ? await api.reportPost(postUuid, reason, trimmed, block)
+        : target === 'comment' && solutionId != null
+          ? await api.reportComment(postUuid, solutionId, { reason, details: trimmed, replyId, alsoBlock: block })
+          : await api.reportPostAuthor(postUuid, reason, trimmed);
     setSubmitting(false);
 
     if (!res.ok) {
       setError(res.error || 'The report could not be sent. Please try again.');
       return;
     }
-    onReported(target);
+    const blocked = !!(res.data as { blocked?: boolean } | undefined)?.blocked;
+    onReported(target, blocked);
     onClose();
   };
 
@@ -85,13 +116,13 @@ export function ReportDialog({ isOpen, onClose, postUuid, target, onReported }: 
     <Modal
       isOpen={isOpen}
       onClose={() => !submitting && onClose()}
-      title={target === 'post' ? 'Report this post' : 'Report the person who posted this'}
+      title={isContent ? `Report this ${thing}` : 'Report the person who posted this'}
       size="md"
     >
       <div className="space-y-4">
         <p className="text-sm text-slate-500">
-          {target === 'post'
-            ? 'Moderators will review this post. The author is not told who reported it.'
+          {isContent
+            ? `Moderators will review this ${thing}. The author is not told who reported it.`
             : 'Moderators will review this account. They are not told who reported them, and if the post is anonymous you will not learn who they are either.'}
         </p>
 
@@ -123,6 +154,25 @@ export function ReportDialog({ isOpen, onClose, postUuid, target, onReported }: 
           })}
         </fieldset>
 
+        {canBlock && (
+          <label
+            className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition-colors ${
+              alsoBlock ? 'border-red-300 bg-red-50' : 'border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={alsoBlock}
+              onChange={(e) => setAlsoBlock(e.target.checked)}
+              className="mt-1 accent-red-600"
+            />
+            <span>
+              <span className="block text-sm font-semibold text-ink">Also block {displayName}</span>
+              <span className="block text-xs text-slate-500">Hide their posts and comments from you. They are not told.</span>
+            </span>
+          </label>
+        )}
+
         {reason && (
           <div className="space-y-1">
             <label htmlFor="report-details" className="text-sm font-semibold text-ink">
@@ -153,7 +203,7 @@ export function ReportDialog({ isOpen, onClose, postUuid, target, onReported }: 
             Cancel
           </Button>
           <Button variant="emergency" onClick={submit} loading={submitting} disabled={!reason}>
-            Send report
+            {canBlock && alsoBlock ? 'Report & block' : 'Send report'}
           </Button>
         </div>
       </div>

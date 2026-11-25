@@ -1,4 +1,13 @@
-import { clearSession, getToken, isTokenExpired, onSessionChange, touchSession } from './session';
+import {
+  clearSession,
+  getRefreshToken,
+  getToken,
+  isTokenExpired,
+  onSessionChange,
+  replaceToken,
+  saveRefreshToken,
+  touchSession,
+} from './session';
 
 const DEFAULT_PROD_API = 'https://safecircle-api-752721321209.asia-south1.run.app';
 
@@ -25,6 +34,54 @@ const orgCache = new Map<string, OrgCacheEntry>();
 onSessionChange(() => orgCache.clear());
 const ORG_CACHE_TTL = 30 * 1000; // 30 seconds
 
+let refreshInFlight: Promise<string | null> | null = null;
+
+/**
+ * Renews an organization-staff session (a Sabhijude user token, about an hour long) with its
+ * refresh token. Platform-admin sessions have no refresh token and simply expire.
+ * Concurrent callers share one request, since Supabase rotates the refresh token on use.
+ */
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
+  refreshInFlight ??= (async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/Auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      const json = await res.json().catch(() => null);
+      const payload = json?.data ?? json;
+      const accessToken: string | undefined = payload?.accessToken;
+      if (!res.ok || !accessToken) return null;
+      replaceToken(accessToken);
+      saveRefreshToken(payload?.refreshToken ?? refreshToken);
+      return accessToken;
+    } catch {
+      return null;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+
+  return refreshInFlight;
+}
+
+/**
+ * The current session token, renewed first if it has expired. For connections that read the
+ * token directly instead of going through adminFetch, such as the live SafetyHub socket, which
+ * would otherwise present an expired staff token and be refused.
+ */
+export async function getFreshToken(): Promise<string | null> {
+  const token = getToken();
+  if (token && isTokenExpired(token)) {
+    return (await refreshAccessToken()) ?? null;
+  }
+  return token;
+}
+
 export async function adminFetch<T = any>(
   endpoint: string,
   options: RequestInit & { forceRefresh?: boolean } = {}
@@ -40,7 +97,12 @@ export async function adminFetch<T = any>(
     }
   }
 
-  const token = getToken();
+  let token = getToken();
+
+  // An expired staff token is renewed first; only when that fails is the session dropped.
+  if (token && isTokenExpired(token)) {
+    token = (await refreshAccessToken()) ?? token;
+  }
 
   // Drop a token that has already expired instead of sending it. Saves a round trip and
   // gets the user to the login screen immediately; the server still verifies every token
@@ -233,12 +295,62 @@ export interface OrgIncident {
   reporterName: string;
   reporterContact: string;
   reporterId?: number;
+  /** The shared post this incident was opened for, if any. */
+  postId?: number | null;
   assignedOfficerName?: string;
   assignedOfficerId?: number;
   createdAt: string;
   updatedAt?: string;
   resolvedAt?: string;
   dispatchTimeline: OrgIncidentEvent[];
+}
+
+/** A post a member shared with the organization (dashboard Posts page). */
+export interface OrgPost {
+  id: number;
+  uuid?: string | null;
+  content: string;
+  categoryName?: string | null;
+  severity: string;
+  riskLevel: string;
+  /** APPROVED, PENDING/REVIEW while held for moderation, REJECTED/REMOVED when not published. */
+  moderationState: string;
+  isAnonymous: boolean;
+  /** Null for anonymous posts. */
+  authorName?: string | null;
+  location?: string | null;
+  createdAt: string;
+  incidentId?: number | null;
+  incidentStatus?: string | null;
+  supportCount?: number;
+  similarCount?: number;
+  /** Published comments (replies not included). */
+  commentCount?: number;
+}
+
+export interface OrgPostReply {
+  id: number;
+  content: string;
+  authorName: string;
+  authorAvatarUrl?: string | null;
+  isOriginalPoster: boolean;
+  isVerifiedExpert: boolean;
+  createdAt: string;
+}
+
+export interface OrgPostComment extends OrgPostReply {
+  isAccepted: boolean;
+  helpfulCount: number;
+  notHelpfulCount: number;
+  replies: OrgPostReply[];
+}
+
+export interface OrgPostDetail {
+  post: OrgPost;
+  supportCount: number;
+  similarCount: number;
+  commentCount: number;
+  comments: OrgPostComment[];
 }
 
 export interface OrgAnalyticsOverview {
@@ -297,7 +409,38 @@ export interface OrgAuditLog {
   timestamp: string;
 }
 
+export interface OrgSettings {
+  id: number;
+  name: string;
+  slug: string;
+  type: string;
+  plan: string;
+  /** Set by the Sabhijude team; read-only here. */
+  domain?: string | null;
+  joinCode?: string | null;
+  officialEmail?: string | null;
+  officialPhone?: string | null;
+  website?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+}
+
+export type OrgSettingsInput = Pick<
+  OrgSettings,
+  'name' | 'officialEmail' | 'officialPhone' | 'website' | 'address' | 'city' | 'state'
+>;
+
 export const organizationsApi = {
+  getSettings: (id: number) =>
+    adminFetch<OrgSettings>(`/api/Organizations/${id}/settings`, { forceRefresh: true }),
+  updateSettings: (id: number, data: OrgSettingsInput) =>
+    adminFetch<OrgSettings>(`/api/Organizations/${id}/settings`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  regenerateJoinCode: (id: number) =>
+    adminFetch<{ joinCode: string }>(`/api/Organizations/${id}/join-code/regenerate`, { method: 'POST' }),
   getAll: (search?: string) =>
     adminFetch<Organization[]>(`/api/Organizations${search ? `?search=${encodeURIComponent(search)}` : ''}`),
   getByIdOrSlug: (idOrSlug: string | number) =>
@@ -314,15 +457,19 @@ export const organizationsApi = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  getDashboardStats: (id: number) =>
-    adminFetch<OrgDashboardStats>(`/api/Organizations/${id}/dashboard/stats`),
-  getIncidents: (id: number, params?: { status?: string; severity?: string }) => {
+  getDashboardStats: (id: number, forceRefresh = false) =>
+    adminFetch<OrgDashboardStats>(`/api/Organizations/${id}/dashboard/stats`, { forceRefresh }),
+  getIncidents: (id: number, params?: { status?: string; severity?: string }, forceRefresh = false) => {
     const q = new URLSearchParams();
     if (params?.status) q.set('status', params.status);
     if (params?.severity) q.set('severity', params.severity);
     const qs = q.toString() ? `?${q.toString()}` : '';
-    return adminFetch<OrgIncident[]>(`/api/Organizations/${id}/incidents${qs}`);
+    return adminFetch<OrgIncident[]>(`/api/Organizations/${id}/incidents${qs}`, { forceRefresh });
   },
+  getPosts: (id: number, forceRefresh = false) =>
+    adminFetch<OrgPost[]>(`/api/Organizations/${id}/posts`, { forceRefresh }),
+  getPostDetail: (id: number, postId: number, forceRefresh = false) =>
+    adminFetch<OrgPostDetail>(`/api/Organizations/${id}/posts/${postId}`, { forceRefresh }),
   getIncidentById: (id: number, incidentId: number) =>
     adminFetch<OrgIncident>(`/api/Organizations/${id}/incidents/${incidentId}`),
   updateIncidentStatus: (id: number, incidentId: number, data: { status: string; assignedOfficerName?: string; notes?: string }) =>
@@ -455,4 +602,16 @@ export const organizationMembersApi = {
 
 export const organizationBroadcastsApi = {
   list: (orgId: number) => adminFetch<OrgBroadcast[]>(`/api/Organizations/${orgId}/broadcasts`),
+};
+
+/**
+ * Changes the signed-in account's own password. Organization staff use the Sabhijude
+ * account endpoint; platform admins use the admin one.
+ */
+export const accountApi = {
+  changePassword: (kind: 'staff' | 'admin', currentPassword: string, newPassword: string) =>
+    adminFetch<{ message?: string }>(
+      kind === 'staff' ? '/api/Auth/change-password' : '/api/admin/auth/change-password',
+      { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }
+    ),
 };

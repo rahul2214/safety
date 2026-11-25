@@ -97,8 +97,8 @@ export default function OrgLoginPage() {
         </form>
 
         <div className="mt-6 pt-5 border-t border-[#e8e8f0] text-center space-y-2">
-          <p className="text-[10.5px] text-[#9797ab]">
-            Protected by Sabhijude Multi-Tenant Security Command
+          <p className="text-[11px] text-[#5b5b6e]">
+            Use the email and password the Sabhijude team created for your organization.
           </p>
           <div className="pt-1">
             <Link

@@ -23,11 +23,6 @@ const OPTIONAL_CONSENTS = [
     help: 'Your phone number and email, so campus security can reach you.',
   },
   {
-    scope: 'location_during_sos',
-    label: 'Location during an SOS',
-    help: 'Only while you have an SOS active, so responders can find you.',
-  },
-  {
     scope: 'location_sharing',
     label: 'Live location sharing',
     help: 'Your location at other times. Most students leave this off.',

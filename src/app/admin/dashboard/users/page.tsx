@@ -16,6 +16,7 @@ import {
   Loader2,
   X,
   Trash2,
+  Flag,
 } from 'lucide-react';
 
 export default function UsersManagementPage() {
@@ -42,7 +43,9 @@ export default function UsersManagementPage() {
     const params = new URLSearchParams();
     if (search.trim()) params.set('search', search.trim());
     if (roleFilter) params.set('role', roleFilter);
-    if (bannedFilter !== '') params.set('isBanned', bannedFilter);
+    // "flagged": accounts several members reported, waiting for a moderator to look.
+    if (bannedFilter === 'flagged') params.set('flagged', 'true');
+    else if (bannedFilter !== '') params.set('isBanned', bannedFilter);
     params.set('page', page.toString());
     params.set('limit', '15');
 
@@ -88,6 +91,15 @@ export default function UsersManagementPage() {
       }
     }
     setActionLoading(false);
+  };
+
+  // Marks a flagged account as looked at. New reports afterwards can flag it again.
+  const handleClearFlag = async (u: any) => {
+    setActionLoading(true);
+    const res = await adminFetch(`/api/admin/users/${u.id}/clear-flag`, { method: 'POST' });
+    setActionLoading(false);
+    if (res.ok) fetchUsers();
+    else alert(res.error?.message || 'Could not clear the flag.');
   };
 
   const handleUpdateRole = async () => {
@@ -167,6 +179,7 @@ export default function UsersManagementPage() {
             <option value="">All Statuses</option>
             <option value="false">Active Only</option>
             <option value="true">Banned Only</option>
+            <option value="flagged">Flagged for review</option>
           </select>
         </div>
       </div>
@@ -231,11 +244,29 @@ export default function UsersManagementPage() {
                           <CheckCircle2 size={11} /> Active
                         </span>
                       )}
+                      {u.reviewFlaggedAt && (
+                        <span
+                          className="mt-1 flex w-fit items-center gap-1 text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold"
+                          title={`${u.reviewFlagReason || 'Reported by several members.'} Flagged ${new Date(u.reviewFlaggedAt).toLocaleString()}.`}
+                        >
+                          <Flag size={11} /> Flagged for review
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-3.5 text-[#717184] text-[11.5px]">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-3.5 text-right space-x-1.5 whitespace-nowrap">
+                      {u.reviewFlaggedAt && (
+                        <button
+                          onClick={() => void handleClearFlag(u)}
+                          disabled={actionLoading}
+                          className="px-2.5 py-1 rounded-[8px] bg-white border border-amber-200 hover:bg-amber-50 text-amber-800 text-[11.5px] font-semibold transition-colors shadow-2xs disabled:opacity-50"
+                          title="Mark this flagged account as reviewed"
+                        >
+                          Clear flag
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           setSelectedUser(u);

@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { getBreadcrumbSchema, getFaqSchema } from '@/lib/seo-schemas';
-import { BLOG_POSTS } from '@/lib/blog-posts';
+import { getPostsByCategory } from '@/lib/blog-posts';
 import { BlogPostCard } from '@/components/blog/PostCard';
 import { BloodGroupMatcher } from '@/components/blood/BloodGroupMatcher';
 import { RequestShowcaseVisual } from '@/components/blood/RequestShowcaseVisual';
@@ -65,7 +65,7 @@ const STATS = [
 ];
 
 export default function BloodDonationPage() {
-  const posts = BLOG_POSTS.slice(0, 3);
+  const posts = getPostsByCategory('blood-donation').slice(0, 3);
   return (
     <div className="bg-white">
       <JsonLd data={getBreadcrumbSchema([{ name: 'Home', item: '/' }, { name: 'Blood requests', item: '/blood-donation' }])} />

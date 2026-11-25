@@ -17,12 +17,14 @@ import {
   ChevronRight,
   Shield,
   LifeBuoy,
+  MessageSquareHeart,
   X,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/admin/dashboard/support', label: 'Support & Help Desk', icon: LifeBuoy },
+  { href: '/admin/dashboard/feedback', label: 'User Feedback', icon: MessageSquareHeart },
   { href: '/admin/dashboard/organizations', label: 'Organizations & Campuses', icon: Building2 },
   { href: '/admin/dashboard/users', label: 'User Directory', icon: Users },
   { href: '/admin/dashboard/moderation', label: 'Moderation Queue', icon: ShieldAlert },

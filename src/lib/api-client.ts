@@ -80,6 +80,8 @@ export interface DiscoverFeed {
 
 export interface BackendPost {
   id: number;
+  /** On the single-post view of an organization post: the organization's status and notes. */
+  organizationUpdates?: import('@/components/OrgUpdatesCard').PostOrgUpdates | null;
   uuid?: string;
   content: string;
   severity: string;
@@ -510,9 +512,20 @@ export const api = {
   },
 
   // Feed & Posts
-  async getFeed(params?: { category?: number; limit?: number; cursor?: string; forceRefresh?: boolean }) {
+  async getFeed(params?: {
+    category?: number;
+    limit?: number;
+    cursor?: string;
+    forceRefresh?: boolean;
+    /** 'community' = community posts only; 'organizations' = posts from the reader's organizations. */
+    scope?: 'community' | 'organizations';
+    /** One organization the reader belongs to. */
+    organizationId?: number;
+  }) {
     const query = new URLSearchParams();
     if (params?.category) query.set('category', params.category.toString());
+    if (params?.scope) query.set('scope', params.scope);
+    if (params?.organizationId) query.set('organizationId', params.organizationId.toString());
     if (params?.limit) query.set('limit', params.limit.toString());
     if (params?.cursor) query.set('cursor', params.cursor);
 
@@ -562,6 +575,8 @@ export const api = {
     /** The pinned place. Optional, and only kept for a Ragging report. */
     latitude?: number;
     longitude?: number;
+    /** Share with this organization's members only. The author must be a member. */
+    organizationId?: number | null;
   }) {
     const derivedSeverityId =
       payload.postSeverityId ||
@@ -591,6 +606,7 @@ export const api = {
         location: payload.location,
         latitude: payload.latitude,
         longitude: payload.longitude,
+        organizationId: payload.organizationId ?? null,
       }),
     });
   },
@@ -671,11 +687,39 @@ export const api = {
   },
 
   /** Reports the post itself to moderators. */
-  async reportPost(uuid: string, reason: string, details?: string) {
-    return request<{ reported: boolean }>(`/api/posts/${encodeURIComponent(uuid)}/report`, {
+  /** Report a post; alsoBlock also blocks its author (refused for an anonymous post). */
+  async reportPost(uuid: string, reason: string, details?: string, alsoBlock = false) {
+    return request<{ reported: boolean; blocked?: boolean }>(`/api/posts/${encodeURIComponent(uuid)}/report`, {
       method: 'POST',
-      body: JSON.stringify({ reason, details }),
+      body: JSON.stringify({ reason, details, alsoBlock }),
     });
+  },
+
+  /** Block the author of a post. Not available for anonymous posts. */
+  async blockPostAuthor(uuid: string) {
+    return request<{ blocked: boolean }>(`/api/posts/${encodeURIComponent(uuid)}/block-author`, {
+      method: 'POST',
+    });
+  },
+
+  /** Report a comment, or one reply under it (replyId). */
+  async reportComment(
+    uuid: string,
+    solutionId: number,
+    data: { reason: string; details?: string; replyId?: number; alsoBlock?: boolean }
+  ) {
+    return request<{ reported: boolean; blocked?: boolean }>(
+      `/api/posts/${encodeURIComponent(uuid)}/solutions/${solutionId}/report`,
+      { method: 'POST', body: JSON.stringify(data) }
+    );
+  },
+
+  /** Block whoever wrote a comment or reply. Not available when they are shown anonymously. */
+  async blockCommentAuthor(uuid: string, solutionId: number, replyId?: number) {
+    return request<{ blocked: boolean }>(
+      `/api/posts/${encodeURIComponent(uuid)}/solutions/${solutionId}/block-author${replyId ? `?replyId=${replyId}` : ''}`,
+      { method: 'POST' }
+    );
   },
 
   /**
@@ -874,6 +918,8 @@ export const api = {
     bloodGroup?: string;
     displayName?: string;
     bio?: string;
+    /** 10-digit mobile number; mainly for accounts created with Google. */
+    phoneNumber?: string;
   }) {
     return request('/api/auth/profile', {
       method: 'PATCH',
@@ -1110,6 +1156,20 @@ export const api = {
   // Requires authentication; the backend identifies the user from the JWT only.
   async getSupportTickets(forceRefresh = false) {
     return request<SupportTicket[]>('/api/support/tickets/mine', {}, 1, { forceRefresh });
+  },
+
+  /** Product feedback. Linked to the account when signed in; contactEmail only for visitors. */
+  async submitFeedback(payload: {
+    rating?: number | null;
+    category: 'BUG' | 'IDEA' | 'PRAISE' | 'OTHER';
+    message: string;
+    page?: string;
+    contactEmail?: string;
+  }) {
+    return request<{ id: number; received: boolean }>('/api/feedback', {
+      method: 'POST',
+      body: JSON.stringify({ ...payload, platform: 'WEB' }),
+    });
   },
 
   async createSupportTicket(payload: CreateSupportTicketPayload) {
