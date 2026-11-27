@@ -5,6 +5,13 @@ import { useRouter, usePathname } from 'next/navigation';
 import { adminFetch } from './api';
 import { clearSession, getStoredUser, getToken, saveSession, saveUser } from './session';
 
+/** What the admin needs to add Sabhijude to an authenticator app. */
+export interface MfaSetupData {
+  secret: string;
+  qrCodeUri: string;
+  recoveryCodes: string[];
+}
+
 export interface AdminUser {
   id: number;
   email: string;
@@ -19,8 +26,10 @@ export interface AdminUser {
 interface AuthContextType {
   admin: AdminUser | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; mfaRequired?: boolean; challengeToken?: string; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; mfaRequired?: boolean; mfaSetupRequired?: boolean; challengeToken?: string; error?: string }>;
   verifyMfa: (challengeToken: string, code: string) => Promise<{ success: boolean; error?: string }>;
+  beginMfaSetup: (setupToken: string) => Promise<{ data?: MfaSetupData; error?: string }>;
+  completeMfaSetup: (setupToken: string, setup: MfaSetupData, code: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
 }
@@ -30,6 +39,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   login: async () => ({ success: false }),
   verifyMfa: async () => ({ success: false }),
+  beginMfaSetup: async () => ({}),
+  completeMfaSetup: async () => ({ success: false }),
   logout: () => {},
   refreshProfile: async () => {},
 });
@@ -95,6 +106,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           challengeToken: payload.challengeToken,
         };
       }
+      // Correct password, but two-step verification must be set up before any session.
+      if (payload.mfaSetupRequired && payload.challengeToken) {
+        return {
+          success: false,
+          mfaSetupRequired: true,
+          challengeToken: payload.challengeToken,
+        };
+      }
 
       const token = (payload as any).token;
       const adminUser = (payload as any).admin;
@@ -136,6 +155,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   };
 
+  const beginMfaSetup = async (setupToken: string) => {
+    const res = await adminFetch<MfaSetupData>('/api/admin/auth/mfa/setup-challenge', {
+      method: 'POST',
+      body: JSON.stringify({ challengeToken: setupToken }),
+    });
+    const payload: any = res.ok && res.data ? (res.data as any).data || res.data : null;
+    if (payload?.secret && payload?.qrCodeUri) {
+      return { data: { secret: payload.secret, qrCodeUri: payload.qrCodeUri, recoveryCodes: payload.recoveryCodes ?? [] } };
+    }
+    return { error: res.error?.message || 'Could not start two-step verification setup. Please sign in again.' };
+  };
+
+  const completeMfaSetup = async (setupToken: string, setup: MfaSetupData, code: string) => {
+    const res = await adminFetch<{ token: string; admin: AdminUser }>('/api/admin/auth/mfa/complete-setup', {
+      method: 'POST',
+      body: JSON.stringify({ challengeToken: setupToken, secret: setup.secret, code, recoveryCodes: setup.recoveryCodes }),
+    });
+    const payload: any = res.ok && res.data ? (res.data as any).data || res.data : null;
+    if (payload?.token && payload?.admin) {
+      saveSession(payload.token, payload.admin);
+      setAdmin(payload.admin);
+      return { success: true };
+    }
+    return { success: false, error: res.error?.message || 'That code did not match. Check your authenticator app and try again.' };
+  };
+
   const logout = () => {
     adminFetch('/api/admin/auth/logout', { method: 'POST' }).catch(() => {});
     clearSession();
@@ -144,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ admin, loading, login, verifyMfa, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ admin, loading, login, verifyMfa, beginMfaSetup, completeMfaSetup, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

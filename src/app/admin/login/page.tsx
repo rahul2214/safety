@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAdminAuth } from '@/portals/admin/lib/auth-context';
+import { MfaSetupStep } from '@/portals/admin/components/MfaSetupStep';
 import { Shield, Lock, Mail, AlertCircle, Loader2, ArrowRight, KeyRound, ChevronLeft } from 'lucide-react';
 
 export default function LoginPage() {
@@ -11,6 +12,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [mfaCode, setMfaCode] = useState('');
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  // Set when the account must set up two-step verification before it can sign in.
+  const [setupToken, setSetupToken] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { login, verifyMfa } = useAdminAuth();
@@ -28,6 +31,8 @@ export default function LoginPage() {
       window.location.href = '/admin/dashboard';
     } else if (res.mfaRequired && res.challengeToken) {
       setChallengeToken(res.challengeToken);
+    } else if (res.mfaSetupRequired && res.challengeToken) {
+      setSetupToken(res.challengeToken);
     } else {
       setError(res.error || 'Invalid administrator credentials');
     }
@@ -54,26 +59,39 @@ export default function LoginPage() {
       <div className="relative z-10 max-w-md w-full bg-white border border-[#e8e8f0] rounded-[22px] p-7 sm:p-8 shadow-sm">
         <div className="flex flex-col items-center mb-6 text-center">
           <div className="h-14 w-14 bg-[#6d4aff] rounded-[18px] flex items-center justify-center text-white shadow-md shadow-[#6d4aff]/20 mb-3.5">
-            {challengeToken ? <KeyRound size={28} /> : <Shield size={28} className="fill-white/20" />}
+            {challengeToken || setupToken ? <KeyRound size={28} /> : <Shield size={28} className="fill-white/20" />}
           </div>
           <h1 className="text-[22px] font-black text-[#16161d] tracking-tight">
-            {challengeToken ? 'Two-Factor Verification' : 'Sabhijude Admin Console'}
+            {setupToken ? 'Set up two-step verification' : challengeToken ? 'Two-Factor Verification' : 'Sabhijude Admin Console'}
           </h1>
           <p className="text-[13px] text-[#5b5b6e] mt-1">
-            {challengeToken
+            {setupToken
+              ? 'Required for every administrator. It takes about two minutes.'
+              : challengeToken
               ? 'Enter the 6-digit code from your authenticator app or recovery code'
               : 'Platform moderation, incident triage & responder operations'}
           </p>
         </div>
 
-        {error && (
+        {error && !setupToken && (
           <div className="mb-5 p-3 bg-[#e11d48]/10 border border-[#e11d48]/20 rounded-[12px] flex items-center gap-2.5 text-[#e11d48] text-xs font-medium">
             <AlertCircle size={16} className="shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        {challengeToken ? (
+        {setupToken ? (
+          <MfaSetupStep
+            setupToken={setupToken}
+            onDone={() => {
+              window.location.href = '/admin/dashboard';
+            }}
+            onCancel={() => {
+              setSetupToken(null);
+              setError('');
+            }}
+          />
+        ) : challengeToken ? (
           <form onSubmit={handleMfaSubmit} className="space-y-4">
             <div>
               <label className="block text-[10.5px] font-black text-[#5b5b6e] uppercase tracking-[1px] mb-1.5">

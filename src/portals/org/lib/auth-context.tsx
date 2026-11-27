@@ -192,6 +192,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     const payload: any = res.ok ? (res.data as any)?.data || res.data : null;
+    if (payload?.mfaRequired || payload?.mfaSetupRequired) {
+      return {
+        success: false as const,
+        error: {
+          code: 'USE_ADMIN_CONSOLE',
+          message: 'Sabhijude administrators sign in at /admin/login, which asks for your two-step verification code.',
+        },
+      };
+    }
     if (payload?.token && payload?.admin) {
       const adminUser: AdminUser = { ...payload.admin, kind: 'admin' };
       saveSession(payload.token, adminUser);
@@ -215,6 +224,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const platform = await loginAsPlatformAdmin(email, password);
     if (platform.success) return { success: true };
+    if (platform.error?.code === 'USE_ADMIN_CONSOLE') return { success: false, error: platform.error.message };
 
     return {
       success: false,
