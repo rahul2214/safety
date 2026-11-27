@@ -31,6 +31,7 @@ import {
   AlertOctagon,
   UserPlus,
   KeyRound,
+  Ban,
 } from 'lucide-react';
 import {
   organizationsApi,
@@ -41,6 +42,7 @@ import {
   type OrgIncidentEvent,
 } from '@/portals/admin/lib/api';
 import { StaffAccountDialog } from '@/portals/admin/components/StaffAccountDialog';
+import { SuspendOrgDialog } from '@/portals/admin/components/SuspendOrgDialog';
 
 export default function OrgCommandCenterPage() {
   const params = useParams();
@@ -53,6 +55,7 @@ export default function OrgCommandCenterPage() {
   const [incidents, setIncidents] = useState<OrgIncident[]>([]);
   const [loading, setLoading] = useState(true);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
 
   // Broadcast Alert Modal
   const [broadcastOpen, setBroadcastOpen] = useState(false);
@@ -258,8 +261,15 @@ export default function OrgCommandCenterPage() {
       <div className="bg-white border border-[#e8e8f0] p-6 rounded-[20px] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
+            <div
+              className={`h-3 w-3 rounded-full ${org.isSuspended ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'}`}
+            />
             <h1 className="text-xl font-black text-[#16161d] tracking-tight">{org.name}</h1>
+            {org.isSuspended && (
+              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-[8px] bg-red-600 text-white">
+                Suspended
+              </span>
+            )}
             <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-[8px] bg-rose-50 text-rose-600 border border-rose-100">
               {org.plan}
             </span>
@@ -287,6 +297,18 @@ export default function OrgCommandCenterPage() {
           >
             <KeyRound size={15} className="text-[#6d4aff]" />
             <span>Create login</span>
+          </button>
+
+          <button
+            onClick={() => setSuspendDialogOpen(true)}
+            className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-[12px] text-xs font-bold transition-colors shadow-2xs border ${
+              org.isSuspended
+                ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+                : 'bg-white hover:bg-red-50 text-red-600 border-red-200'
+            }`}
+          >
+            {org.isSuspended ? <CheckCircle2 size={15} /> : <Ban size={15} />}
+            <span>{org.isSuspended ? 'Reactivate' : 'Suspend'}</span>
           </button>
 
           <button
@@ -1093,6 +1115,13 @@ export default function OrgCommandCenterPage() {
             </form>
           </div>
         </div>
+      )}
+      {suspendDialogOpen && (
+        <SuspendOrgDialog
+          org={org}
+          onClose={() => setSuspendDialogOpen(false)}
+          onChanged={(updated) => setOrg(updated)}
+        />
       )}
       {loginDialogOpen && (
         <StaffAccountDialog

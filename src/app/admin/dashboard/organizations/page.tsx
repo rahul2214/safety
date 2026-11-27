@@ -430,8 +430,13 @@ export default function OrganizationsPage() {
                     </div>
 
                     {/* Name & Domain */}
-                    <h3 className="text-base font-bold text-[#16161d] group-hover:text-[#6d4aff] transition-colors">
-                      {org.name}
+                    <h3 className="text-base font-bold text-[#16161d] group-hover:text-[#6d4aff] transition-colors flex items-center gap-2 flex-wrap">
+                      <span>{org.name}</span>
+                      {org.isSuspended && (
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-[8px] bg-red-600 text-white">
+                          Suspended
+                        </span>
+                      )}
                     </h3>
                     <p className="text-xs text-[#747488] font-mono mt-0.5 break-all">
                       {org.domain || 'No domain set'}

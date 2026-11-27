@@ -144,6 +144,10 @@ export interface Organization {
   logoUrl?: string;
   plan: 'STARTER' | 'PRO' | 'ENTERPRISE' | string;
   isActive: boolean;
+  /** active, suspended or pending_verification. */
+  status?: string;
+  /** Suspended by a platform admin: its staff have no organization access. */
+  isSuspended?: boolean;
   memberCount: number;
   activeIncidentsCount: number;
   safetyScore: number;
@@ -312,6 +316,14 @@ export const organizationsApi = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+  /** Takes all organization access away from its staff. The reason goes in its audit log. */
+  suspend: (id: number, reason: string) =>
+    adminFetch<Organization>(`/api/Organizations/${id}/suspend`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    }),
+  reactivate: (id: number) =>
+    adminFetch<Organization>(`/api/Organizations/${id}/reactivate`, { method: 'POST' }),
   getMembers: (id: number) =>
     adminFetch<OrganizationMember[]>(`/api/Organizations/${id}/members`),
   addMember: (id: number, data: { email: string; role?: string; department?: string; title?: string }) =>

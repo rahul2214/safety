@@ -54,16 +54,26 @@ interface StaffMembership {
   organizationId: number;
   organizationName: string;
   role: string;
+  /** Suspended by the Sabhijude team: the staff role grants nothing until it is lifted. */
+  organizationSuspended?: boolean;
 }
+
+const SUSPENDED_MESSAGE =
+  "Your organization's portal access has been suspended. Contact the Sabhijude team to restore it.";
 
 const INVALID_LOGIN = 'Incorrect email or password.';
 
-/** The staff roles this account holds, across all its organizations. */
+/**
+ * The staff roles this account holds, across all its organizations, including those in
+ * suspended organizations (see activeOnly).
+ */
 async function loadStaffMemberships(): Promise<StaffMembership[] | null> {
   const res = await adminFetch<StaffMembership[]>('/api/users/me/organizations', { forceRefresh: true });
   if (!res.ok || !res.data) return null;
   return res.data.filter((m) => STAFF_ROLES.includes(m.role?.toUpperCase() as (typeof STAFF_ROLES)[number]));
 }
+
+const activeOnly = (memberships: StaffMembership[]) => memberships.filter((m) => !m.organizationSuspended);
 
 function roleLabel(memberships: StaffMembership[]): string {
   const order = ['OWNER', 'ORG_ADMIN', 'SECURITY_OFFICER'];
@@ -82,13 +92,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (stored?.kind === 'staff') {
       // Confirms the session is alive and the account still holds a staff role.
-      const memberships = await loadStaffMemberships();
+      const all = await loadStaffMemberships();
+      const memberships = all ? activeOnly(all) : null;
       if (memberships && memberships.length > 0) {
         const next = { ...stored, role: roleLabel(memberships) };
         setAdmin(next);
         saveUser(next);
       } else if (memberships) {
-        // Still signed in, but no longer staff anywhere.
+        // Still signed in, but no longer staff anywhere (or every organization is suspended).
         clearSession();
         setAdmin(null);
       }
@@ -165,7 +176,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     saveSession(accessToken, profile);
     saveRefreshToken(refreshToken);
 
-    const memberships = await loadStaffMemberships();
+    const all = await loadStaffMemberships();
+    const memberships = all ? activeOnly(all) : null;
+    if (all && all.length > 0 && memberships && memberships.length === 0) {
+      clearSession();
+      return {
+        success: false as const,
+        error: { code: 'ORGANIZATION_SUSPENDED', message: SUSPENDED_MESSAGE },
+      };
+    }
     if (!memberships || memberships.length === 0) {
       clearSession();
       return {
@@ -215,7 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (staff.success) return { success: true };
 
     // Signed in fine but holds no staff role: say so rather than trying the admin login.
-    if (staff.error?.code === 'NOT_ORG_STAFF') {
+    if (staff.error?.code === 'NOT_ORG_STAFF' || staff.error?.code === 'ORGANIZATION_SUSPENDED') {
       return { success: false, error: staff.error.message };
     }
     if (staff.error?.code === 'TOO_MANY_ATTEMPTS' || staff.error?.code === 'EMAIL_NOT_VERIFIED') {
